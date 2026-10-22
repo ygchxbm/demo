@@ -1,0 +1,88 @@
+/* V2.2 finalized business layouts. */
+:root{--explore-gap:.65rem;--explore-line:color-mix(in srgb,var(--accent) 24%,transparent);--explore-surface:color-mix(in srgb,var(--surface) 88%,transparent)}
+:root .app{grid-template-rows:4.5rem auto minmax(0,1fr) 1.5rem}
+:root .navigation{flex-wrap:wrap;gap:.35rem;padding:.4rem 0 .65rem}
+:root .nav-tabs{gap:.5rem;flex-wrap:wrap;justify-content:center}
+:root .nav-tabs button{min-height:2rem}
+:root .demo-label{position:static;margin-left:auto}
+.view-switch button{font-size:.7rem;line-height:1.5;padding:.35rem .7rem;background:color-mix(in srgb,var(--surface) 60%,transparent);border:1px solid var(--border);border-radius:2px;color:var(--muted);white-space:nowrap}
+.view-switch button[aria-pressed=true]{color:var(--text);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+:root .wing{grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;grid-template-rows:repeat(var(--panel-count,2),minmax(0,1fr));gap:.75rem}
+:root .panel{padding:.75rem}
+:root .panel-head h2{font-size:.95rem}
+:root .scene-ui{grid-template-rows:2.5rem minmax(14rem,1fr) auto auto;grid-template-areas:'heading' 'space' 'summary' 'layers';gap:.65rem}
+:root .summary{grid-template-columns:repeat(var(--summary-count,6),minmax(0,1fr))}
+:root .summary-item .label{font-size:.65rem}
+:root .map-legend{bottom:7.5rem}
+:root .selection-panel{bottom:7.5rem}
+.selection-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.selection-actions button{font-size:.7rem}
+.view-switch{display:flex;flex-wrap:wrap;gap:.35rem}
+.view-switch button{font-size:.6rem;padding:.25rem .45rem}
+.view-copy{font-size:.8rem;line-height:1.75;margin:0;max-width:65ch}
+.muted{color:var(--muted)}
+.linked-rows{--od-gap:.4rem}
+.linked-row{width:100%;padding:.5rem .4rem;border:0;border-bottom:1px solid var(--explore-line);text-align:left;background:transparent;color:var(--text);--od-gap:.5rem;min-height:2.5rem}
+.linked-row strong{font-size:.75rem;font-weight:500;overflow-wrap:anywhere}
+.linked-row small{font-size:.65rem;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+.linked-row .od-icon{--od-icon-size:.9rem}
+.object-search{--od-gap:.35rem}
+.object-search label{font-size:.7rem;color:var(--muted)}
+.object-search input{width:100%;min-width:0;padding:.45rem .5rem;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.75rem;pointer-events:auto;border-radius:2px}
+.object-results{overflow-y:auto;min-height:0;max-height:24rem;padding-right:.25rem;overscroll-behavior:contain}
+:root[data-layout=map] .workspace{grid-template-columns:minmax(0,.8fr) minmax(0,3.4fr) minmax(0,.8fr)}
+:root[data-layout=map] .wing:before{opacity:.4}
+:root[data-layout=map] .wing .panel{background:var(--explore-surface)}
+:root[data-layout=video] .workspace{grid-template-columns:minmax(0,1fr) minmax(0,3fr) minmax(0,1fr)}
+:root[data-layout=video] .scene-space{pointer-events:auto;display:flex;min-height:0}
+:root[data-layout=video] .scene-ui{grid-template-rows:2.5rem minmax(22rem,1fr) auto auto}
+:root[data-layout=video] .map-legend{display:none}
+.video-workspace{display:grid;grid-template-rows:auto minmax(10rem,1fr) auto auto;gap:.65rem;padding:.75rem;width:100%;min-width:0;border:1px solid var(--border);background:var(--explore-surface)}
+.wall-header{--od-gap:.5rem}
+.wall-header strong{font-size:.85rem;font-weight:500}
+.wall-header small{font-size:.65rem;color:var(--muted)}
+.wall-header .text-btn{font-size:.7rem;flex:none}
+.wall-main{display:grid;place-items:center;min-width:0;min-height:10rem;width:100%;border:1px solid var(--border);background:linear-gradient(#031c3e55,#031c3e55),url('背景图.png') var(--camera-position,center)/cover no-repeat;color:#fff;cursor:zoom-in}
+.wall-main>.od-field{background:rgba(0,22,36,.85);text-align:center;padding:.75rem 1rem;--od-gap:.35rem}
+.wall-main strong{font-size:1rem;font-weight:500}
+.wall-main small{font-size:.7rem}
+.wall-main .od-icon{--od-icon-size:1.1rem}
+.wall-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}
+.wall-rail button{background:transparent;border:1px solid var(--border);padding:.5rem;text-align:left;color:var(--muted);--od-gap:.2rem}
+.wall-rail button[aria-pressed=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--text)}
+.wall-rail strong{font:.75rem var(--number)}
+.wall-rail span{font-size:.7rem;overflow-wrap:anywhere}
+.video-workspace>.text-btn{justify-self:start;font-size:.7rem}
+@media(hover:hover){.view-switch button:hover,.linked-row:hover,.wall-rail button:hover{background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--text);border-color:var(--accent)}
+}
+@media(max-width:1599px){:root .app{height:auto;grid-template-rows:4.5rem auto auto auto}
+:root .wing{grid-template-rows:repeat(var(--panel-count,2),minmax(13rem,auto))}
+:root .navigation{justify-content:flex-start}
+.object-results{max-height:30rem}
+}
+@media(max-width:1199px){:root .app{grid-template-rows:auto auto auto auto}
+:root .workspace{grid-template-columns:repeat(2,minmax(0,1fr))}
+:root .center{grid-column:1/-1}
+.view-switch button,.linked-row,.wall-rail button{min-height:44px}
+.view-switch button,.linked-row strong,.wall-rail span{font-size:.85rem}
+.linked-row small,.wall-header small{font-size:.75rem}
+.object-search label,.object-search input{font-size:1rem}
+.view-copy{font-size:1rem}
+.object-results{max-height:24rem}
+}
+@media(max-width:767px){:root .workspace{grid-template-columns:minmax(0,1fr)}
+:root .nav-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;overflow:visible;gap:.5rem}
+:root .nav-tabs button{width:100%;min-width:0;white-space:normal}
+:root .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+:root .scene-ui{grid-template-rows:auto minmax(14rem,1fr) auto auto}
+:root[data-layout=video] .scene-ui{grid-template-rows:auto minmax(26rem,1fr) auto auto}
+:root .map-heading{flex-wrap:wrap}
+:root .selection-panel{bottom:13rem}
+.wall-header{flex-wrap:wrap}
+.wall-header .od-fill{flex-basis:100%}
+.wall-rail{grid-template-columns:1fr}
+.wall-main strong{font-size:.9rem}
+.video-workspace{padding:.5rem}
+.video-workspace>.text-btn{font-size:.85rem}
+}
+

@@ -1,0 +1,22 @@
+/* V2.2 finalized version 1 menu buttons. */
+:root{--menu-pill-radius:999px;--menu-pill-edge:color-mix(in srgb,var(--accent) 48%,transparent);--menu-pill-glow:color-mix(in srgb,var(--accent) 25%,transparent);--menu-pill-top:color-mix(in srgb,var(--accent) 30%,var(--surface));--menu-pill-bottom:color-mix(in srgb,var(--surface) 85%,#071f3d)}
+:root .navigation{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.4rem .75rem}
+:root #navigation{grid-column:1/-1;grid-row:1;display:flex;flex-wrap:wrap;width:100%;justify-content:center;justify-self:center}
+:root .demo-label{grid-column:2;grid-row:2;justify-self:end;align-self:center;margin:0}
+:root #navigation{gap:.85rem;padding:.4rem .35rem .65rem}
+:root #navigation button{position:relative;display:flex;align-items:center;justify-content:center;flex:none;min-width:6.25rem;min-height:1.85rem;padding:.25rem 1rem;border:1px solid var(--menu-pill-edge);border-radius:var(--menu-pill-radius);clip-path:none;background:linear-gradient(180deg,var(--menu-pill-top),var(--menu-pill-bottom) 70%,color-mix(in srgb,var(--accent) 19%,var(--surface)));box-shadow:inset 0 1px 0 color-mix(in srgb,var(--accent) 55%,transparent),inset 0 -2px 5px color-mix(in srgb,var(--accent) 16%,transparent),0 2px 5px rgba(0,22,46,.2);font-size:.75rem;font-weight:500;line-height:1.5;letter-spacing:.08em;color:var(--text);text-shadow:0 1px 3px rgba(0,17,40,.7)}
+:root #navigation button:after{content:'';display:block;position:absolute;bottom:-.25rem;left:28%;width:44%;height:2px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 75%,white),transparent);opacity:.45;box-shadow:none;pointer-events:none}
+:root #navigation button[aria-current=page]{border-color:var(--accent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 54%,#2459a6),color-mix(in srgb,var(--accent) 20%,#164d94) 55%,color-mix(in srgb,var(--accent) 40%,#2163ac));box-shadow:inset 0 1px 2px rgba(225,250,255,.75),inset 0 -2px 5px var(--menu-pill-glow),0 0 .5rem var(--menu-pill-glow);color:#fff;text-shadow:0 0 .35rem rgba(210,245,255,.55)}
+:root #navigation button[aria-current=page]:after{opacity:1;box-shadow:0 0 .3rem var(--menu-pill-glow)}
+:root #navigation button:focus-visible{outline:2px solid var(--text);outline-offset:4px}
+@media(hover:hover){:root #navigation button:hover{border-color:var(--accent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 45%,var(--surface)),var(--menu-pill-bottom));color:var(--text)}
+}
+@media(max-width:1199px){:root #navigation button{min-height:44px}
+}
+@media(max-width:767px){:root #navigation{display:flex;gap:.75rem;flex-wrap:wrap}
+:root #navigation button{width:auto;flex:0 1 calc(50% - .5rem);min-width:0}
+:root .navigation{grid-template-columns:minmax(0,1fr)}
+:root .demo-label{grid-column:1;grid-row:3}
+:root #navigation button{padding:.4rem .65rem;font-size:.8rem}
+}
+

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="people">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#075174">
+<title>V2.3 · 海南码头 · 港区运行指挥中心 V2.1</title>
+<style>/* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio, geometry.
+   Put this @layer first; product CSS outside the layer always wins. */
+@layer od-layout {
+  :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+
+  /* containers */
+  .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+  .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+  .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+  .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+  .od-fill    { flex: 1 1 0; min-width: 0; }
+  .od-fixed   { flex: none; }
+  .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+
+  /* stacked information: each piece is its own line — never sibling inline spans */
+  .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+  :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+  .od-tile { display: grid; grid-template-rows: auto 1fr; }
+  :where(.od-tile) > :where(*) { display: block; }
+
+  /* media keeps its intrinsic ratio by default; never a distorted or cropped
+     cover by accident. height:auto lets the ratio win over an <img height="…">
+     attribute. Cropping to a uniform box is an explicit opt-in: set --od-ratio
+     AND add .od-media-cover together (per the core rule, only where a crop is
+     deliberate — tile thumbs, decorative fills — never on full-frame content). */
+  .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+  .od-media-cover { object-fit: cover; }
+
+  /* functional inline SVG icons opt into bounded geometry; content SVGs keep their own */
+  .od-icon { display: inline-block; inline-size: var(--od-icon-size, 1em); block-size: var(--od-icon-size, 1em); flex: none; }
+
+  /* data text only — authored copy is rewritten to its budget instead */
+  .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .od-clamp-2 { -webkit-line-clamp: 2; }
+  .od-clamp-3 { -webkit-line-clamp: 3; }
+  .od-lines-2 { min-height: calc(2 * 1.4em); }   /* block-level reservation for a shared baseline */
+  .od-nowrap  { white-space: nowrap; }           /* 数字+单位 · 价格+起 · 日期+星期 */
+  .od-keep    { word-break: keep-all; overflow-wrap: anywhere; } /* CJK labels break at spaces / <wbr> first */
+
+  /* screen skeleton (optional): bars take their own space, the middle scrolls — no padding guessed for chrome */
+  .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+  .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+
+  /* horizontal rail: the next item peeks at the edge; trailing room survives overflow */
+  .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+             padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+  .od-rail::-webkit-scrollbar { display: none; }
+  :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+  :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+
+  .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+  .od-touch  { min-width: 44px; min-height: 44px; }
+}
+/* /OD-LAYOUT-PRIMITIVES v1 */
+</style>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="v2.css">
+<link rel="stylesheet" href="v21.css">
+<link rel="stylesheet" href="background-options.css">
+<link rel="stylesheet" href="menu-options.css">
+<link rel="stylesheet" href="menu-buttons.css">
+<link rel="stylesheet" href="v23.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">跳转至运行态势</a>
+<div class="app">
+<div class="panorama-layer" id="panorama-layer" role="region" tabindex="0" aria-label="港区全景地图，可拖动、滚轮缩放或使用方向键与加减键，按0恢复全景">
+      <div class="map-world" id="map-world">
+        <img class="port-image od-media" id="port-image" src="背景图.png" width="1774" height="887" alt="用户提供的海南码头港区全景底图，包含码头、作业区、道路和水域" draggable="false">
+        <div class="map-tint" aria-hidden="true"></div>
+        <div id="markers"></div>
+      </div>
+</div>
+<header class="masthead">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 3L43 14v20L24 45 5 34V14L24 3Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 29V16h6v13m8 0V16h6v13M10 31c5-4 9 4 14 0s9 4 14 0M10 36c5-4 9 4 14 0s9 4 14 0M24 12v15" stroke="currentColor" stroke-width="2"/></svg>
+    <div><span class="brand-label">海南码头</span><span class="brand-small">HAINAN PORT · OPERATIONS</span></div>
+  </div>
+  <div class="title"><svg class="title-frame" viewBox="0 0 1000 115" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="title-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".02"/><stop offset="1" stop-color="currentColor" stop-opacity=".13"/></linearGradient></defs><path d="M0 14H115L150 2H850L885 14H1000L925 62H890L846 101H154L110 62H75Z" fill="url(#title-fill)"/><path d="M0 14H115L150 2H850L885 14H1000M75 62H110L154 101H846L890 62H925" stroke="currentColor" stroke-width="1" opacity=".55" fill="none"/><path d="M135 68L166 95H834L865 68" stroke="currentColor" stroke-width="2" opacity=".9" fill="none"/><path d="M85 32l18 13m-6-13l18 13m-6-13l18 13M915 32l-18 13m6-13l-18 13m6-13l-18 13" stroke="currentColor" stroke-width="3" opacity=".5"/></svg><h1>海南码头运行指挥中心</h1><p id="topic-en">PERSONNEL DYNAMICS</p></div>
+  <div class="header-tools">
+    <div class="clock"><strong id="time">--:--:--</strong><span id="date">本地时间</span></div>
+    <div class="theme-wrap">
+      <button id="theme-button" class="icon-btn" aria-label="切换配色" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-menu" title="切换配色"><span data-icon="palette"></span></button>
+      <div class="theme-menu" id="theme-menu" role="menu" aria-label="界面配色" hidden>
+        <button role="menuitemradio" data-theme-choice="ocean" aria-checked="true"><span class="swatch" style="--swatch:#72d5ff"></span>海蓝通透</button>
+        <button role="menuitemradio" data-theme-choice="jade" aria-checked="false"><span class="swatch" style="--swatch:#8ce7df"></span>青绿通透</button>
+        <button role="menuitemradio" data-theme-choice="slate" aria-checked="false"><span class="swatch" style="--swatch:#b6ddff"></span>蓝灰通透</button>
+      </div>
+    </div>
+    <div class="prototype-wrap">
+      <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
+      <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
+        <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
+        <p class="prototype-empty">暂无待选方案</p>
+      </section>
+    </div>
+    <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>
+  </div>
+</header>
+<div class="navigation">
+  <nav id="navigation" class="nav-tabs" aria-label="业务专题"></nav>
+  <div class="demo-label"><span class="status-dot"></span>运行态势<span style="color:var(--border)"> / </span>演示数据</div>
+
+</div>
+<main id="main-content" class="workspace">
+  <aside id="left-panels" class="wing" aria-label="业务分析左侧面板"></aside>
+  <section class="center" aria-label="港区场景与监控">
+    <div class="map-stage" id="map-stage" tabindex="0" role="region" aria-label="海南码头二维地图。可拖动或滚轮缩放，键盘方向键平移，加减键缩放，0键复位。点位均为示意位置。">
+<div class="scene-halo" aria-hidden="true"><svg viewBox="0 0 1000 650" fill="none"><defs><radialGradient id="scene-light"><stop stop-color="currentColor" stop-opacity=".12"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></radialGradient></defs><ellipse cx="500" cy="340" rx="470" ry="300" fill="url(#scene-light)"/><ellipse cx="500" cy="340" rx="465" ry="286" stroke="currentColor" opacity=".12"/><ellipse cx="500" cy="340" rx="450" ry="275" stroke="currentColor" stroke-dasharray="3 16" opacity=".19"/><path d="M44 355a460 286 0 0 1 142-222M814 133a460 286 0 0 1 142 222M184 552a460 286 0 0 0 632 0" stroke="currentColor" opacity=".28"/><path d="M30 340h25m890 0h25M500 38v18m0 570v18" stroke="currentColor" opacity=".4"/></svg></div>
+      <div class="scene-ui">
+        <section id="summary" class="summary" aria-label="港区核心指标"></section>
+    <div class="map-heading">
+      <div class="od-field"><h2 id="map-title">港区运行态势</h2><small><span id="topic-label">人员动态</span> · <span id="visible-count">0</span> 个示意点位 · <span id="zoom-level">100%</span></small></div>
+      <div class="map-tools" role="group" aria-label="地图操作">
+        <button id="zoom-out" class="icon-btn" aria-label="缩小地图" title="缩小"><span data-icon="minus"></span></button>
+        <button id="zoom-in" class="icon-btn" aria-label="放大地图" title="放大"><span data-icon="plus"></span></button>
+        <button id="reset-map" class="icon-btn" aria-label="恢复港区全景" title="恢复全景"><span data-icon="reset"></span></button>
+      </div>
+    </div>
+        <div class="scene-space" aria-hidden="true"></div>
+        <div class="layer-controls" id="layer-controls" role="group" aria-label="地图图层筛选"></div>
+      </div>
+      <div class="map-note" id="map-note">港区全景 · 示意点位</div>
+      <div class="map-coordinate" aria-hidden="true">HAINAN PORT / 2D OPERATIONS MAP</div>
+      <div class="map-legend"><span><i></i>运行对象</span><span><i class="warn"></i>重点关注</span></div>
+      <section class="selection-panel" id="selection" aria-label="所选点位信息" hidden>
+        <div class="selection-head"><strong id="selection-title"></strong><button id="selection-close" class="close-btn" aria-label="关闭点位信息"><span data-icon="close"></span></button></div>
+        <dl id="selection-info"></dl>
+        <button class="text-btn" id="selection-action">查看关联详情</button>
+        <div class="selection-actions" hidden><button class="text-btn" id="selection-video">关联监控：暂无资料</button></div>
+      </section>
+    </div>
+  </section>
+  <aside id="right-panels" class="wing" aria-label="业务分析右侧面板"></aside>
+</main>
+<footer class="footer"><div class="footer-left"><span class="status-dot"></span><span>海南码头 · 港区运行态势</span><span> / </span><span>数据日期 2026-10-22</span></div><span class="notice">所有指标、点位及监控均为演示内容</span></footer>
+</div>
+<dialog id="detail-dialog" aria-labelledby="detail-title">
+  <div class="dialog-head"><h2 id="detail-title">业务详情</h2><button class="close-btn" data-close="detail-dialog" aria-label="关闭业务详情"><span data-icon="close"></span></button></div>
+  <div class="dialog-body">
+    <p id="detail-context"></p>
+    <div class="detail-toolbar"><div class="search-field"><label for="detail-search">查询指标或记录</label><input id="detail-search" type="search" placeholder="输入关键词筛选" autocomplete="off"></div><div class="period-filter"><label for="detail-period">展示范围</label><select id="detail-period"><option value="all">全部记录</option><option value="numeric">数值指标</option></select></div></div>
+    <div id="detail-content"></div><div class="detail-count" id="detail-count"></div>
+    <p class="dialog-note">演示数据用于原型交互，不代表真实业务结果。区域与设备位置为示意。</p>
+  </div>
+</dialog>
+<dialog id="video-dialog" aria-labelledby="video-title">
+  <div class="dialog-head"><h2 id="video-title">监控画面</h2><button class="close-btn" data-close="video-dialog" aria-label="关闭模拟监控"><span data-icon="close"></span></button></div>
+  <div class="dialog-body">
+    <div class="video-screen" id="video-screen"><div class="video-caption" id="video-name"></div><div class="video-center"><span data-icon="camera"></span><strong id="video-state">模拟监控已开启</strong><small id="video-description"></small><small id="video-time"></small></div></div>
+    <div class="video-controls"><div class="period-filter"><label for="camera-channel">监控通道</label><select id="camera-channel"><option value="0">01 泊位监控</option><option value="1">作业区监控</option><option value="2">出入口监控</option></select></div><div class="od-cluster"><button class="text-btn" id="video-toggle">暂停模拟</button><button class="text-btn" id="video-locate">定位到地图</button></div></div>
+    <p class="dialog-note">当前为静态底图模拟画面；暂停与继续仅演示操作状态，未接入真实视频流。</p>
+  </div>
+</dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<div id="chart-tooltip" class="chart-tooltip" role="tooltip" hidden></div>
+<div id="live-status" class="sr-only" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%)"></div>
+<noscript><p style="padding:2rem">此原型需要启用 JavaScript 才能展示业务专题和地图交互。</p></noscript>
+</body>
+</html>

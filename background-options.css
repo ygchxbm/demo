@@ -1,0 +1,30 @@
+/* Final V2.1 panorama and reusable prototype settings shell. */
+.masthead{z-index:30}
+.prototype-wrap{position:relative;flex:none}
+.prototype-panel{position:absolute;right:0;top:calc(100% + .75rem);z-index:60;width:min(25rem,calc(100vw - 2rem));max-height:calc(100svh - 6rem);overflow:auto;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:0 1rem 3rem rgba(0,20,34,.3);text-align:left;cursor:default}
+.prototype-panel-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+.prototype-panel-head h2{margin:0;font-size:1rem;line-height:1.5;font-weight:500;letter-spacing:.04em}
+.prototype-panel-head .close-btn{width:2rem;height:2rem;flex:none}
+.prototype-empty{margin:0;padding:.5rem 0;font-size:1rem;line-height:1.75;color:var(--muted)}
+.prototype-panel button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#prototype-settings-button[aria-expanded=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
+.panorama-layer{position:absolute;inset:0;z-index:0;overflow:hidden;touch-action:none;cursor:grab;isolation:isolate}
+.panorama-layer:active{cursor:grabbing}
+.panorama-layer:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
+.app>.navigation,
+.app>.workspace,
+.app>.footer{position:relative;z-index:2;pointer-events:none}
+.wing,
+.navigation button,
+.scene-ui button,
+.selection-panel,
+.media-dock{pointer-events:auto}
+.map-stage{pointer-events:none;overflow:visible;background:none;border:0}
+.map-stage:after{display:none}
+.wing:before{opacity:.72}
+.panorama-layer .map-world{top:50%;left:50%;position:absolute;z-index:1}
+.panorama-layer .port-image{mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);filter:brightness(.98) saturate(.95);pointer-events:none}
+.panorama-layer:after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(90deg,color-mix(in srgb,var(--bg) 75%,transparent),transparent 34%,transparent 66%,color-mix(in srgb,var(--bg) 70%,transparent)),linear-gradient(180deg,rgba(1,40,61,.3),transparent 18%,transparent 87%,rgba(1,40,61,.25))}
+@media(max-width:1199px){.prototype-panel{width:min(25rem,calc(100vw - 2rem))}.prototype-panel-head .close-btn{min-width:44px;min-height:44px}.panorama-layer{top:7rem;bottom:auto;height:40rem}}
+@media(max-width:767px){.prototype-panel{position:fixed;top:5rem;right:1rem;width:calc(100vw - 2rem);max-height:calc(100svh - 6rem);padding:1rem}.prototype-panel-head h2{font-size:1rem}.panorama-layer{top:9rem;height:45rem}}
+@media(prefers-reduced-motion:reduce){.prototype-panel *{transition:none!important}}

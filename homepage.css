@@ -1,0 +1,193 @@
+/* Personnel homepage, based on the supplied glass-panel reference. */
+:root[data-topic=people] {
+  --person-series-0: #79d6ff;
+  --person-series-1: #77efcf;
+  --person-series-2: #ffe28b;
+  --person-series-3: #afbaff;
+  --text: #f2fbff;
+  --muted: #d6edfa;
+  --person-chart-line: rgba(182,226,247,.3);
+}
+:root[data-topic=people] .panorama-layer .port-image { filter: brightness(1.04) saturate(1.15); mask-image: none; }
+:root[data-topic=people] .panorama-layer:after { background: linear-gradient(180deg,rgba(0,57,95,.08),transparent 30%,transparent 85%,rgba(0,58,84,.08)); }
+:root[data-topic=people] .wing {
+  border: 1px solid rgba(169,226,255,.4);
+  border-radius: .8rem;
+  background: linear-gradient(120deg,rgba(24,111,164,.62),rgba(12,99,143,.48));
+  box-shadow: inset 0 0 2rem rgba(114,215,255,.08),0 .3rem 2rem rgba(0,37,65,.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1.1rem 1.2rem;
+  gap: 0;
+}
+:root[data-topic=people] .wing:before { display: none; }
+:root[data-topic=people] .panel,
+:root[data-topic=people] .wing:last-child .panel { border: 0; border-radius: 0; background: none; padding: 0 .1rem; box-shadow: none; }
+:root[data-topic=people] .panel+.panel { border-top: 1px solid var(--person-chart-line); padding-top: .75rem; }
+:root[data-topic=people] .panel-head { min-height: 2.25rem; padding-bottom: .5rem; margin-bottom: .65rem; border-bottom: 1px solid var(--person-chart-line); }
+:root[data-topic=people] .panel-head:after { display: none; }
+:root[data-topic=people] .panel-head h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: .08em; }
+:root[data-topic=people] .panel-link { font-size: .75rem; color: var(--text); }
+:root[data-topic=people] .panel-body { gap: .6rem; }
+:root[data-topic=people] .person-number strong { font-size: 2.6rem; color: var(--person-series-0); line-height: 1.1; }
+:root[data-topic=people] .person-number strong small { color: var(--text); font-size: 1rem; margin-left: .3rem; }
+:root[data-topic=people] .person-number>span,
+:root[data-topic=people] .person-peak>span { font-size: .85rem; }
+:root[data-topic=people] .person-stock { gap: 0; align-items: stretch; }
+:root[data-topic=people] .person-stock>.person-number { flex: 1; align-content: start; gap: .3rem; }
+:root[data-topic=people] .person-peak { flex: 1; padding-left: 2rem; border-left: 1px solid rgba(177,226,255,.45); text-align: left; align-content: start; }
+:root[data-topic=people] .person-peak strong { font-size: 2.25rem; line-height: 1.05; }
+:root[data-topic=people] .person-peak strong small { font-size: 1rem; }
+:root[data-topic=people] .person-role-grid { border-top: 1px solid var(--person-chart-line); padding-top: .8rem; padding-bottom: .9rem; gap: .6rem; }
+:root[data-topic=people] .person-role-grid>.od-stat { border: 0; gap: .25rem; }
+:root[data-topic=people] .person-role-grid span { display: flex; align-items: center; gap: .55rem; font-size: .8rem; white-space: nowrap; }
+:root[data-topic=people] .person-role-grid span:before { content: ''; width: .65rem; height: .65rem; border-radius: 50%; background: var(--role-color); box-shadow: inset 0 1px 2px #ffffff66; }
+:root[data-topic=people] .person-role-grid>.od-stat:nth-child(1) { --role-color: var(--person-series-0); }
+:root[data-topic=people] .person-role-grid>.od-stat:nth-child(2) { --role-color: var(--person-series-1); }
+:root[data-topic=people] .person-role-grid>.od-stat:nth-child(3) { --role-color: var(--person-series-2); }
+:root[data-topic=people] .person-role-grid>.od-stat:nth-child(4) { --role-color: var(--person-series-3); }
+:root[data-topic=people] .person-role-grid strong { padding-left: 1.2rem; font-size: 1.4rem; }
+:root[data-topic=people] .person-role-grid small { font-size: .8rem; }
+:root[data-topic=people] .person-share { grid-template-columns: minmax(0,.85fr) minmax(0,1.1fr); gap: .65rem; }
+:root[data-topic=people] .person-share-graphic,
+:root[data-topic=people] .person-share-graphic>svg { width: 100%; max-height: 10.5rem; }
+:root[data-topic=people] .person-ring-center { gap: .15rem; }
+:root[data-topic=people] .person-ring-center strong { font-size: 1.65rem; }
+:root[data-topic=people] .person-ring-center span { font-size: .75rem; }
+:root[data-topic=people] [data-panel=peopleWeekComposition] .person-ring-center strong { font-size: 1.35rem; }
+:root[data-topic=people] [data-panel=peopleWeekComposition] .person-ring-center span { font-size: .65rem; }
+:root[data-topic=people] .person-share-row { grid-template-columns: minmax(0,1fr) auto auto; gap: .65rem; font-size: .85rem; }
+:root[data-topic=people] .person-share-row strong { font-size: 1.25rem; }
+:root[data-topic=people] .person-share-row small { font-size: .8rem; color: var(--text); }
+:root[data-topic=people] .person-share-row>span:last-child { font-size: .9rem; color: var(--text); }
+:root[data-topic=people] .person-share-legend { gap: .9rem; }
+:root[data-topic=people] .person-series-label { gap: .55rem; white-space: nowrap; }
+:root[data-topic=people] .person-series-label:before { width: .65rem; height: .65rem; border-radius: 50%; box-shadow: inset 0 1px 2px #ffffff66; }
+:root[data-topic=people] .chart-caption { display: none; }
+:root[data-topic=people] .person-entry-head { align-items: stretch; gap: 0; }
+:root[data-topic=people] .person-entry-head>.person-number { flex: 1; }
+:root[data-topic=people] .person-change { flex: 1; border-left: 1px solid rgba(177,226,255,.45); text-align: left; padding-left: 2rem; align-content: start; }
+:root[data-topic=people] .person-change span { font-size: .75rem; }
+:root[data-topic=people] .person-change strong { font-size: 1.25rem; }
+:root[data-topic=people] .person-columns { min-height: 0; max-height: 9rem; }
+:root[data-topic=people] .person-columns .person-gridline { stroke-dasharray: 2 4; }
+:root[data-topic=people] .person-columns text { fill: var(--text); }
+:root[data-topic=people] .person-small-multiples { gap: 0; }
+:root[data-topic=people] .person-mini-trend { position: relative; display: flex; align-items: stretch; padding: .65rem .15rem; border-bottom: 1px solid var(--person-chart-line); }
+:root[data-topic=people] .person-mini-trend+.person-mini-trend { border-top: 0; padding-top: .65rem; }
+:root[data-topic=people] .person-mini-head { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; align-items: start; width: 100%; gap: .1rem .5rem; }
+:root[data-topic=people] .person-mini-head .person-series-label { grid-column: 1; font-size: .85rem; }
+:root[data-topic=people] .person-mini-head>span { grid-column: 1; grid-row: 2; font-size: .85rem; margin-left: 1.2rem; }
+:root[data-topic=people] .person-mini-head b { font-size: 1.8rem; color: var(--text); }
+:root[data-topic=people] .person-mini-head small { grid-column: 2; grid-row: 1; justify-self: end; font-size: .8rem; }
+:root[data-topic=people] .person-trend-chart { position: absolute; bottom: .6rem; right: 0; width: calc(100% - 7rem); height: 3.7rem; }
+:root[data-topic=people] .person-trend-line { stroke-width: 2; }
+:root[data-topic=people] .person-trend-dates { display: flex; justify-content: space-between; color: var(--muted); font: .75rem var(--number); padding: .5rem .3rem .7rem; }
+:root[data-topic=people] .map-heading h2,
+:root[data-topic=people] .map-heading small,
+:root[data-topic=people] .map-legend,
+:root[data-topic=people] .layer-controls,
+:root[data-topic=people] #markers,
+:root[data-topic=people] .demo-label,
+:root[data-topic=people] .footer { display: none; }
+:root[data-topic=people] #navigation { gap: .65rem; padding: .2rem 0 .4rem; }
+:root[data-topic=people] #navigation button { min-width: 6rem; min-height: 1.8rem; padding: .2rem .8rem; border-color: rgba(177,231,255,.5); background: linear-gradient(180deg,rgba(57,144,185,.55),rgba(0,59,100,.7)); box-shadow: inset 0 1px 1px rgba(226,249,255,.2); font-weight: 400; }
+:root[data-topic=people] #navigation button:after { display: none; }
+:root[data-topic=people] #navigation button[aria-current=page] { border-color: #65e0ff; background: linear-gradient(180deg,rgba(13,139,235,.85),rgba(24,178,250,.6)); box-shadow: inset 0 0 .45rem #77e3ff,0 0 .9rem #16bdff99; }
+:root[data-topic=people] .title { position: relative; }
+:root[data-topic=people] .title:before,
+:root[data-topic=people] .title:after { content: ''; position: absolute; top: 72%; height: 2px; width: 2.75rem; background: linear-gradient(90deg,transparent,#a7e7ff); }
+:root[data-topic=people] .title:before { left: 20%; }
+:root[data-topic=people] .title:after { right: 20%; transform: rotate(180deg); }
+@media (min-width:1200px) {
+  :root[data-topic=people] { font-size: clamp(12px,.902vw,32px); overflow: hidden; }
+  :root[data-topic=people] .app { padding: 0 1.25rem 1.75rem; grid-template-rows: 4.5rem 2.5rem minmax(0,1fr) 0; height: 100svh; }
+  :root[data-topic=people] .masthead { grid-template-columns: 1fr minmax(28rem,2fr) 1fr; gap: 1.5rem; }
+  :root[data-topic=people] .title h1 { font-size: 1.65rem; }
+  :root[data-topic=people] .title p { font-size: .75rem; }
+  :root[data-topic=people] .brand { display: flex; }
+  :root[data-topic=people] .brand-label { display: block; font-size: 1.15rem; }
+  :root[data-topic=people] .brand-mark { width: 2.3rem; height: 2.3rem; }
+  :root[data-topic=people] .brand-small { font-size: .6rem; }
+  :root[data-topic=people] .clock strong { font-size: 1.5rem; }
+  :root[data-topic=people] .clock span { font-size: .8rem; }
+  :root[data-topic=people] .navigation { padding: 0; align-self: start; z-index: 10; }
+  :root[data-topic=people] .workspace { grid-template-columns: minmax(0,24.65%) minmax(0,1fr) minmax(0,24.65%); gap: 1rem; margin-top: -1.25rem; height: calc(100% + 1.25rem); }
+  :root[data-topic=people] #left-panels { grid-template-rows: minmax(0,1.1fr) minmax(0,.95fr) minmax(0,1.05fr); }
+  :root[data-topic=people] #right-panels { grid-template-rows: minmax(0,1.75fr) minmax(0,1fr); }
+  :root[data-topic=people] .center,
+  :root[data-topic=people] .map-stage { min-height: 0; }
+  :root[data-topic=people] .scene-ui { width: 100%; grid-template-rows: 5.2rem minmax(0,1fr) auto; grid-template-areas: 'heading' 'space' 'summary'; padding: 0 0 .6rem; }
+  :root[data-topic=people] .scene-space { min-height: 0; }
+  :root[data-topic=people] .map-heading { align-self: end; padding: 0; }
+  :root[data-topic=people] .map-tools { margin-left: auto; margin-right: 22%; gap: .2rem; }
+  :root[data-topic=people] .map-tools .icon-btn { width: 2rem; height: 2rem; }
+  :root[data-topic=people] .summary { width: 76%; justify-self: center; padding: .7rem .5rem; background: rgba(9,91,132,.65); border: 1px solid rgba(178,231,255,.35); border-radius: .65rem; backdrop-filter: blur(8px); gap: 0; }
+  :root[data-topic=people] .summary-item { background: none; border-radius: 0; padding: 0 .5rem!important; }
+  :root[data-topic=people] .summary-item+.summary-item { border-left: 1px solid rgba(181,227,253,.4); }
+  :root[data-topic=people] .summary-item .label { font-size: .8rem; }
+  :root[data-topic=people] .summary-item .value { font-size: 1.5rem; }
+  :root[data-topic=people] .summary-item .value .unit { font-size: .8rem; }
+  :root[data-topic=people] .person-stock { padding: .45rem .3rem .8rem; }
+  :root[data-topic=people] [data-panel=people] .panel-body { gap: .7rem; }
+  :root[data-topic=people] [data-panel=peopleAffiliation] .panel-head { margin-bottom: 0; }
+  :root[data-topic=people] [data-panel=peopleAffiliation] .panel-body { padding-bottom: .6rem; }
+  :root[data-topic=people] [data-panel=peopleWeekComposition] .panel-body { padding-bottom: 1rem; }
+}
+@media (max-width:1199px) {
+  :root[data-topic=people] .wing { padding: 1rem; }
+  :root[data-topic=people] .panel { padding: .75rem 0; }
+  :root[data-topic=people] .person-share-row { font-size: .75rem; gap: .4rem; }
+  :root[data-topic=people] .person-share-row strong { font-size: 1rem; }
+  :root[data-topic=people] .person-peak,:root[data-topic=people] .person-change { padding-left: 1rem; }
+  :root[data-topic=people] .person-small-multiples { min-height: 25rem; }
+  :root[data-topic=people] .person-mini-head small { font-size: .7rem; }
+  :root[data-topic=people] #navigation button { min-height: 44px; }
+}
+@media (max-width:767px) {
+  :root[data-topic=people] .person-role-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: .3rem; }
+  :root[data-topic=people] .person-role-grid span { font-size: .7rem; gap: .3rem; }
+  :root[data-topic=people] .person-role-grid strong { padding-left: .8rem; font-size: 1.2rem; }
+  :root[data-topic=people] .person-role-grid span:before { width: .45rem; height: .45rem; }
+  :root[data-topic=people] .person-mini-head small { margin-left: 0; }
+  :root[data-topic=people] .person-share-row { gap: .3rem; font-size: .7rem; }
+  :root[data-topic=people] .person-share-row strong { font-size: .95rem; }
+  :root[data-topic=people] .person-share-row>span:last-child { font-size: .75rem; }
+  :root[data-topic=people] .person-mini-head .person-series-label { font-size: .8rem; }
+  :root[data-topic=people] .person-ring-center span { font-size: .65rem; }
+}
+/* Match the reference's bright cyan water and translucent blue glass. */
+:root[data-topic=people] .panorama-layer .port-image { filter: brightness(1.06) saturate(1.5) contrast(1.04); }
+:root[data-topic=people] .wing { background: linear-gradient(120deg,rgba(12,113,167,.6),rgba(5,106,152,.46)); }
+:root[data-topic=people] .person-share { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); }
+:root[data-topic=people] .person-columns text { font-size: 22px; }
+:root[data-topic=people] .person-trend-dates { font: .8rem var(--font); }
+:root[data-topic=people] .person-number strong,
+:root[data-topic=people] .person-peak strong,
+:root[data-topic=people] .person-role-grid strong,
+:root[data-topic=people] .person-ring-center strong,
+:root[data-topic=people] .person-share-row strong,
+:root[data-topic=people] .person-mini-head b,
+:root[data-topic=people] .person-change strong,
+:root[data-topic=people] .summary-item .value { font-family: 'DIN Alternate','Arial Narrow','Avenir Next Condensed',sans-serif; font-style: normal; font-weight: 500; }
+@media (min-width:1200px) {
+  :root[data-topic=people] .wing { padding-top: 1.35rem; }
+  :root[data-topic=people] #right-panels { grid-template-rows: minmax(0,1.9fr) minmax(0,1fr); }
+  :root[data-topic=people] .person-role-grid { padding-bottom: 1.6rem; }
+  :root[data-topic=people] .person-peak { padding-left: 2.5rem; }
+  :root[data-topic=people] .masthead { background: linear-gradient(180deg,rgba(0,80,130,.48),transparent); }
+  :root[data-topic=people] .title:before { left: 22%; }
+  :root[data-topic=people] .title:after { right: 22%; }
+}
+:root[data-topic=people] .panorama-layer .port-image { filter: brightness(1.08) saturate(1.2); }
+:root[data-topic=people] .panorama-layer:after {
+  background: linear-gradient(180deg,rgba(0,110,168,.42),transparent 30%),rgba(0,155,195,.1);
+}
+:root[data-topic=people] .wing { backdrop-filter: blur(8px) saturate(1.25); -webkit-backdrop-filter: blur(8px) saturate(1.25); }
+:root[data-topic=people] .person-trend-dates { padding-bottom: 1.7rem; }
+:root[data-topic=people] #left-panels .panel-head h2 { padding-left: .25rem; }
+:root[data-topic=people] .person-role-grid { padding-inline: .6rem; }
+:root[data-topic=people] .person-entry-head { padding-left: .25rem; }
+@media (min-width:1200px) {
+  :root[data-topic=people] .app { overflow: clip; }
+}

@@ -97,41 +97,49 @@ const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.
 function linkedRows(rows){return `<div class="linked-rows od-stack">${rows.map(([title,detail,attr,value])=>`<button ${attr}="${value}" class="linked-row od-row"><span class="od-field od-fill"><strong>${esc(title)}</strong><small>${esc(detail)}</small></span>${icon('arrow')}</button>`).join('')}</div>`;}
 // Personnel data has distinct stocks (currently on site) and flows (daily entries).
 const onSiteRoles=[['管理',96],['作业',214],['参观访问',24],['船舶相关',52]];
+const onSiteTotal=onSiteRoles.reduce((sum,[,n])=>sum+n,0);
+const onSitePeak=428;
+const onSiteGap=onSitePeak-onSiteTotal;
+const affiliation=[['海油内',248],['海油外',138]];
+const affiliationTotal=affiliation.reduce((sum,[,n])=>sum+n,0);
 const dailyEntries=days.map((_,i)=>Object.values(personSeries).reduce((sum,series)=>sum+series[i],0));
 const todayEntry=dailyEntries.at(-1),previousEntry=dailyEntries.at(-2);
-const personnelNumber=(value,label)=>`<div class="person-number od-stat"><strong class="od-nowrap">${fmt(value)}<small>人</small></strong><span>${label}</span></div>`;
-function personnelRoleGrid(rows){return `<div class="person-role-grid">${rows.map(([label,value])=>`<div class="od-stat"><span>${label}</span><strong class="od-nowrap">${value}<small> 人</small></strong></div>`).join('')}</div>`;}
+const entryDelta=todayEntry-previousEntry;
+const entryPct=(Math.abs(entryDelta)/previousEntry*100).toFixed(1);
+const peakNote=onSiteGap>0?`当前较峰值少 ${onSiteGap} 人`:onSiteGap<0?`当前较峰值多 ${-onSiteGap} 人`:'与今日峰值持平';
+function personnelRoleGrid(rows){return `<div class="person-role-grid">${rows.map(([label,value],i)=>`<div class="od-stat"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${label}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong></div>`).join('')}</div>`;}
 function personnelTrendChart(values,name){
- const max=Math.ceil(Math.max(...values)*1.12/20)*20;
- const coords=values.map((value,i)=>[40+i*560/6,62-value/max*44]);
- const path=coords.map(([x,y],i)=>(i?'L':'M')+x+','+y).join(' ');
- return `<svg class="person-trend-chart" viewBox="0 0 640 88" role="img" aria-label="${name}近七日入场人数：${values.join('、')}人"><title>${name}近七日入场趋势，纵轴单位为人，刻度上限 ${max}</title>${[0,.5,1].map(r=>`<line x1="40" y1="${62-r*44}" x2="600" y2="${62-r*44}" class="person-gridline"/><text x="0" y="${67-r*44}">${Math.round(max*r)}</text>`).join('')}<path d="${path} L600,62 L40,62 Z" class="person-trend-area"/><path d="${path}" class="person-trend-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><circle cx="${x}" cy="${y}" r="8" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.5" class="person-trend-dot"/><text x="${x}" y="84" text-anchor="middle">${days[i]}</text></g>`).join('')}</svg>`;
+ const min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,1),w=280,n=values.length;
+ const coords=values.map((value,i)=>[((i+.5)/n)*w,6+(max-value)/span*18]);
+ const path=coords.map(([x,y],i)=>(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)).join(' ');
+ return `<svg class="person-trend-chart" viewBox="0 0 ${w} 32" role="img" aria-label="${name}近七日入场人数：${values.join('、')}人"><title>${name}近七日入场趋势，纵轴单位为人，范围 ${min}–${max}</title><path d="${path}" class="person-trend-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="person-trend-dot"/></g>`).join('')}</svg>`;
 }
-function personnelShare(rows,ring=false){
+function personnelShare(rows,center,tight){
  const total=rows.reduce((sum,[,n])=>sum+n,0),radius=72,circumference=2*Math.PI*radius;
  let offset=0;
  const geometry=rows.map(([name,value],i)=>{
-  const start=offset/total*2*Math.PI,end=(offset+value)/total*2*Math.PI;offset+=value;
   const info=esc(name+'：'+value+' 人，'+(value/total*100).toFixed(1)+'%');
-  const color=`var(--person-series-${i})`;
-  if(ring)return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="${color}" stroke-width="22" stroke-dasharray="${Math.max(0,value/total*circumference-3)} ${circumference}" stroke-dashoffset="${-(offset-value)/total*circumference}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
-  const x=a=>100+radius*Math.sin(a),y=a=>100-radius*Math.cos(a);
-  return `<path d="M100 100 L${x(start)} ${y(start)} A72 72 0 ${value/total>.5?1:0} 1 ${x(end)} ${y(end)} Z" fill="${color}" stroke="var(--surface)" stroke-width="1.5" tabindex="0" data-tip="${info}"><title>${info}</title></path>`;
+  const dash=`${Math.max(0,value/total*circumference-2)} ${circumference}`,shift=-(offset/total*circumference);
+  offset+=value;
+  return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--person-series-${i})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
  }).join('');
- return `<div class="person-share"><div class="person-share-graphic"><svg viewBox="0 0 200 200" role="img" aria-label="${ring?'近七日分类入场构成':'当前在场人员海油内外构成'}，合计 ${total} 人">${geometry}</svg>${ring?`<div class="person-ring-center od-stat"><strong>${fmt(total)}</strong><span>七日累计入场</span></div>`:''}</div><div class="person-share-legend">${rows.map(([name,value],i)=>`<div class="person-share-row"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+ const viewBox=tight?'18 18 164 164':'0 0 200 200';
+ return `<div class="person-share"><div class="person-share-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${center}，合计 ${total} 人"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="person-ring-center od-stat"><strong>${fmt(total)}</strong><span>${center}</span></div></div><div class="person-share-legend">${rows.map(([name,value],i)=>`<div class="person-share-row"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
 }
 function personnelColumns(rows){
- const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/100)*100;
- return `<svg class="person-columns" viewBox="0 0 640 160" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>今日分类入场，单位：人，各柱共用零起点</title>${[0,.5,1].map(r=>`<line x1="40" x2="620" y1="${122-r*94}" y2="${122-r*94}" class="person-gridline"/><text x="0" y="${127-r*94}">${Math.round(max*r)}</text>`).join('')}${rows.map(([name,value],i)=>{const x=105+i*140,h=value/max*94;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' 人')}"><rect x="${x-25}" y="${122-h}" width="50" height="${h}" fill="var(--person-series-${i})"/><text x="${x}" y="${112-h}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x}" y="151" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('')}</svg>`;
+ const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/100)*100||1,left=46,right=628,base=236,top=24,plot=base-top;
+ const guides=[0,.5,1].map(r=>{const y=base-r*plot;return `<line class="person-gridline" x1="${left}" x2="${right}" y1="${y}" y2="${y}"/><text x="2" y="${y+5}">${Math.round(max*r)}</text>`;}).join('');
+ const cols=rows.map(([name,value],i)=>{const x=left+(i+.5)*(right-left)/rows.length,h=Math.max(value/max*plot,1),w=48;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' 人')}"><rect x="${x-w/2}" y="${base-h}" width="${w}" height="${h}" rx="1.5" fill="var(--person-series-${i})"/><text x="${x}" y="${base-h-8}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x}" y="${base+24}" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('');
+ return `<svg class="person-columns" viewBox="0 0 640 268" preserveAspectRatio="none" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>今日分类入场，单位：人，各柱共用零起点，刻度上限 ${max}</title>${guides}${cols}</svg>`;
 }
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
 const personTrendKeys=Object.keys(personSeries);
 Object.assign(panels,{
- people:{title:'在场规模',topic:'people',kind:'人员',rows:[['当前在场人数',386,'人'],['今日在场峰值',428,'人'],['当前较峰值少',42,'人'],...onSiteRoles.map(([name,value])=>[name+'在场',value,'人'])],render:()=>`<div class="person-stock od-row"><div class="person-number od-stat"><span>当前在场人数</span><strong>386<small> 人</small></strong></div><div class="person-peak od-stat"><span>今日在场峰值</span><strong>428<small> 人</small></strong><span>当前较峰值少 42 人</span></div></div>`+personnelRoleGrid(onSiteRoles)},
- peopleAffiliation:{title:'海油内 / 海油外',topic:'people',kind:'人员',rows:[['海油内',248,'人'],['海油外',138,'人'],['当前在场合计',386,'人']],render:()=>personnelShare([['海油内',248],['海油外',138]])+caption('统计对象：当前在场人员','合计 386 人')},
- peopleEntry:{title:'今日入场情况',topic:'people',kind:'人员',rows:[['今日入场人数',todayEntry,'人'],['前一日入场人数',previousEntry,'人'],...Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),'人'])],render:()=>`<div class="person-entry-head od-row">${personnelNumber(todayEntry,'今日累计入场')}<div class="person-change od-field"><span>较前一日增加</span><strong>${todayEntry-previousEntry} 人 / ${((todayEntry-previousEntry)/previousEntry*100).toFixed(1)}%</strong></div></div>`+personnelColumns(Object.entries(personSeries).map(([name,values])=>[name,values.at(-1)]))+caption('四类人员 · 统一零起点','单位：人')},
- peopleTrends:{title:'近七日分类入场趋势',topic:'people',kind:'人员',headers:['日期',...personTrendKeys],rows:days.map((d,i)=>[d,...personTrendKeys.map(name=>personSeries[name][i])]),render:()=>`<div class="person-small-multiples">${personTrendKeys.map((name,i)=>{const values=personSeries[name],change=values.at(-1)-values.at(-2);return `<section class="person-mini-trend" style="--trend-color:var(--person-series-${i})" aria-label="${name}近七日趋势"><div class="person-mini-head od-row"><strong class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</strong><span class="od-nowrap">今日 <b>${values.at(-1)}</b> 人</span><small>较前日${change>=0?'增加':'减少'} ${Math.abs(change)} 人</small></div>${personnelTrendChart(values,name)}</section>`;}).join('')}</div>`+caption('10/16—10/22 · 各图刻度独立标明','单位：人')},
- peopleWeekComposition:{title:'近七日入场构成',topic:'people',kind:'人员',rows:weeklyRoles.map(([name,value])=>[name,value,'人']),render:()=>personnelShare(weeklyRoles,true)+caption('分类七日累计 · 非独立去重人数','演示数据')}
+ people:{title:'在场规模',topic:'people',kind:'人员',rows:[['当前在场人数',onSiteTotal,'人'],['今日在场峰值',onSitePeak,'人'],['当前较峰值少',onSiteGap,'人'],...onSiteRoles.map(([name,value])=>[name+'在场',value,'人'])],render:()=>`<div class="person-stock"><div class="person-number od-stat"><span>当前在场人数</span><strong>${fmt(onSiteTotal)}<small> 人</small></strong></div><div class="person-peak od-stat"><span>今日在场峰值</span><strong>${fmt(onSitePeak)}<small> 人</small></strong><span class="person-gap">${peakNote}</span></div></div>`+personnelRoleGrid(onSiteRoles)},
+ peopleAffiliation:{title:'海油内 / 海油外',topic:'people',kind:'人员',rows:[...affiliation.map(([name,value])=>[name,value,'人']),['当前在场合计',affiliationTotal,'人']],render:()=>personnelShare(affiliation,'总计人数',true)},
+ peopleEntry:{title:'今日入场情况',topic:'people',kind:'人员',rows:[['今日入场人数',todayEntry,'人'],['前一日入场人数',previousEntry,'人'],...Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),'人'])],render:()=>`<div class="person-entry-head"><div class="person-number od-stat"><strong class="od-nowrap">${fmt(todayEntry)}<small> 人</small></strong><span>今日累计入场</span></div><div class="person-change od-field"><span>较前一日${entryDelta>=0?'增加':'减少'}</span><strong class="od-nowrap">${entryDelta>0?'+':''}${entryDelta} 人 / ${entryPct}%</strong></div></div>`+personnelColumns(Object.entries(personSeries).map(([name,values])=>[name,values.at(-1)]))},
+ peopleTrends:{title:'近七日分类入场趋势',topic:'people',kind:'人员',headers:['日期',...personTrendKeys],rows:days.map((d,i)=>[d,...personTrendKeys.map(name=>personSeries[name][i])]),render:()=>`<div class="person-small-multiples">${personTrendKeys.map((name,i)=>{const values=personSeries[name],change=values.at(-1)-values.at(-2);return `<section class="person-mini-trend" style="--trend-color:var(--person-series-${i})" aria-label="${name}近七日趋势"><div class="person-mini-head"><strong class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> 人</small></b><small class="person-mini-delta">较前日${change>=0?'增加':'减少'} ${Math.abs(change)} 人</small></div>${personnelTrendChart(values,name)}</section>`;}).join('')}<div class="person-date-axis">${days.map(day=>`<span>${day}</span>`).join('')}</div></div>`},
+ peopleWeekComposition:{title:'近七日入场构成',topic:'people',kind:'人员',rows:weeklyRoles.map(([name,value])=>[name,value,'人']),render:()=>personnelShare(weeklyRoles,'七日累计入场')}
 });
  Object.assign(panels,{
   vehicleFlow:{title:'今日车辆进出',topic:'vehicles',kind:'拖车',rows:[['进场',142,'车次'],['出场',126,'车次'],['合计',268,'车次']],render:()=>bars([['进场',142,'车次'],['出场',126,'车次']],160)+caption('进出合计 268 车次','今日')},
@@ -146,7 +154,7 @@ function activeView(){return topics[current];}
 function objectResults(){const q=objectQuery.trim().toLowerCase(),items=points.filter(p=>enabled.has(p.kind)&&(!q||(p.name+p.kind+p.status).toLowerCase().includes(q)));return items.length?linkedRows(items.map(p=>[p.name,p.kind+' · '+p.status,'data-locate',p.id])):'<p class="view-copy">没有匹配对象，请调整关键词或开启相关图层。</p>';}
 function topicSummary(){
  const view=activeView();
- if(current==='people')return [['当前在场',386,'人','','people','people'],['今日峰值',428,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',248,'人','','people','peopleAffiliation'],['海油外',138,'人','','people','peopleAffiliation']];
+ if(current==='people')return [['当前在场',onSiteTotal,'人','','people','people'],['今日峰值',onSitePeak,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',affiliation[0][1],'人','','people','peopleAffiliation'],['海油外',affiliation[1][1],'人','','people','peopleAffiliation']];
  if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['图层类型',9,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
  if(view.layout==='video')return [['模拟通道',3,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
  const keys={vehicles:['vehicles','vehicleFlow','approvals'],ships:['ships','voyages','berths'],energy:['electricity','solar','carbon'],safety:['safety','permits'],production:['production','shipWork','cargo']}[current];

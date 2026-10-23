@@ -181,8 +181,9 @@
 .sb-sparks{display:flex;flex-direction:column;justify-content:space-between;gap:.2rem;flex:1;min-height:0}
 .sb-sparks-tall{gap:.12rem}
 .sb-sparks-tall .sb-spark+.sb-spark{padding-top:.22rem}
+:root[data-sidebar=airy][data-topic=energy] #right-panels .panel:last-child .sb-donut{flex:none}
 :root[data-sidebar=airy][data-topic=energy] #right-panels .panel:last-child .sb-donut-graphic,
-:root[data-sidebar=airy][data-topic=energy] #right-panels .panel:last-child .sb-donut-graphic>svg{max-height:9.5rem}
+:root[data-sidebar=airy][data-topic=energy] #right-panels .panel:last-child .sb-donut-graphic>svg{max-height:8rem}
 .sb-today{display:grid;gap:.2rem;flex:none;margin-top:.05rem;padding-top:.35rem;border-top:1px solid var(--sb-line)}
 .sb-today-grid{display:grid;grid-template-columns:1fr 1fr;gap:.15rem 1rem}
 .sb-today .sb-dot{font-size:.68rem}
@@ -205,6 +206,8 @@
 :root[data-sidebar=airy] .linked-row small{color:var(--sb-muted);font-size:.64rem}
 :root[data-sidebar=airy][data-topic=map] .panel-body,
 :root[data-sidebar=airy][data-topic=video] .panel-body{justify-content:flex-start;gap:.45rem}
+:root[data-sidebar=airy][data-topic=ships] #right-panels .panel:last-child .panel-body,
+:root[data-sidebar=airy][data-topic=vehicles] #right-panels .panel:last-child .panel-body{justify-content:flex-start;overflow:auto}
 :root[data-sidebar=airy][data-topic=map] #map-kind-list{flex:1;min-height:0;display:flex}
 :root[data-sidebar=airy][data-topic=map] #map-kind-list .sb-fuels{flex:1;align-content:space-between}
 .sb-spark{display:grid;gap:.05rem;min-height:0}

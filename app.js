@@ -36,12 +36,20 @@ const kwhPct=(Math.abs(kwhDelta)/prevKwh*100).toFixed(1);
 const kwhChange=`较前一日${kwhDelta>=0?'增加':'减少'} ${Math.abs(kwhDelta)} kWh / ${kwhPct}%`;
 const peakGap=peakKwh-todayKwh;
 const peakGapNote=peakGap===0?'与七日峰值持平':`较峰值${peakGap>0?'少':'多'} ${Math.abs(peakGap)} kWh · ${peakDay}`;
-const gridKwh=32100,solarSelf=10760,solarExport=2100,solarGen=solarSelf+solarExport;
+const solarSelfSeries=[8420,9680,9120,11040,10320,10180,10760];
+const gridSeries=energyKwh.map((total,i)=>total-solarSelfSeries[i]);
+const exportSeries=[1680,1920,1540,2260,2080,1840,2100];
+const solarGenSeries=solarSelfSeries.map((value,i)=>value+exportSeries[i]);
+const shoreSeries=[7420,8060,7680,8320,8540,8920,8640];
+const dieselSeries=[16.4,17.8,15.9,19.2,18.1,17.4,18.6];
+const waterSeries=[298,314,286,342,318,305,326];
+const lngSeries=[38.2,41.6,36.8,44.1,40.4,39.7,42.5];
+const gridKwh=gridSeries.at(-1),solarSelf=solarSelfSeries.at(-1),solarExport=exportSeries.at(-1),solarGen=solarGenSeries.at(-1);
 const shoreBerths=[['01 号泊位',3280],['02 号泊位',2860],['03 号泊位',2500]];
-const shoreTotal=shoreBerths.reduce((sum,[,n])=>sum+n,0);
+const shoreTotal=shoreSeries.at(-1);
 const solarHours=['00时','04时','08时','12时','16时','20时','24时'];
 const solarCurve=[0,820,2480,4860,3620,1080,0];
-const fuels=[['柴油',18.6,'t'],['淡水',326,'m³'],['LNG',42.5,'t']];
+const fuels=[['柴油',dieselSeries.at(-1),'t'],['淡水',waterSeries.at(-1),'m³'],['LNG',lngSeries.at(-1),'t']];
 const metrics = rows => `<div class="metrics" style="--cols:${Math.min(rows.length,3)}">${rows.map(([label,value,unit=''])=>`<div class="metric od-stat"><span class="metric-label">${label}</span><strong class="metric-value od-nowrap">${fmt(value)}<small>${unit}</small></strong></div>`).join('')}</div>`;
 let chartSerial=0;
 function lineChart(values, values2, labels=days, names=['入场人数','作业人员']){
@@ -61,39 +69,61 @@ const ticketSum=tickets.reduce((sum,[,n])=>sum+n,0);
 const voyageSeries=[27,32,29,35,31,36,38];
 const portHours=['00:00','04:00','08:00','12:00','16:00'];
 const portCurve=[8,10,14,16,12];
-const portToday=12,portPeak=16,portGap=portPeak-portToday;
-const shipStatus=[['装卸中',2],['加油中',1],['待作业',1]];
+const portSeries=[9,11,10,13,14,11,12];
+const servedSeries=[18,22,19,24,21,23,26];
+const portToday=portSeries.at(-1),portPeak=16,portGap=portPeak-portToday;
 const vehicleOnSite=[62,74,68,81,79,91,86];
 const vehiclePeak=Math.max(...vehicleOnSite),vehiclePeakDay=days[vehicleOnSite.indexOf(vehiclePeak)];
 const vehicleToday=vehicleOnSite.at(-1),vehiclePrev=vehicleOnSite.at(-2),vehicleGap=vehiclePeak-vehicleToday;
-const flowIn=142,flowOut=126,approvalParts=[['待审批',3],['已通过',18],['已驳回',1]];
+const flowInSeries=[118,136,124,151,133,128,142];
+const flowOutSeries=[104,121,116,138,127,119,126];
+const pendingSeries=[5,2,6,4,3,5,3];
+const passedSeries=[14,16,12,19,17,15,18];
+const rejectedSeries=[2,1,3,0,2,1,1];
+const flowIn=flowInSeries.at(-1),flowOut=flowOutSeries.at(-1);
+const approvalParts=[['待审批',pendingSeries.at(-1)],['已通过',passedSeries.at(-1)],['已驳回',rejectedSeries.at(-1)]];
 const safetySeries=[18,22,20,26,23,21,24];
+const activePermitSeries=[7,11,8,12,10,8,9];
+const intactSeries=[95.4,97.1,96.6,98.0,96.8,97.4,96.2];
+const inUseSeries=[8,12,10,14,11,9,11];
+const yearAvailSeries=[98.2,98.4,98.3,98.7,98.5,98.6,98.6];
+const pieceSeries=[1086,1164,1120,1210,1188,1236,1248];
+const fuelCallSeries=[7,9,8,12,11,8,10];
+const efficiencySeries=[168,174,171,192,180,188,186];
+const stockSeries=[724,706,742,698,712,694,680];
+const dutySeries=[8.1,8.6,7.9,8.8,8.3,8.5,8.4];
+const annualSeries=[127.1,127.3,127.5,127.8,128.0,128.3,128.6];
+const ashOutSeries=[4,7,5,8,6,5,6];
+const ashBackSeries=[1,3,2,2,1,3,2];
+const cargoCallSeries=[12,15,13,18,14,17,16];
+const seriesRows=(name,values,unit)=>days.map((day,i)=>[day+' '+name,values[i],unit]);
+const sparkDelta=(change,_name,_values,unit)=>sbDayDelta(change,unit);
 const equipRows=[['消防水泵',100,'%'],['空压机',91.7,'%'],['生活水泵',100,'%']];
 const panels={
- shipScale:{title:'在港规模',topic:'ships',kind:'船舶',rows:[['当日在港',portToday,'艘'],['今日峰值',portPeak,'艘'],['较峰值少',portGap,'艘'],['服务船舶',26,'艘'],['服务航次',voyageSeries.at(-1),'航次']],render:()=>sbDual({label:'当日在港',value:portToday,unit:'艘',note:`较峰值少 ${portGap} 艘`},{label:'今日峰值',value:portPeak,unit:'艘',note:'出现在 12:00'},true)+sbChips([['服务船舶',26,'艘'],['服务航次',voyageSeries.at(-1),'航次']])},
- shipStatus:{title:'示意船舶状态',topic:'ships',kind:'船舶',rows:[...shipStatus.map(([name,value])=>[name,value,'艘']),['示意船舶',shipStatus.reduce((s,[,n])=>s+n,0),'艘'],['口径','地图示意','不等于当日在港 12 艘']],render:()=>sbDonut(shipStatus,'示意船舶',{unit:'艘',tight:true})+caption('四艘为地图示意','不等于在港 12 艘')},
- shipToday:{title:'今日在港',topic:'ships',kind:'船舶',rows:portHours.map((hour,i)=>[hour,portCurve[i],'艘']),render:()=>sbColumns(portHours.map((hour,i)=>[hour,portCurve[i]]),{unit:'艘',step:4,aria:'今日在港船舶：'+portHours.map((hour,i)=>hour+portCurve[i]+'艘').join('、'),title:max=>`今日在港数量，单位艘，仅今日五个时刻，刻度上限 ${max}`})+caption('仅今日','峰值 16 艘在 12:00')},
- voyageTrend:{title:'近七日航次',topic:'ships',kind:'船舶',rows:[...days.map((d,i)=>[d,voyageSeries[i],'航次']),['当日在港',portToday,'艘'],['服务船舶',26,'艘'],['在港与服务船舶','仅今日','无七日序列']],render:()=>sbSparks([['航次',voyageSeries,'航次']],{chartHeight:164,delta:(change,_n,_v,unit)=>sbDayDelta(change,unit)})+sbToday([['当日在港',portToday,'艘'],['服务船舶',26,'艘']])},
- berths:{title:'在港船舶',topic:'ships',kind:'船舶',headers:['船舶编号','泊位（示意）','状态'],rows:[['示意船舶 A01','01 号泊位','装卸中'],['示意船舶 A02','02 号泊位','加油中'],['示意船舶 A03','03 号泊位','待作业'],['示意船舶 A04','04 号泊位','装卸中']],render:()=>linkedRows(points.filter(p=>p.kind==='船舶').map(p=>[p.name.replace('示意船舶 ',''),p.berth+' · '+p.status,'data-locate',p.id]))+caption('点击定位到地图','示意泊位')},
+ shipScale:{title:'在港规模',topic:'ships',kind:'船舶',rows:[['当日在港',portToday,'艘'],['今日峰值',portPeak,'艘'],['较峰值少',portGap,'艘'],['服务船舶',servedSeries.at(-1),'艘'],['服务航次',voyageSeries.at(-1),'航次'],...seriesRows('在港',portSeries,'艘'),...seriesRows('服务船舶',servedSeries,'艘')],render:()=>sbDual({label:'当日在港',value:portToday,unit:'艘',note:`较峰值少 ${portGap} 艘`},{label:'今日峰值',value:portPeak,unit:'艘',note:'出现在 12:00'},true)+sbChips([['服务船舶',servedSeries.at(-1),'艘'],['服务航次',voyageSeries.at(-1),'航次']])},
+ shipStatus:{title:'在港状态',topic:'ships',kind:'船舶',rows:[],render:()=>{const parts=shipStatusParts();return sbDonut(parts,'在港船舶',{unit:'艘',tight:true})+caption('与当日在港同一口径',parts.map(([name,value])=>name+' '+value).join(' · '));}},
+ shipToday:{title:'今日在港',topic:'ships',kind:'船舶',rows:[...portHours.map((hour,i)=>[hour,portCurve[i],'艘']),...seriesRows('在港',portSeries,'艘')],render:()=>sbColumns(portHours.map((hour,i)=>[hour,portCurve[i]]),{unit:'艘',step:4,aria:'今日在港船舶：'+portHours.map((hour,i)=>hour+portCurve[i]+'艘').join('、'),title:max=>`今日在港数量，单位艘，五个时刻，刻度上限 ${max}`})+caption('今日五个时刻','峰值 16 艘在 12:00')},
+ voyageTrend:{title:'近七日航次',topic:'ships',kind:'船舶',rows:[...seriesRows('航次',voyageSeries,'航次'),...seriesRows('在港',portSeries,'艘'),...seriesRows('服务船舶',servedSeries,'艘')],render:()=>sbSparks([['航次',voyageSeries,'航次'],['在港',portSeries,'艘'],['服务船舶',servedSeries,'艘']],{chartHeight:56,delta:sparkDelta})},
+ berths:{title:'在港船舶',topic:'ships',kind:'船舶',headers:['船舶编号','泊位（示意）','状态'],rows:[],render:()=>caption('在港 '+portToday+' 艘','点击定位')+linkedRows(points.filter(p=>p.kind==='船舶').map(p=>[p.name.replace('示意船舶 ',''),p.berth+' · '+p.status,'data-locate',p.id]))},
  prodHead:{title:'作业完成',topic:'production',kind:'场地',rows:[['作业完成率',86.7,'%'],['任务数',120,'单'],['接单数',116,'单'],['已完成',104,'单'],['未完成',16,'单']],render:()=>sbDual({label:'作业完成率',value:86.7,unit:'%'},{label:'已完成',value:104,unit:'单'},true)+sbChips([['任务',120,'单'],['已接单',116,'单'],['未完成',16,'单']])},
  prodMix:{title:'任务构成',topic:'production',kind:'场地',rows:[['管输',36,'单'],['场地',48,'单'],['泊位',36,'单'],['任务合计',120,'单']],render:()=>sbDonut([['管输',36],['场地',48],['泊位',36]],'任务合计',{unit:'单',tight:true})},
- prodCargo:{title:'今日卸装',topic:'production',kind:'场地',rows:[['卸装吨数',2860,'t'],['卸装件数',1248,'件'],['卸装船次',16,'船次'],['已完成',14,'船次'],['作业中',2,'船次']],render:()=>sbDual({label:'卸装吨数',value:2860,unit:'t'},{label:'卸装船次',value:16,unit:'船次',note:'件数 1,248'},true)+sbColumns([['已完成',14],['作业中',2]],{unit:'船次',step:4,aria:'卸装船次：已完成 14、作业中 2',title:max=>`卸装船次，单位船次，刻度上限 ${max}`})},
- prodTrend:{title:'近七日作业量',topic:'production',kind:'场地',headers:['业务','今日','昨日'],rows:[['柴油（t）',126,112],['灰浆（t）',320,296],['件杂货（t）',2414,2260],['吞吐量（t）',2860,2668]],render:()=>sbSparks(Object.entries(productionSeries).map(([name,values])=>[name,values,'t']),{delta:(change,_n,_v,unit)=>sbDayDelta(change,unit)})},
- prodSide:{title:'今日其它',topic:'production',kind:'场地',rows:[['年吞吐量',128.6,'万吨'],['装卸效率',186,'t/h'],['平均在岗',8.4,'h'],['柴油储存',680,'t'],['加油船次',10,'船次'],['输送',6,'船次'],['反打',2,'船次'],['输灰合计',8,'船次']],render:()=>sbDonut([['输送',6],['反打',2]],'输灰船次',{unit:'船次'})+sbStatList('仅今日 · 无七日序列',[['年吞吐量',128.6,'万吨'],['装卸效率',186,'t/h'],['平均在岗',8.4,'h'],['柴油储存',680,'t'],['加油船次',10,'船次'],['卸装件数',1248,'件']])},
- safetyHead:{title:'今日许可',topic:'safety',kind:'场地',rows:[['今日作业许可',24,'项'],['作业票',ticketSum,'张'],['执行中',9,'项'],['在用设备',11,'台'],['年可用率',98.6,'%'],...tickets.map(([k,v])=>[k,v,'张'])],render:()=>sbDual({label:'今日许可',value:24,unit:'项'},{label:'执行中',value:9,unit:'项',note:'作业票 '+ticketSum+' 张'},true)+sbChips([['在用设备',11,'台'],['年可用率',98.6,'%']])},
- safetyEquip:{title:'设备完好',topic:'safety',kind:'场地',rows:[['设备总数',26,'台'],['可用',25,'台'],['停用',1,'台'],['在用',11,'台'],['完好率',96.2,'%'],['年可用率',98.6,'%'],...equipRows.map(([name,value,unit])=>[name+'完好率',value,unit])],render:()=>sbDonut([['可用',25],['停用',1]],'设备总数',{unit:'台',tight:true})+caption('在用 11 台不计入环','完好率 96.2% · 年可用率 98.6%')},
+ prodCargo:{title:'今日卸装',topic:'production',kind:'场地',rows:[['卸装吨数',2860,'t'],['卸装件数',pieceSeries.at(-1),'件'],['卸装船次',cargoCallSeries.at(-1),'船次'],['已完成',14,'船次'],['作业中',2,'船次'],...seriesRows('卸装船次',cargoCallSeries,'船次'),...seriesRows('卸装件数',pieceSeries,'件')],render:()=>sbDual({label:'卸装吨数',value:2860,unit:'t'},{label:'卸装船次',value:cargoCallSeries.at(-1),unit:'船次',note:'件数 '+fmt(pieceSeries.at(-1))},true)+sbColumns([['已完成',14],['作业中',2]],{unit:'船次',step:4,aria:'卸装船次：已完成 14、作业中 2',title:max=>`卸装船次，单位船次，刻度上限 ${max}`})},
+ prodTrend:{title:'近七日作业量',topic:'production',kind:'场地',headers:['业务','今日','昨日'],rows:[['柴油（t）',126,112],['灰浆（t）',320,296],['件杂货（t）',2414,2260],['吞吐量（t）',2860,2668]],render:()=>sbSparks(Object.entries(productionSeries).map(([name,values])=>[name,values,'t']),{delta:sparkDelta})},
+ prodSide:{title:'近七日其它',topic:'production',kind:'场地',rows:[...seriesRows('年吞吐量',annualSeries,'万吨'),...seriesRows('装卸效率',efficiencySeries,'t/h'),...seriesRows('平均在岗',dutySeries,'h'),...seriesRows('柴油储存',stockSeries,'t'),...seriesRows('加油船次',fuelCallSeries,'船次'),...seriesRows('卸装件数',pieceSeries,'件'),...seriesRows('输送',ashOutSeries,'船次'),...seriesRows('反打',ashBackSeries,'船次'),['输灰合计',ashOutSeries.at(-1)+ashBackSeries.at(-1),'船次']],render:()=>sbSparks([['年吞吐量',annualSeries,'万吨'],['装卸效率',efficiencySeries,'t/h'],['平均在岗',dutySeries,'h'],['柴油储存',stockSeries,'t'],['加油船次',fuelCallSeries,'船次'],['卸装件数',pieceSeries,'件']],{chartHeight:22,delta:sparkDelta})+caption('输灰船次',`输送 ${ashOutSeries.at(-1)} + 反打 ${ashBackSeries.at(-1)}`)},
+ safetyHead:{title:'今日许可',topic:'safety',kind:'场地',rows:[['今日作业许可',24,'项'],['作业票',ticketSum,'张'],['执行中',activePermitSeries.at(-1),'项'],['在用设备',inUseSeries.at(-1),'台'],['年可用率',yearAvailSeries.at(-1),'%'],...tickets.map(([k,v])=>[k,v,'张']),...seriesRows('执行中',activePermitSeries,'项'),...seriesRows('在用设备',inUseSeries,'台')],render:()=>sbDual({label:'今日许可',value:24,unit:'项'},{label:'执行中',value:activePermitSeries.at(-1),unit:'项',note:'作业票 '+ticketSum+' 张'},true)+sbChips([['在用设备',inUseSeries.at(-1),'台'],['年可用率',yearAvailSeries.at(-1),'%']])},
+ safetyEquip:{title:'设备完好',topic:'safety',kind:'场地',rows:[['设备总数',26,'台'],['可用',25,'台'],['停用',1,'台'],['在用',inUseSeries.at(-1),'台'],['完好率',intactSeries.at(-1),'%'],['年可用率',yearAvailSeries.at(-1),'%'],...equipRows.map(([name,value,unit])=>[name+'完好率',value,unit]),...seriesRows('完好率',intactSeries,'%'),...seriesRows('年可用率',yearAvailSeries,'%')],render:()=>sbDonut([['可用',25],['停用',1]],'设备总数',{unit:'台',tight:true})+caption('在用 '+inUseSeries.at(-1)+' 台不计入环','完好率 '+intactSeries.at(-1)+'% · 年可用率 '+yearAvailSeries.at(-1)+'%')},
  safetyTickets:{title:'作业票分项',topic:'safety',kind:'场地',rows:tickets.map(([k,v])=>[k,v,'张']),render:()=>sbColumns(tickets,{unit:'张',step:2,aria:'作业票分项：'+tickets.map(([k,v])=>k+v+'张').join('、'),title:max=>`作业票分项，单位张，合计 ${ticketSum}，刻度上限 ${max}`})+caption('六类合计 '+ticketSum+' 张','与今日许可同口径')},
- safetyTrend:{title:'近七日作业票',topic:'safety',kind:'场地',rows:[...days.map((d,i)=>[d,safetySeries[i],'张']),['执行中',9,'项'],['完好率',96.2,'%'],['执行中与完好率','仅今日','无七日序列']],render:()=>sbSparks([['作业票',safetySeries,'张']],{chartHeight:56,delta:(change,_n,_v,unit)=>sbDayDelta(change,unit)})+sbToday([['执行中',9,'项'],['完好率',96.2,'%']])},
+ safetyTrend:{title:'近七日作业票',topic:'safety',kind:'场地',rows:[...seriesRows('作业票',safetySeries,'张'),...seriesRows('执行中',activePermitSeries,'项'),...seriesRows('完好率',intactSeries,'%')],render:()=>sbSparks([['作业票',safetySeries,'张'],['执行中',activePermitSeries,'项'],['完好率',intactSeries,'%']],{chartHeight:24,delta:sparkDelta})},
  safetyWatch:{title:'许可与关注',topic:'safety',kind:'场地',headers:['事项','位置或类型','状态'],rows:[['PT-1022-024','吊装','执行中'],['PT-1022-023','动火','执行中'],['PT-1022-022','有限空间','待开始'],['PT-1022-021','高处','已结束'],['空压机停用','设备区','检修中'],['吊装作业','03 号场地','执行中'],['动火作业','维修区','执行中']],render:()=>`<p class="sb-note">近期作业许可</p>`+linkedRows([['…024 吊装','执行中','data-detail','safetyWatch'],['…023 动火','执行中','data-detail','safetyWatch'],['…022 有限空间','待开始','data-detail','safetyWatch'],['…021 高处','已结束','data-detail','safetyWatch']])+`<p class="sb-note">重点关注</p>`+linkedRows([['空压机停用','示意设备区 · 检修中','data-locate','a3'],['吊装作业','示意场地 B区 · 执行中','data-locate','a2'],['动火作业','维修区 · 执行中','data-detail','safetyWatch']])},
  vehicleScale:{title:'在场车辆',topic:'vehicles',kind:'拖车',rows:[['当前在场',vehicleToday,'辆'],['前一日在场',vehiclePrev,'辆'],['近七日峰值',vehiclePeak,'辆'],['峰值日期',vehiclePeakDay,''],['进场',flowIn,'车次'],['出场',flowOut,'车次'],['待审批',3,'单']],render:()=>sbDual({label:'当前在场',value:vehicleToday,unit:'辆',note:sbDayDelta(vehicleToday-vehiclePrev,'辆')},{label:'近七日峰值',value:vehiclePeak,unit:'辆',note:`较峰值少 ${vehicleGap} 辆 · ${vehiclePeakDay}`},true)+sbChips([['进场',flowIn,'车次'],['出场',flowOut,'车次'],['待审批',3,'单']])},
- vehicleFlow:{title:'今日进出',topic:'vehicles',kind:'拖车',rows:[['进场',flowIn,'车次'],['出场',flowOut,'车次'],['合计',flowIn+flowOut,'车次']],render:()=>sbDonut([['进场',flowIn],['出场',flowOut]],'进出合计',{unit:'车次',tight:true})},
- approvals:{title:'出门审批',topic:'vehicles',kind:'门禁',rows:[...approvalParts.map(([name,value])=>[name,value,'单']),['合计',approvalParts.reduce((s,[,n])=>s+n,0),'单'],['CM-1022-021','作业车辆','待审批'],['CM-1022-020','物资运输','待审批'],['CM-1022-019','设备出场','待审批'],['CM-1022-018','作业车辆','已通过']],headers:['事项','内容','状态'],render:()=>sbDonut(approvalParts,'审批合计',{unit:'单',tight:true})},
+ vehicleFlow:{title:'今日进出',topic:'vehicles',kind:'拖车',rows:[['进场',flowIn,'车次'],['出场',flowOut,'车次'],['合计',flowIn+flowOut,'车次'],...seriesRows('进场',flowInSeries,'车次'),...seriesRows('出场',flowOutSeries,'车次')],render:()=>sbDonut([['进场',flowIn],['出场',flowOut]],'进出合计',{unit:'车次',tight:true})},
+ approvals:{title:'出门审批',topic:'vehicles',kind:'门禁',rows:[...approvalParts.map(([name,value])=>[name,value,'单']),['合计',approvalParts.reduce((s,[,n])=>s+n,0),'单'],...seriesRows('待审批',pendingSeries,'单'),...seriesRows('已通过',passedSeries,'单'),...seriesRows('已驳回',rejectedSeries,'单'),['CM-1022-021','作业车辆','待审批'],['CM-1022-020','物资运输','待审批'],['CM-1022-019','设备出场','待审批'],['CM-1022-018','作业车辆','已通过']],headers:['事项','内容','状态'],render:()=>sbDonut(approvalParts,'审批合计',{unit:'单',tight:true})},
  electricity:{title:'今日用电',topic:'energy',kind:'场地',rows:[['今日总用电',todayKwh,'kWh'],['前一日用电',prevKwh,'kWh'],['较前一日',kwhDelta,'kWh'],['近七日峰值',peakKwh,'kWh'],['峰值日期',peakDay,''],['较峰值',todayKwh-peakKwh,'kWh'],['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['岸电',shoreTotal,'kWh']],render:()=>sbDual({label:'今日总用电',value:todayKwh,unit:'kWh',note:kwhChange},{label:'近七日峰值',value:peakKwh,unit:'kWh',note:peakGapNote},true)+sbChips([['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal]],'kWh')},
  powerMix:{title:'用电构成',topic:'energy',kind:'场地',rows:[['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['总用电量',gridKwh+solarSelf,'kWh'],['岸电',shoreTotal,'kWh'],['岸电口径','未计入环内','单独统计']],render:()=>sbDonut([['购电',gridKwh],['光伏自用',solarSelf]],'总计用电',{unit:'kWh',tight:true})+caption('岸电未计入环内',fmt(shoreTotal)+' kWh 单独统计')},
  todayItems:{title:'今日分项',topic:'energy',kind:'场地',rows:[...[['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal],['外送',solarExport]].map(([name,value])=>[name,value,'kWh']),['光伏发电',solarGen,'kWh'],...shoreBerths.map(([name,value])=>[name+'岸电',value,'kWh']),['柱图口径','四项不相加','购电与光伏自用合计为总用电']],render:()=>sbColumns([['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal],['外送',solarExport]],{unit:'kWh',step:10000,aria:'今日分项电量：购电'+gridKwh+'、光伏自用'+solarSelf+'、岸电'+shoreTotal+'、外送'+solarExport+'，单位 kWh，柱间不相加',title:max=>`今日分项电量，单位 kWh，各柱共用零起点但不互加，刻度上限 ${max}`})+sbChips(shoreBerths,'kWh')+caption('购电 + 光伏自用 = 总用电','岸电按泊位拆开，外送单独统计')},
- solarBalance:{title:'今日光伏平衡',topic:'energy',kind:'场地',rows:[['总发电量',solarGen,'kWh'],['光伏自用电',solarSelf,'kWh'],['外送电量',solarExport,'kWh'],...solarHours.map((hour,i)=>[hour+'发电',solarCurve[i],'kWh']),...fuels.map(([name,value,unit])=>[name+'消耗',value,unit])],render:()=>sbDonut([['光伏自用',solarSelf,1],['外送电量',solarExport,2]],'总发电量',{unit:'kWh'})+sbFuels(fuels)},
- energyTrend:{title:'近七日趋势',topic:'energy',kind:'场地',rows:[...days.map((d,i)=>[d+' 用电',energyKwh[i],'kWh']),...days.map((d,i)=>[d+' 碳减排',carbonDaily[i],'tCO₂']),['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂'],['排放因子','未设定','演示'],['岸电',shoreTotal,'kWh'],['光伏发电',solarGen,'kWh'],['岸电与光伏发电','仅今日','无七日序列']],render:()=>sbSparks([['总用电',energyKwh,'kWh'],['碳减排',carbonDaily,'tCO₂']],{chartHeight:84,delta:(change,_name,_values,unit)=>{const digits=Number.isInteger(change)?0:2,amount=Math.round(Math.abs(change)*10**digits)/10**digits;return `较前日${change>=0?'增加':'减少'} ${amount} ${unit}`;}})+sbToday([['岸电',shoreTotal,'kWh'],['光伏发电',solarGen,'kWh']])},
- vehicleTrend:{title:'近七日在场',topic:'vehicles',kind:'拖车',rows:[...days.map((d,i)=>[d,vehicleOnSite[i],'辆']),['进场',flowIn,'车次'],['出场',flowOut,'车次'],['进出车次','仅今日','无七日序列']],render:()=>sbSparks([['在场车辆',vehicleOnSite,'辆']],{chartHeight:144,delta:(change,_n,_v,unit)=>sbDayDelta(change,unit)})+sbToday([['进场',flowIn,'车次'],['出场',flowOut,'车次']])}
+ solarBalance:{title:'今日光伏平衡',topic:'energy',kind:'场地',rows:[['总发电量',solarGen,'kWh'],['光伏自用电',solarSelf,'kWh'],['外送电量',solarExport,'kWh'],...seriesRows('外送',exportSeries,'kWh'),...seriesRows('柴油',dieselSeries,'t'),...seriesRows('淡水',waterSeries,'m³'),...seriesRows('LNG',lngSeries,'t'),...solarHours.map((hour,i)=>[hour+'发电',solarCurve[i],'kWh'])],render:()=>sbDonut([['光伏自用',solarSelf,1],['外送电量',solarExport,2]],'总发电量',{unit:'kWh'})+sbSparks([['柴油',dieselSeries,'t'],['淡水',waterSeries,'m³'],['LNG',lngSeries,'t']],{chartHeight:22,delta:sparkDelta})},
+ energyTrend:{title:'近七日趋势',topic:'energy',kind:'场地',rows:[...seriesRows('用电',energyKwh,'kWh'),...seriesRows('购电',gridSeries,'kWh'),...seriesRows('光伏发电',solarGenSeries,'kWh'),...seriesRows('岸电',shoreSeries,'kWh'),...seriesRows('碳减排',carbonDaily,'tCO₂'),['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂'],['排放因子','未设定','演示']],render:()=>sbSparks([['总用电',energyKwh,'kWh'],['购电',gridSeries,'kWh'],['光伏发电',solarGenSeries,'kWh'],['岸电',shoreSeries,'kWh'],['碳减排',carbonDaily,'tCO₂']],{chartHeight:24,delta:sparkDelta})},
+ vehicleTrend:{title:'近七日在场',topic:'vehicles',kind:'拖车',rows:[...seriesRows('在场',vehicleOnSite,'辆'),...seriesRows('进场',flowInSeries,'车次'),...seriesRows('出场',flowOutSeries,'车次'),...seriesRows('待审批',pendingSeries,'单')],render:()=>sbSparks([['在场车辆',vehicleOnSite,'辆'],['进场',flowInSeries,'车次'],['出场',flowOutSeries,'车次']],{chartHeight:48,delta:sparkDelta})}
 };
 const topics={
  people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
@@ -109,9 +139,26 @@ const layerKinds={'叉车':'forklift','船舶':'ship','拖车':'truck','平板�
 const point=(id,kind,x,y,name,status='正常',extra={})=>({id,kind,x,y,name,status,...extra});
 const points=[
  point('s1','船舶',20,20,'示意船舶 A01','装卸中',{berth:'01 号泊位',task:'件杂货装卸'}),point('s2','船舶',53,43,'示意船舶 A02','加油中',{berth:'02 号泊位',task:'柴油加注'}),point('s3','船舶',61,39,'示意船舶 A03','待作业',{berth:'03 号泊位',task:'输灰'}),point('s4','船舶',75,32,'示意船舶 A04','装卸中',{berth:'04 号泊位',task:'物资装卸'}),
+ point('s5','船舶',14,30,'示意船舶 A05','装卸中',{berth:'05 号泊位',task:'管输'}),point('s6','船舶',34,16,'示意船舶 A06','装卸中',{berth:'06 号泊位',task:'件杂货装卸'}),point('s7','船舶',42,31,'示意船舶 A07','待作业',{berth:'锚地',task:'候泊待命'}),point('s8','船舶',66,18,'示意船舶 A08','候泊',{berth:'锚地',task:'待靠泊'}),
+ point('s9','船舶',84,27,'示意船舶 A09','加油中',{berth:'07 号泊位',task:'柴油加注'}),point('s10','船舶',90,38,'示意船舶 A10','待作业',{berth:'锚地',task:'输灰'}),point('s11','船舶',28,28,'示意船舶 A11','装卸中',{berth:'08 号泊位',task:'物资装卸'}),point('s12','船舶',48,22,'示意船舶 A12','候泊',{berth:'锚地',task:'待靠泊'}),
  point('f1','叉车',34,44,'示意叉车 F01','作业中'),point('f2','叉车',44,59,'示意叉车 F02','空闲'),point('t1','拖车',39,64,'示意拖车 T01','运输中'),point('t2','拖车',67,56,'示意拖车 T02','运输中'),point('p1','平板拖车',49,72,'示意平板车 P01','作业中'),point('c1','汽车吊',31,32,'示意汽车吊 C01','作业中'),point('c2','轮胎吊',51,57,'示意轮胎吊 C02','作业中'),
  point('v1','摄像头',27,30,'01 泊位监控','模拟通道',{channel:0}),point('v2','摄像头',47,66,'作业区监控','模拟通道',{channel:1}),point('v3','摄像头',69,71,'出入口监控','模拟通道',{channel:2}),point('g1','门禁',58,74,'示意门岗 G01','正常'),point('g2','门禁',79,64,'示意门岗 G02','正常'),point('a1','场地',40,39,'示意场地 A区','正常'),point('a2','场地',58,57,'示意场地 B区','吊装作业',{alert:true}),point('a3','场地',34,61,'示意设备区','检修中',{alert:true})
 ];
+function gridFleet(prefix,kind,start,count,cols,x0,x1,y0,y1,statuses){
+ const rows=Math.ceil(count/cols);
+ for(let i=0;i<count;i++){
+  const col=i%cols,row=Math.floor(i/cols),n=start+i;
+  const x=x0+(col+.5)*(x1-x0)/cols+((i*3)%5-2)*.55;
+  const y=y0+(row+.5)*(y1-y0)/rows+((i*5)%5-2)*.4;
+  points.push(point(prefix+n,kind,Math.round(x*10)/10,Math.round(y*10)/10,`示意${kind} ${prefix.toUpperCase()}${String(n).padStart(2,'0')}`,statuses[i%statuses.length],{compact:true}));
+ }
+}
+gridFleet('f','叉车',3,26,7,22,50,42,63,['作业中','空闲','作业中','待命']);
+gridFleet('t','拖车',3,34,8,48,84,46,68,['运输中','待命','运输中','作业中']);
+gridFleet('p','平板拖车',2,21,7,26,72,66,80,['作业中','待命','运输中']);
+function shipStatusParts(){const counts=new Map();points.filter(p=>p.kind==='船舶').forEach(p=>counts.set(p.status,(counts.get(p.status)||0)+1));return [...counts.entries()];}
+panels.shipStatus.rows=[...shipStatusParts().map(([name,value])=>[name,value,'艘']),['在港合计',portToday,'艘']];
+panels.berths.rows=points.filter(p=>p.kind==='船舶').map(p=>[p.name,p.berth,p.status]);
 const cameras=['01 泊位监控','作业区监控','出入口监控'];
 let current='people', selected=null, enabled=new Set(topics.people.layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
@@ -182,10 +229,6 @@ function sbDayDelta(change,unit){const digits=Number.isInteger(change)?0:2,amoun
 function sbStatList(note,rows){
  return `<div class="sb-fuels">${note?`<p class="sb-note">${esc(note)}</p>`:''}${rows.map(([name,value,unit],i)=>`<div class="sb-fuel"><span class="sb-dot" style="--item-color:var(--sb-series-${i%4})">${esc(name)}</span><b class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></b></div>`).join('')}</div>`;
 }
-function sbToday(rows){
- return `<div class="sb-today"><p class="sb-note">仅今日 · 无七日序列</p><div class="sb-today-grid">${rows.map(([label,value,unit],i)=>`<div class="od-stat"><span class="sb-dot" style="--item-color:var(--sb-series-${i+2})">${esc(label)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong></div>`).join('')}</div></div>`;
-}
-function sbFuels(rows){return sbStatList('今日油气水 · 单位各不相同',rows);}
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
 const personTrendKeys=Object.keys(personSeries);
 const entryBars=Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),name.replace('人员','')]);
@@ -204,7 +247,7 @@ function paintMapScale(){
  if(list)list.innerHTML=sbStatList('九类图层的示意点，关闭的图层记 0',mapKindRows());
 }
  Object.assign(panels,{
-  vehicleObjects:{title:'作业车辆示意',topic:'vehicles',kind:'拖车',rows:points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name,p.kind,p.status]),headers:['对象','类型','状态'],render:()=>linkedRows(points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name,p.kind+' · '+p.status,'data-locate',p.id]))+caption('地图示意','不是在场 86 辆')},
+  vehicleObjects:{title:'作业车辆示意',topic:'vehicles',kind:'拖车',rows:points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name,p.kind,p.status]),headers:['对象','类型','状态'],render:()=>caption('在场 '+vehicleToday+' 辆','示意位置，可滚动')+linkedRows(points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name.replace('示意',''),p.kind+' · '+p.status,'data-locate',p.id]))},
   mapObjects:{title:'对象查找',topic:'map',kind:'场地',headers:['对象','类型','状态'],rows:points.map(p=>[p.name,p.kind,p.status]),render:()=>`<div class="od-field object-search"><label for="object-search">名称或类型</label><input id="object-search" type="search" value="${esc(objectQuery)}" placeholder="搜索船舶、门禁等" autocomplete="off"></div><div id="object-results" class="object-results">${objectResults()}</div>`},
   mapScale:{title:'图层与点位',topic:'map',kind:'场地',rows:Object.keys(layerKinds).map(k=>[k,points.filter(p=>p.kind===k).length,'个']),render:()=>sbDual({id:'map-visible-total',label:'可见对象',value:points.filter(p=>enabled.has(p.kind)).length,unit:'个'},{id:'map-layer-total',label:'开启图层',value:enabled.size,unit:'类'},true)+`<div id="map-kind-list">${sbStatList('九类图层的示意点，关闭的图层记 0',mapKindRows())}</div>`+`<p class="view-copy">筛选底部图层，点击对象查看详情。滚轮缩放、拖动平移，按 0 恢复全景。位置均为示意。</p>`+linkedRows(points.filter(p=>p.alert).map(p=>[p.name,p.status+' · 重点关注','data-locate',p.id]))},
   channelList:{title:'监控通道',topic:'video',kind:'摄像头',headers:['通道','名称','接入状态'],rows:cameras.map((n,i)=>['CAM 0'+(i+1),n,'模拟']),render:()=>sbDual({label:'模拟通道',value:cameras.length,unit:'路'},{label:'真实接入',value:0,unit:'路',note:'未接入视频流'},true)+linkedRows(cameras.map((n,i)=>[n,'CAM 0'+(i+1)+' · 静态底图模拟','data-wall-channel',String(i)]))+caption('点击通道切换画面','三路均为模拟')},
@@ -217,10 +260,10 @@ function topicSummary(){
  const view=activeView();
  if(current==='people')return [['当前在场',onSiteTotal,'人','','people','people'],['今日峰值',onSitePeak,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',affiliation[0][1],'人','','people','peopleAffiliation'],['海油外',affiliation[1][1],'人','','people','peopleAffiliation']];
  if(current==='energy')return [['今日用电',todayKwh,'kWh','','bolt','electricity'],['购电',gridKwh,'kWh','','bolt','powerMix'],['光伏发电',solarGen,'kWh','','bolt','solarBalance'],['岸电',shoreTotal,'kWh','','bolt','todayItems'],['今日碳减排',carbonDaily.at(-1),'tCO₂','','bolt','energyTrend']];
- if(current==='ships')return [['当日在港',portToday,'艘','','ship','shipScale'],['今日峰值',portPeak,'艘','','ship','shipToday'],['近七日航次',voyageSeries.at(-1),'航次','','ship','voyageTrend'],['服务船舶',26,'艘','','ship','shipScale'],['示意船舶',4,'艘','','ship','berths']];
+ if(current==='ships')return [['当日在港',portToday,'艘','','ship','shipScale'],['今日峰值',portPeak,'艘','','ship','shipToday'],['近七日航次',voyageSeries.at(-1),'航次','','ship','voyageTrend'],['服务船舶',servedSeries.at(-1),'艘','','ship','shipScale'],['在港船舶',points.filter(p=>p.kind==='船舶').length,'艘','','ship','berths']];
  if(current==='vehicles')return [['当前在场',vehicleToday,'辆','','truck','vehicleScale'],['七日峰值',vehiclePeak,'辆','','truck','vehicleTrend'],['进场',flowIn,'车次','','truck','vehicleFlow'],['出场',flowOut,'车次','','truck','vehicleFlow'],['待审批',3,'单','','gate','approvals']];
- if(current==='production')return [['完成率',86.7,'%','','chart','prodHead'],['已完成',104,'单','','chart','prodHead'],['吞吐量',productionSeries['吞吐量'].at(-1),'t','','chart','prodTrend'],['加油',productionSeries['柴油'].at(-1),'t','','chart','prodTrend'],['卸装船次',16,'船次','','chart','prodCargo']];
- if(current==='safety')return [['今日许可',24,'项','','shield','safetyHead'],['执行中',9,'项','','shield','safetyHead'],['作业票',safetySeries.at(-1),'张','','shield','safetyTrend'],['设备完好',96.2,'%','','shield','safetyEquip'],['停用',1,'台','','shield','safetyEquip']];
+ if(current==='production')return [['完成率',86.7,'%','','chart','prodHead'],['已完成',104,'单','','chart','prodHead'],['吞吐量',productionSeries['吞吐量'].at(-1),'t','','chart','prodTrend'],['加油',productionSeries['柴油'].at(-1),'t','','chart','prodTrend'],['卸装船次',cargoCallSeries.at(-1),'船次','','chart','prodCargo']];
+ if(current==='safety')return [['今日许可',24,'项','','shield','safetyHead'],['执行中',activePermitSeries.at(-1),'项','','shield','safetyHead'],['作业票',safetySeries.at(-1),'张','','shield','safetyTrend'],['设备完好',intactSeries.at(-1),'%','','shield','safetyEquip'],['停用',1,'台','','shield','safetyEquip']];
  if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','','area','mapObjects'],['开启图层',enabled.size,'类','','layers','mapScale'],['示意点位',points.length,'个','','area','mapScale'],['重点关注',points.filter(p=>p.alert).length,'处','','shield','mapScale'],['摄像通道',3,'路','','camera','channelList']];
  if(view.layout==='video')return [['模拟通道',cameras.length,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
  return [];
@@ -256,7 +299,7 @@ function locateObject(id){
 
 $('#navigation').innerHTML=Object.entries(topics).map(([key,t])=>`<button data-topic="${key}" ${key===current?'aria-current="page"':''}>${t.name}</button>`).join('');
 $('#layer-controls').innerHTML='<span class="layer-caption">'+icon('layers')+' 图层</span>'+Object.entries(layerKinds).map(([kind,i])=>`<button class="layer-btn" data-layer="${kind}" aria-pressed="${enabled.has(kind)}">${icon(i)}<span>${kind}</span></button>`).join('');
-$('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
+$('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" ${p.compact?'data-compact="true"':''} style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
 function renderPanels(){
  const root=document.documentElement;
  root.dataset.topic=current;

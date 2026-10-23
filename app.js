@@ -28,6 +28,18 @@ document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = icon(el.da
 let toastTimer;
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').hidden=true,3000);}
 const days=['10/16','10/17','10/18','10/19','10/20','10/21','10/22'];
+const energyKwh=[38620,40180,39480,42060,41240,43120,42860];
+const carbonDaily=[6.2,7.1,6.8,7.6,7.4,8.1,7.82];
+const todayKwh=energyKwh.at(-1),prevKwh=energyKwh.at(-2),kwhDelta=todayKwh-prevKwh;
+const peakKwh=Math.max(...energyKwh),peakDay=days[energyKwh.indexOf(peakKwh)];
+const kwhPct=(Math.abs(kwhDelta)/prevKwh*100).toFixed(1);
+const kwhChange=`较前一日${kwhDelta>=0?'增加':'减少'} ${Math.abs(kwhDelta)} kWh / ${kwhPct}%`;
+const gridKwh=32100,solarSelf=10760,solarExport=2100,solarGen=solarSelf+solarExport;
+const shoreBerths=[['01 号泊位',3280],['02 号泊位',2860],['03 号泊位',2500]];
+const shoreTotal=shoreBerths.reduce((sum,[,n])=>sum+n,0);
+const solarHours=['00时','04时','08时','12时','16时','20时','24时'];
+const solarCurve=[0,820,2480,4860,3620,1080,0];
+const fuels=[['柴油',18.6,'t'],['淡水',326,'m³'],['LNG',42.5,'t']];
 const metrics = rows => `<div class="metrics" style="--cols:${Math.min(rows.length,3)}">${rows.map(([label,value,unit=''])=>`<div class="metric od-stat"><span class="metric-label">${label}</span><strong class="metric-value od-nowrap">${fmt(value)}<small>${unit}</small></strong></div>`).join('')}</div>`;
 let chartSerial=0;
 function lineChart(values, values2, labels=days, names=['入场人数','作业人员']){
@@ -58,12 +70,12 @@ const panels={
  fuel:{title:'加油作业',topic:'production',kind:'船舶',rows:[['柴油储存',680,'t'],['加油吨数',126,'t'],['加油船次',10,'船次']],render:()=>metrics([['柴油储存',680,'t'],['加油吨数',126,'t'],['加油船次',10,'船次']])+lineChart([84,96,92,108,116,112,126],null,days,['加油吨数'])+caption('近七日加油量','单位：t')},
  ash:{title:'输灰作业',topic:'production',kind:'场地',rows:[['输送反打船次',8,'船次'],['输送船次',6,'船次'],['反打船次',2,'船次']],render:()=>metrics([['输送反打',8,'船次'],['输送',6,'船次'],['反打',2,'船次']])+bars([['输送',6],['反打',2]],8)+caption('业务名称沿用原表')},
  prodTrend:{title:'生产趋势',topic:'production',kind:'场地',headers:['业务','今日','昨日'],rows:[['柴油（t）',126,112],['灰浆（t）',320,296],['件杂货（t）',2414,2260],['吞吐量（t）',2860,2668]],render:()=>strip(Object.keys(productionSeries),'data-production-series',trendChoice)+lineChart(productionSeries[trendChoice],null,days,[trendChoice])+caption('近七日'+trendChoice,'单位：t')},
- electricity:{title:'电力使用',topic:'energy',kind:'场地',rows:[['总用电量',42860,'kWh'],['购电量',32100,'kWh'],['光伏自用电',10760,'kWh']],render:()=>metrics([['总用电量',42860,'kWh'],['购电量',32100,'kWh'],['光伏自用',10760,'kWh']])+bars([['购电',32100],['光伏自用',10760]],42860)+caption('总用电＝购电＋光伏自用','今日')},
- solar:{title:'光伏发电',topic:'energy',kind:'场地',rows:[['总发电量',12860,'kWh'],['光伏自用电',10760,'kWh'],['外送电量',2100,'kWh']],render:()=>metrics([['总发电量',12860,'kWh'],['光伏自用',10760,'kWh'],['外送电量',2100,'kWh']])+lineChart([0,820,2480,4860,3620,1080,0],null,['00时','04时','08时','12时','16时','20时','24时'],['发电量'])+caption('示例日内发电分布','单位：kWh')},
- shore:{title:'岸电使用',topic:'energy',kind:'船舶',rows:[['岸电总用量',8640,'kWh'],['01 号泊位',3280,'kWh'],['02 号泊位',2860,'kWh'],['03 号泊位',2500,'kWh']],render:()=>metrics([['岸电使用',8640,'kWh']])+bars([['01 号泊位',3280],['02 号泊位',2860],['03 号泊位',2500]],4000)+caption('泊位名称及位置为示意')},
- resources:{title:'油气水消耗',topic:'energy',kind:'场地',rows:[['柴油消耗',18.6,'t'],['淡水消耗',326,'m³'],['LNG 加注',42.5,'t']],render:()=>metrics([['柴油消耗',18.6,'t'],['淡水消耗',326,'m³'],['LNG 加注',42.5,'t']])+table(['能源类型','统计周期','计量单位'],[['柴油','今日','t'],['淡水','今日','m³'],['LNG','今日','t']])},
- carbon:{title:'碳减排',topic:'energy',kind:'场地',rows:[['今日碳减排',7.82,'tCO₂'],['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂']],render:()=>metrics([['今日',7.82,'tCO₂'],['本月',186.4,'tCO₂'],['本年',2148.6,'tCO₂']])+lineChart([6.2,7.1,6.8,7.6,7.4,8.1,7.82],null,days,['碳减排量'])+caption('仅演示展示，未设定排放因子','单位：tCO₂')},
- energyTrend:{title:'用电量趋势',topic:'energy',kind:'场地',rows:days.map((d,i)=>[d,[38620,40180,39480,42060,41240,43120,42860][i],'kWh']),render:()=>lineChart([38620,40180,39480,42060,41240,43120,42860],null,days,['用电量'])+caption('近七日总用电量','单位：kWh')},
+ electricity:{title:'今日用电',topic:'energy',kind:'场地',rows:[['今日总用电',todayKwh,'kWh'],['前一日用电',prevKwh,'kWh'],['较前一日',kwhDelta,'kWh'],['近七日峰值',peakKwh,'kWh'],['峰值日期',peakDay,''],['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh']],render:()=>sbDual({label:'今日总用电',value:todayKwh,unit:'kWh',note:kwhChange},{label:'近七日峰值',value:peakKwh,unit:'kWh',note:'出现在 '+peakDay},true)},
+ powerMix:{title:'用电构成',topic:'energy',kind:'场地',rows:[['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['总用电量',gridKwh+solarSelf,'kWh']],render:()=>sbDonut([['购电',gridKwh],['光伏自用',solarSelf]],'总计用电',{unit:'kWh',tight:true})},
+ shore:{title:'岸电',topic:'energy',kind:'船舶',rows:[['岸电总用量',shoreTotal,'kWh'],...shoreBerths.map(([name,value])=>[name,value,'kWh']),['统计口径','未并入总用电','说明']],render:()=>sbKpi({label:'岸电总用量',value:shoreTotal,unit:'kWh',note:'未并入上方用电构成'})+sbChips(shoreBerths,'kWh')+caption('泊位名称为示意','不与购电相加')},
+ solar:{title:'今日光伏平衡',topic:'energy',kind:'场地',rows:[['总发电量',solarGen,'kWh'],['光伏自用电',solarSelf,'kWh'],['外送电量',solarExport,'kWh'],...solarHours.map((hour,i)=>[hour+'发电',solarCurve[i],'kWh'])],render:()=>sbDonut([['光伏自用',solarSelf,1],['外送电量',solarExport,2]],'总发电量',{unit:'kWh'})},
+ resources:{title:'油气水',topic:'energy',kind:'场地',rows:fuels.map(([name,value,unit])=>[name+'消耗',value,unit]),render:()=>sbChips(fuels)+caption('今日消耗','单位各不相同')},
+ energyTrend:{title:'近七日趋势',topic:'energy',kind:'场地',rows:[...days.map((d,i)=>[d+' 用电',energyKwh[i],'kWh']),...days.map((d,i)=>[d+' 碳减排',carbonDaily[i],'tCO₂']),['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂'],['排放因子','未设定','演示']],render:()=>sbSparks([['总用电',energyKwh,'kWh'],['碳减排',carbonDaily,'tCO₂']],{delta:(change,_name,_values,unit)=>{const digits=Number.isInteger(change)?0:2,amount=Math.round(Math.abs(change)*10**digits)/10**digits;return `较前日${change>=0?'增加':'减少'} ${amount} ${unit}`;}})},
  equipment:{title:'关键重要设备',topic:'safety',kind:'场地',headers:['设备','总数 / 可用 / 停用 / 在用','完好率'],rows:[['消防水泵','8 / 8 / 0 / 2','100%'],['空压机','12 / 11 / 1 / 6','91.7%'],['生活水泵','6 / 6 / 0 / 3','100%']],render:()=>table(['设备','总数 / 在用','完好率'],[['消防水泵','8 / 2','100%'],['空压机','12 / 6','91.7%'],['生活水泵','6 / 3','100%']])+caption('点击详情查看可用、停用数量')},
  availability:{title:'设备可靠性',topic:'safety',kind:'场地',rows:[['设备总数',26,'台'],['年可用率',98.6,'%'],['当前完好率',96.2,'%'],['可用设备',25,'台'],['停用设备',1,'台'],['在用设备',11,'台']],render:()=>donut(96.2,'设备完好率',[['总数','26 台'],['年可用率','98.6%'],['在用','11 台']])+caption('可用 25 台 · 停用 1 台')},
  permits:{title:'作业许可记录',topic:'safety',kind:'场地',headers:['票号','作业类型','状态'],rows:[['PT-1022-024','吊装','执行中'],['PT-1022-023','动火','执行中'],['PT-1022-022','有限空间','待开始'],['PT-1022-021','高处','已结束']],render:()=>table(['作业票','类型','状态'],[['…024','吊装','执行中'],['…023','动火','执行中'],['…022','有限空间','待开始'],['…021','高处','已结束']])},
@@ -72,7 +84,7 @@ const panels={
 };
 const topics={
  people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
- energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','solar','shore','resources','carbon','energyTrend'],layers:['场地','船舶']},
+ energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','powerMix','shore','energyTrend','solar','resources'],layers:['场地','船舶']},
  ships:{name:'船舶动态',en:'VESSEL DYNAMICS',panels:['ships','voyages','berths','shipPeak'],layers:['船舶','摄像头']},
  vehicles:{name:'车辆动态',en:'VEHICLE DYNAMICS',panels:['vehicles','vehicleFlow','approvals','vehicleObjects'],layers:['拖车','平板拖车','叉车','门禁']},
  map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'},
@@ -115,18 +127,18 @@ function sbKpi(item){
  return `<div class="sb-kpi od-stat">${item.lead?value+label:label+value}${note}</div>`;
 }
 function sbDual(left,right,tight){return `<div class="sb-dual${tight?' sb-dual-tight':''}">${sbKpi(left)}${sbKpi(right)}</div>`;}
-function sbChips(rows,unit){return `<div class="sb-chips">${rows.map(([label,value],i)=>`<div class="od-stat"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(label)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong></div>`).join('')}</div>`;}
+function sbChips(rows,unit){const style=rows.length===4?'':` style="--sb-chip-cols:${rows.length}"`;return `<div class="sb-chips"${style}>${rows.map(([label,value,rowUnit],i)=>`<div class="od-stat"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(label)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(rowUnit||unit)}</small></strong></div>`).join('')}</div>`;}
 function sbDonut(rows,center,{unit='人',tight=false}={}){
  const total=rows.reduce((sum,[,n])=>sum+n,0),radius=72,circumference=2*Math.PI*radius;
  let offset=0;
- const geometry=rows.map(([name,value],i)=>{
-  const info=esc(name+'：'+value+' '+unit+'，'+(value/total*100).toFixed(1)+'%');
+ const geometry=rows.map(([name,value,color],i)=>{
+  const slot=color??i,info=esc(name+'：'+value+' '+unit+'，'+(value/total*100).toFixed(1)+'%');
   const dash=`${Math.max(0,value/total*circumference-2)} ${circumference}`,shift=-(offset/total*circumference);
   offset+=value;
-  return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--sb-series-${i})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
+  return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--sb-series-${slot})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
  }).join('');
  const viewBox=tight?'18 18 164 164':'0 0 200 200';
- return `<div class="sb-donut"><div class="sb-donut-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${esc(center+'，合计 '+total+' '+unit)}"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="sb-donut-center od-stat"><strong>${fmt(total)}</strong><span>${esc(center)}</span></div></div><div class="sb-legend">${rows.map(([name,value],i)=>`<div class="sb-legend-row"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+ return `<div class="sb-donut"><div class="sb-donut-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${esc(center+'，合计 '+total+' '+unit)}"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="sb-donut-center od-stat"><strong>${fmt(total)}</strong><span>${esc(center)}</span></div></div><div class="sb-legend">${rows.map(([name,value,color],i)=>{const slot=color??i;return `<div class="sb-legend-row"><span class="sb-dot" style="--item-color:var(--sb-series-${slot})">${esc(name)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`;}).join('')}</div></div>`;
 }
 function sbColumns(rows,{unit='人',step=100,aria,title}={}){
  const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/step)*step||1,left=46,right=628,base=236,top=24,plot=base-top;
@@ -147,10 +159,10 @@ function sbSparkline(values,name,opt){
  return `<svg class="sb-spark-chart" viewBox="0 0 ${w} 32" role="img" aria-label="${esc(aria)}"><title>${esc(title)}</title><path d="${path}" class="sb-spark-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(tip(labels[i],name,values[i]))}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="sb-spark-dot"/></g>`).join('')}</svg>`;
 }
 function sbSparks(items,opt={}){
- const unit=opt.unit??'人',labels=opt.labels??days;
- const delta=opt.delta||(change=>`${change>=0?'+':''}${change} ${unit}`);
+ const fallback=opt.unit??'人',labels=opt.labels??days;
+ const delta=opt.delta||((change,_name,_values,unit)=>`${change>=0?'+':''}${change} ${unit}`);
  const sectionLabel=opt.sectionLabel||(name=>name+'近七日趋势');
- const rows=items.map(([name,values],i)=>{const change=values.at(-1)-values.at(-2);return `<section class="sb-spark" style="--trend-color:var(--sb-series-${i})" aria-label="${esc(sectionLabel(name))}"><div class="sb-spark-head"><strong class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> ${esc(unit)}</small></b><small class="sb-spark-delta">${esc(delta(change,name,values))}</small></div>${sbSparkline(values,name,opt)}</section>`;}).join('');
+ const rows=items.map(([name,values,rowUnit],i)=>{const unit=rowUnit||fallback,change=values.at(-1)-values.at(-2);return `<section class="sb-spark" style="--trend-color:var(--sb-series-${i})" aria-label="${esc(sectionLabel(name))}"><div class="sb-spark-head"><strong class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> ${esc(unit)}</small></b><small class="sb-spark-delta">${esc(delta(change,name,values,unit))}</small></div>${sbSparkline(values,name,{...opt,unit})}</section>`;}).join('');
  return `<div class="sb-sparks">${rows}<div class="sb-axis">${labels.map(day=>`<span>${esc(day)}</span>`).join('')}</div></div>`;
 }
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
@@ -177,9 +189,10 @@ function objectResults(){const q=objectQuery.trim().toLowerCase(),items=points.f
 function topicSummary(){
  const view=activeView();
  if(current==='people')return [['当前在场',onSiteTotal,'人','','people','people'],['今日峰值',onSitePeak,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',affiliation[0][1],'人','','people','peopleAffiliation'],['海油外',affiliation[1][1],'人','','people','peopleAffiliation']];
+ if(current==='energy')return [['今日用电',todayKwh,'kWh','','bolt','electricity'],['七日峰值',peakKwh,'kWh','','bolt','energyTrend'],['光伏发电',solarGen,'kWh','','bolt','solar'],['购电',gridKwh,'kWh','','bolt','powerMix'],['今日碳减排',carbonDaily.at(-1),'tCO₂','','bolt','energyTrend']];
  if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['图层类型',9,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
  if(view.layout==='video')return [['模拟通道',3,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
- const keys={vehicles:['vehicles','vehicleFlow','approvals'],ships:['ships','voyages','berths'],energy:['electricity','solar','carbon'],safety:['safety','permits'],production:['production','shipWork','cargo']}[current];
+ const keys={vehicles:['vehicles','vehicleFlow','approvals'],ships:['ships','voyages','berths'],safety:['safety','permits'],production:['production','shipWork','cargo']}[current];
  return keys.flatMap(k=>panels[k].rows.filter(r=>typeof r[1]==='number').slice(0,2).map(([l,v,u])=>[l,v,u,'','chart',k])).slice(0,6);
 }
 function renderSummary(){const rows=topicSummary();$('#summary').style.setProperty('--summary-count',rows.length);$('#summary').innerHTML=rows.map(([l,v,u,h,i,key])=>`<button class="summary-item" data-detail="${key}" aria-label="查看${l}"><span class="label">${l}</span><span class="mini-icon">${icon(i)}</span><strong class="value od-nowrap">${fmt(v)}<small class="unit">${u}</small></strong><span class="hint">${h||''}</span></button>`).join('');}
@@ -217,7 +230,7 @@ $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${
 function renderPanels(){
  const root=document.documentElement;
  root.dataset.topic=current;
- if(current==='people')root.dataset.sidebar='airy';else delete root.dataset.sidebar;
+ if(current==='people'||current==='energy')root.dataset.sidebar='airy';else delete root.dataset.sidebar;
  const keys=activeView().panels,half=Math.ceil(keys.length/2);
  ['left-panels','right-panels'].forEach((id,index)=>{const wing=$('#'+id),items=keys.slice(index*half,index*half+half);wing.style.setProperty('--panel-count',items.length);wing.innerHTML=items.map(key=>{const p=panels[key];return `<section class="panel" data-panel="${key}"><div class="panel-head"><h2>${p.title}</h2><button class="panel-link" data-detail="${key}" aria-label="查看${p.title}详情">详情 ${icon('arrow')}</button></div><div class="panel-body">${p.render()}</div></section>`}).join('');});
 }

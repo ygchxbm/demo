@@ -1,5 +1,5 @@
 /* Reference: cursor/sidebar-shared-extract-4ee7 (67c2360).
-   Only enabled by syncPageStyle for personnel, at either display ratio.
+   Only enabled by syncPageAppearance for personnel, at either display ratio.
    Business DOM, chart colors and the original glass skin remain unchanged. */
 :root[data-page-style=airy] {
   --airy-veil:

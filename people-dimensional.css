@@ -1,0 +1,17 @@
+/* Chart geometry only; page surfaces and layout are independently selected. */
+:root .person-chart-depth { display: none!important; }
+:root[data-chart-mode=dimensional] .person-chart-depth { display: block!important; }
+:root[data-chart-mode=dimensional] .person-chart-flat { display: none!important; }
+:root[data-chart-mode=dimensional] .person-ring-floor { filter: blur(3px); }
+:root[data-chart-mode=dimensional] .person-column-side { fill: color-mix(in srgb,var(--column-color) 45%,#102133); }
+:root[data-chart-mode=dimensional] .person-column-top { fill: color-mix(in srgb,var(--column-color) 60%,white); }
+:root[data-chart-mode=dimensional] .person-column-edge { fill: none; stroke: rgba(244,253,255,.55); stroke-width: 1; }
+:root[data-chart-mode=dimensional] .person-trend-chart { height: 4.6rem; }
+:root[data-chart-mode=dimensional] .person-solid-rail-shadow { fill: none; stroke: rgba(0,9,20,.55); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+:root[data-chart-mode=dimensional] .person-solid-rail { fill: none; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; }
+:root[data-chart-mode=dimensional] .person-solid-rail-glint { fill: none; stroke: rgba(244,253,255,.7); stroke-width: 1; stroke-linejoin: round; stroke-linecap: round; }
+:root[data-chart-mode=dimensional] :is(.person-ring-top,.person-solid-column):focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+
+:root[data-chart-mode=dimensional] { --chart-shadow: rgba(var(--theme-shadow-rgb),.55); }
+:root[data-chart-mode=dimensional] .person-share-graphic>svg { overflow: visible; filter: drop-shadow(0 6px 8px var(--chart-shadow)); }
+:root[data-chart-mode=dimensional] .person-ring-center { position: relative; transform: translateY(-.6rem); }

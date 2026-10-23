@@ -199,14 +199,28 @@ try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||d
 // Display ratio is shared by every topic; 32:9 uses scheme 2.
 function activeDashboardLayout(){return dashboardLayout;}
 const pageStyleKey='hainan-port-people-page-style';
-let pageStyle='glass';
-try{if(localStorage.getItem(pageStyleKey)==='airy')pageStyle='airy';}catch{}
-function syncPageStyle(){
+const dataDisplayKey='hainan-port-people-data-display';
+let pageStyle='glass',dataDisplay='flat';
+try{
+ const savedStyle=localStorage.getItem(pageStyleKey),savedDisplay=localStorage.getItem(dataDisplayKey);
+ if(savedStyle==='airy'||savedStyle==='dimensional')pageStyle='airy';
+ if(['flat','dimensional'].includes(savedDisplay))dataDisplay=savedDisplay;
+ else if(savedStyle==='dimensional')dataDisplay='dimensional';
+ // Persist the independent data choice before migrating the old combined style.
+ if(savedStyle==='dimensional'){
+  localStorage.setItem(dataDisplayKey,dataDisplay);
+  localStorage.setItem(pageStyleKey,pageStyle);
+ }
+}catch{}
+function syncPageAppearance(){
  const supported=current==='people';
  if(supported&&pageStyle==='airy')document.documentElement.dataset.pageStyle='airy';
  else delete document.documentElement.dataset.pageStyle;
+ if(supported&&dataDisplay==='dimensional')document.documentElement.dataset.chartMode='dimensional';
+ else delete document.documentElement.dataset.chartMode;
  document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pageStyleChoice===pageStyle)));
- $('#page-style-note').textContent=pageStyle==='airy'&&!supported?'已记住融合渐变；切回人员动态时生效。':'融合渐变支持人员动态的 16:9 与 32:9。';
+ document.querySelectorAll('[data-display-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.displayChoice===dataDisplay)));
+ $('#page-style-note').textContent=supported?'两组设置可独立组合，支持人员动态的 16:9 与 32:9。':'设置已记住；切回人员动态时生效。';
 }
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
@@ -217,11 +231,25 @@ const dailyEntries=days.map((_,i)=>Object.values(personSeries).reduce((sum,serie
 const todayEntry=dailyEntries.at(-1),previousEntry=dailyEntries.at(-2);
 const personnelNumber=(value,label)=>`<div class="person-number od-stat"><strong class="od-nowrap">${fmt(value)}<small>人</small></strong><span>${label}</span></div>`;
 function personnelRoleGrid(rows){return `<div class="person-role-grid">${rows.map(([label,value])=>`<div class="od-stat"><span>${label}</span><strong class="od-nowrap">${value}<small> 人</small></strong></div>`).join('')}</div>`;}
+// Dimensional geometry is derived from the same values as the flat charts.
+function personnelSolidRing(rows,key,total){
+ const outer=84,inner=58,depth=24,sy=.78;
+ const point=(r,a,d=0)=>[100+r*Math.cos(a*Math.PI/180),88+r*sy*Math.sin(a*Math.PI/180)+d];
+ const wall=(r,a,b)=>{const p=point(r,a),q=point(r,b),u=point(r,b,depth),v=point(r,a,depth);return `M${p} A${r},${r*sy} 0 ${b-a>180?1:0} 1 ${q} L${u} A${r},${r*sy} 0 ${b-a>180?1:0} 0 ${v} Z`;};
+ let offset=-90;
+ const sectors=rows.map(([name,value],i)=>{const start=offset;offset+=value/total*360;return {name,value,i,start,end:offset-.6};});
+ const defs=sectors.map(({i})=>`<linearGradient id="${key}-solid-top-${i}" x2=".6" y2="1"><stop stop-color="color-mix(in srgb,var(--person-series-${i}) 65%,white)"/><stop offset=".45" stop-color="var(--person-series-${i})"/><stop offset="1" stop-color="color-mix(in srgb,var(--person-series-${i}) 80%,#17324a)"/></linearGradient><linearGradient id="${key}-solid-wall-${i}" x2="0" y2="1"><stop stop-color="color-mix(in srgb,var(--person-series-${i}) 64%,#102235)"/><stop offset="1" stop-color="color-mix(in srgb,var(--person-series-${i}) 30%,#07131e)"/></linearGradient>`).join('');
+ const walls=sectors.map(({i,start,end})=>[[outer,0,180],[inner,-90,0],[inner,180,270]].map(([r,a,b])=>{a=Math.max(a,start);b=Math.min(b,end);return b>a?`<path d="${wall(r,a,b)}" fill="url(#${key}-solid-wall-${i})"/>`:'';}).join('')).join('');
+ const tops=sectors.map(({name,value,i,start,end})=>{const a=point(outer,start),b=point(outer,end),c=point(inner,end),d=point(inner,start),large=end-start>180?1:0,tip=esc(name+'：'+value+' 人，'+(value/total*100).toFixed(1)+'%');return `<path class="person-ring-top" d="M${a} A${outer},${outer*sy} 0 ${large} 1 ${b} L${c} A${inner},${inner*sy} 0 ${large} 0 ${d} Z" fill="url(#${key}-solid-top-${i})" stroke="rgba(238,253,255,.4)" stroke-width=".65" tabindex="0" data-tip="${tip}"><title>${tip}</title></path>`;}).join('');
+ return `<g class="person-chart-depth"><defs>${defs}</defs><ellipse cx="100" cy="177" rx="83" ry="12" fill="rgba(0,8,18,.4)" class="person-ring-floor"/><g aria-hidden="true" pointer-events="none">${walls}</g>${tops}</g>`;
+}
 function personnelTrendChart(values,name){
  const min=Math.min(...values),max=Math.max(...values),range=max-min||1;
  const coords=values.map((value,i)=>[12+i*296/6,43-(value-min)/range*26]);
  const path=coords.map(([x,y],i)=>(i?'L':'M')+x+','+y).join(' ');
- return `<svg class="person-trend-chart" viewBox="0 0 320 60" role="img" aria-label="${name}近七日入场人数：${values.join('、')}人"><title>${name}近七日入场趋势，独立纵轴 ${min}—${max} 人</title><path d="${path}" class="person-trend-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><circle cx="${x}" cy="${y}" r="8" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.8" class="person-trend-dot"/></g>`).join('')}</svg>`;
+ const key='person-trend-solid-'+Object.keys(personSeries).indexOf(name);
+ const solid=`<g class="person-chart-depth"><defs><linearGradient id="${key}-rail" x2="0" y2="1"><stop stop-color="color-mix(in srgb,var(--trend-color) 40%,white)"/><stop offset="1" stop-color="var(--trend-color)"/></linearGradient><radialGradient id="${key}-node" cx=".3" cy=".25" r=".75"><stop stop-color="#f5fdff"/><stop offset=".3" stop-color="var(--trend-color)"/><stop offset="1" stop-color="color-mix(in srgb,var(--trend-color) 35%,#071727)"/></radialGradient></defs><path d="${path}" transform="translate(0 5)" class="person-solid-rail-shadow"/><path d="${path}" stroke="url(#${key}-rail)" class="person-solid-rail"/><path d="${path}" transform="translate(0 -1)" class="person-solid-rail-glint"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><ellipse cx="${x}" cy="${y+6}" rx="6" ry="2" fill="rgba(0,8,18,.45)"/><circle cx="${x}" cy="${y}" r="4.8" fill="url(#${key}-node)"/><circle cx="${x}" cy="${y}" r="9" fill="transparent"/></g>`).join('')}</g>`;
+ return `<svg class="person-trend-chart" viewBox="0 0 320 60" role="img" aria-label="${name}近七日入场人数：${values.join('、')}人"><title>${name}近七日入场趋势，独立纵轴 ${min}—${max} 人</title><g class="person-chart-flat"><path d="${path}" class="person-trend-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><circle cx="${x}" cy="${y}" r="8" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.8" class="person-trend-dot"/></g>`).join('')}</g>${solid}</svg>`;
 }
 function personnelShare(rows,ring=false){
  const total=rows.reduce((sum,[,n])=>sum+n,0),radius=72,circumference=2*Math.PI*radius;
@@ -232,11 +260,13 @@ function personnelShare(rows,ring=false){
   const circle=`<circle cx="100" cy="100" r="${radius}" fill="none" stroke="${color}" stroke-width="20" stroke-dasharray="${Math.max(0,value/total*circumference-1)} ${circumference}" stroke-dashoffset="${-offset/total*circumference}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
   offset+=value;return circle;
  }).join('');
- return `<div class="person-share"><div class="person-share-graphic"><svg viewBox="0 0 200 200" role="img" aria-label="${ring?'近七日分类入场构成':'当前在场人员海油内外构成'}，合计 ${total} 人"><defs><linearGradient id="${key}-ring-0" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#269dff"/><stop offset="1" stop-color="#81e7ff"/></linearGradient><linearGradient id="${key}-ring-1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55e5cb"/><stop offset="1" stop-color="#9af6e5"/></linearGradient></defs>${geometry}</svg><div class="person-ring-center od-stat"><strong>${fmt(total)}</strong><span>${ring?'七日累计入场':'总计人数'}</span></div></div><div class="person-share-legend">${rows.map(([name,value],i)=>`<div class="person-share-row"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+ return `<div class="person-share"><div class="person-share-graphic"><svg viewBox="0 0 200 200" role="img" aria-label="${ring?'近七日分类入场构成':'当前在场人员海油内外构成'}，合计 ${total} 人"><defs><linearGradient id="${key}-ring-0" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#269dff"/><stop offset="1" stop-color="#81e7ff"/></linearGradient><linearGradient id="${key}-ring-1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#55e5cb"/><stop offset="1" stop-color="#9af6e5"/></linearGradient></defs><g class="person-chart-flat">${geometry}</g>${personnelSolidRing(rows,key,total)}</svg><div class="person-ring-center od-stat"><strong>${fmt(total)}</strong><span>${ring?'七日累计入场':'总计人数'}</span></div></div><div class="person-share-legend">${rows.map(([name,value],i)=>`<div class="person-share-row"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
 }
 function personnelColumns(rows){
  const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/100)*100;
- return `<svg class="person-columns" viewBox="0 0 640 160" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>今日分类入场，单位：人，各柱共用零起点</title>${[0,.5,1].map(r=>`<line x1="40" x2="620" y1="${122-r*116}" y2="${122-r*116}" class="person-gridline"/><text x="0" y="${127-r*116}">${Math.round(max*r)}</text>`).join('')}${rows.map(([name,value],i)=>{const x=105+i*140,h=value/max*116;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' 人')}"><rect x="${x-28}" y="${122-h}" width="56" height="${h}" fill="var(--person-series-${i})"/><text x="${x}" y="${112-h}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x}" y="151" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('')}</svg>`;
+ const flat=`<svg class="person-columns person-chart-flat" viewBox="0 0 640 160" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>今日分类入场，单位：人，各柱共用零起点</title>${[0,.5,1].map(r=>`<line x1="40" x2="620" y1="${122-r*116}" y2="${122-r*116}" class="person-gridline"/><text x="0" y="${127-r*116}">${Math.round(max*r)}</text>`).join('')}${rows.map(([name,value],i)=>{const x=105+i*140,h=value/max*116;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' 人')}"><rect x="${x-28}" y="${122-h}" width="56" height="${h}" fill="var(--person-series-${i})"/><text x="${x}" y="${112-h}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x}" y="151" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('')}</svg>`;
+ const solid=`<svg class="person-columns person-chart-depth" viewBox="0 0 640 220" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>实体柱正面按统一零起点读取，顶面表示厚度，单位：人</title>${[0,.5,1].map(r=>`<line x1="42" x2="622" y1="${176-r*136}" y2="${176-r*136}" class="person-gridline"/><text x="8" y="${181-r*136}">${Math.round(max*r)}</text>`).join('')}${rows.map(([name,value],i)=>{const x=110+i*140,h=value/max*136,y=176-h,left=x-24,right=x+24,tip=esc(name+'：'+value+' 人');return `<g tabindex="0" data-tip="${tip}" class="person-solid-column" style="--column-color:var(--person-series-${i})"><defs><linearGradient id="person-column-solid-${i}" x2="1" y2=".2"><stop stop-color="color-mix(in srgb,var(--column-color) 90%,white)"/><stop offset="1" stop-color="color-mix(in srgb,var(--column-color) 65%,#18304b)"/></linearGradient></defs><ellipse cx="${x+8}" cy="180" rx="43" ry="7" fill="rgba(0,8,18,.4)"/><path d="M${right},${y} l14,-10 V166 l-14,10 Z" class="person-column-side"/><rect x="${left}" y="${y}" width="48" height="${h}" fill="url(#person-column-solid-${i})"/><path d="M${left},${y} l14,-10 h48 l-14,10 Z" class="person-column-top"/><path d="M${left},${y} H${right} V176" class="person-column-edge"/><text x="${x+7}" y="${y-19}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x+5}" y="209" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('')}</svg>`;
+ return flat+solid;
 }
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
 const personTrendKeys=Object.keys(personSeries);
@@ -448,13 +478,19 @@ function syncDashboardLayout(){
    const wing=$('#'+id);wing.style.setProperty('--layout-panel-count',wing.querySelectorAll(':scope > .panel').length);
   }
  }
- syncPageStyle();syncPreviewPopovers();fitMap();
+ syncPageAppearance();syncPreviewPopovers();fitMap();
 }
 document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
  pageStyle=button.dataset.pageStyleChoice;
  try{localStorage.setItem(pageStyleKey,pageStyle);}catch{}
- syncPageStyle();fitMap();
- $('#live-status').textContent=pageStyle==='airy'&&current!=='people'?'已记住融合渐变，适用于人员动态':'已切换为'+button.textContent.trim();
+ syncPageAppearance();fitMap();
+ $('#live-status').textContent=pageStyle!=='glass'&&current!=='people'?'已记住'+button.textContent.trim()+'，适用于人员动态':'已切换为'+button.textContent.trim();
+}));
+document.querySelectorAll('[data-display-choice]').forEach(button=>button.addEventListener('click',()=>{
+ dataDisplay=button.dataset.displayChoice;
+ try{localStorage.setItem(dataDisplayKey,dataDisplay);}catch{}
+ syncPageAppearance();
+ $('#live-status').textContent=current==='people'?'已切换为'+button.textContent.trim():'已记住'+button.textContent.trim()+'，适用于人员动态';
 }));
 document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
  const choice=button.dataset.dashboardLayoutChoice;

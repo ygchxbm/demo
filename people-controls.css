@@ -1,0 +1,59 @@
+/* Personnel controls share the chosen page surface. Chart rendering stays independent. */
+:root[data-topic=people] {
+  --people-control-fill: color-mix(in srgb,var(--surface) 84%,transparent);
+  --people-control-edge: color-mix(in srgb,var(--accent) 38%,transparent);
+  --people-control-selected: color-mix(in srgb,var(--accent) 24%,var(--surface));
+}
+:root[data-topic=people] #navigation {
+  width: fit-content; max-width: 100%; margin-inline: auto; gap: .35rem; padding: .3rem;
+  border: 1px solid var(--people-control-edge); border-radius: .7rem; background: var(--people-control-fill);
+  box-shadow: 0 4px 16px rgba(var(--theme-shadow-rgb),.25); backdrop-filter: blur(12px);
+}
+:root[data-topic=people] #navigation button {
+  min-height: 2.25rem; min-width: 6rem; padding: .35rem .8rem; border: 1px solid transparent; border-radius: .45rem;
+  background: transparent; box-shadow: none; font-size: .9rem; font-weight: 500; letter-spacing: .04em; color: var(--text); text-shadow: none;
+}
+:root[data-topic=people] #navigation button[aria-current=page] {
+  border-color: var(--accent); background: var(--people-control-selected); box-shadow: inset 0 -2px 0 var(--accent); color: var(--text);
+}
+:root[data-topic=people] .map-tools {
+  gap: .25rem; padding: .25rem; border: 1px solid var(--people-control-edge); border-radius: .6rem;
+  background: var(--people-control-fill); backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(var(--theme-shadow-rgb),.25);
+}
+:root[data-topic=people] .map-tools .icon-btn {
+  width: 2.25rem; height: 2.25rem; border: 1px solid transparent; border-radius: .4rem; background: transparent; color: var(--text);
+}
+:root[data-topic=people] .map-tools .od-icon { --od-icon-size: 1.15rem; stroke-width: 2; }
+:root[data-topic=people] .map-tools .icon-btn:disabled { opacity: .4; }
+:root[data-topic=people] .summary {
+  padding: .8rem .65rem; border: 1px solid var(--people-control-edge); border-radius: .65rem;
+  background: color-mix(in srgb,var(--surface) 90%,transparent); box-shadow: 0 4px 20px rgba(var(--theme-shadow-rgb),.25); backdrop-filter: blur(12px);
+}
+:root[data-topic=people] .summary-item .label { color: var(--text); font-size: .85rem; font-weight: 500; }
+:root[data-topic=people] .summary-item .value { color: var(--text); font-weight: 600; font-size: 1.75rem; text-shadow: none; }
+:root[data-topic=people] .summary-item .value .unit { color: var(--muted); font-size: .75rem; }
+:root[data-topic=people][data-page-style=airy] :is(#navigation,.map-tools) {
+  background: color-mix(in srgb,var(--surface) 92%,transparent); border-color: color-mix(in srgb,var(--text) 24%,transparent); backdrop-filter: none;
+}
+:root[data-topic=people][data-page-style=airy] .summary {
+  border: 0; border-bottom: 2px solid color-mix(in srgb,var(--accent) 50%,transparent); border-radius: 0;
+  background: linear-gradient(90deg,color-mix(in srgb,var(--surface) 72%,transparent),color-mix(in srgb,var(--surface) 96%,transparent) 18%,color-mix(in srgb,var(--surface) 96%,transparent) 82%,color-mix(in srgb,var(--surface) 72%,transparent)); backdrop-filter: none;
+}
+:root[data-topic=people][data-dashboard-layout=wide] .summary-item .value { font-size: clamp(30px,calc(16px / var(--dashboard-preview-scale)),60px); }
+:root[data-topic=people][data-dashboard-layout=wide] .summary-item .label { font-size: clamp(16px,calc(12px / var(--dashboard-preview-scale)),36px); }
+:root[data-topic=people][data-dashboard-layout=wide] .summary-item .value .unit { font-size: clamp(14px,calc(10px / var(--dashboard-preview-scale)),30px); }
+/* Reuse the original controls outside the scaled frame at readable CSS pixels. */
+:root[data-topic=people] .readable-floating { position: fixed; z-index: 50; pointer-events: auto; }
+:root[data-topic=people] #navigation.readable-floating {
+  transform: translateX(-50%); max-width: calc(100vw - 32px); margin: 0; padding: 6px; gap: 6px; box-sizing: border-box;
+}
+:root[data-topic=people] #navigation.readable-floating button { flex: 1 1 0; min-width: 82px; min-height: 40px; padding: 6px 8px; font-size: 14px; line-height: 1.4; }
+:root[data-topic=people] .map-tools.readable-floating { display: flex; width: auto; margin: 0!important; gap: 4px; padding: 4px; }
+:root[data-topic=people] .map-tools.readable-floating .icon-btn { width: 40px; height: 40px; }
+:root[data-topic=people] .map-tools.readable-floating .od-icon { --od-icon-size: 20px; }
+:root[data-topic=people] :is(#navigation button,.map-tools .icon-btn,.summary-item):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (hover:hover) {
+  :root[data-topic=people] #navigation button:hover,
+  :root[data-topic=people] .map-tools .icon-btn:not(:disabled):hover,
+  :root[data-topic=people] .summary-item:hover { background: var(--glass-highlight); color: var(--text); }
+}

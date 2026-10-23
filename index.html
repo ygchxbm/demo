@@ -72,6 +72,7 @@
 <link rel="stylesheet" href="dashboard-layouts.css">
 <link rel="stylesheet" href="themes.css">
 <link rel="stylesheet" href="people-airy.css">
+<link rel="stylesheet" href="people-dimensional.css">
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -118,11 +119,18 @@
         <div class="prototype-setting-row">
           <p class="prototype-layout-note" id="page-style-label">页面风格</p>
           <div class="prototype-layout-options" role="group" aria-labelledby="page-style-label" aria-describedby="page-style-note">
-            <button type="button" data-page-style-choice="glass" aria-pressed="true"><strong>当前风格</strong></button>
-            <button type="button" data-page-style-choice="airy" aria-pressed="false" title="参考 cursor/sidebar-shared-extract-4ee7"><strong>融合渐变</strong></button>
+            <button type="button" data-page-style-choice="glass" aria-pressed="true"><strong>磨砂玻璃</strong></button>
+            <button type="button" data-page-style-choice="airy" aria-pressed="false" title="参考 cursor/sidebar-shared-extract-4ee7"><strong>渐变融合</strong></button>
           </div>
         </div>
-        <p id="page-style-note" class="prototype-style-note">融合渐变支持人员动态的 16:9 与 32:9。</p>
+        <div class="prototype-setting-row">
+          <p class="prototype-layout-note" id="data-display-label">数据展示</p>
+          <div class="prototype-layout-options" role="group" aria-labelledby="data-display-label" aria-describedby="page-style-note">
+            <button type="button" data-display-choice="flat" aria-pressed="true"><strong>平面数据</strong></button>
+            <button type="button" data-display-choice="dimensional" aria-pressed="false"><strong>立体数据</strong></button>
+          </div>
+        </div>
+        <p id="page-style-note" class="prototype-style-note">两组设置可独立组合，支持人员动态的 16:9 与 32:9。</p>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>

@@ -401,17 +401,57 @@
   box-shadow:0 0 .45rem var(--accent),0 0 .12rem var(--accent);
 }
 
-/* 光条版：无胶囊。当前项底部是更亮、更宽的主题色光条，贴近示意稿。 */
-:root[data-sidebar=airy][data-nav=glow] #navigation{gap:1.35rem}
+/* 光条版：菜单直接排在顶栏里，纯文字，没有胶囊，也没有第二条导航槽。当前项底部是主题色光条。 */
+:root[data-sidebar=airy][data-nav=glow] .app{grid-template-rows:4.5rem minmax(0,1fr) 1.5rem}
+:root[data-sidebar=airy][data-nav=glow] .navigation{display:none}
+:root[data-sidebar=airy][data-nav=glow] .masthead{
+  display:flex;
+  align-items:center;
+  gap:1.35rem;
+  min-height:4.5rem;
+  overflow:visible;
+}
+:root[data-sidebar=airy][data-nav=glow] .brand{padding:0;gap:0;flex:none}
+:root[data-sidebar=airy][data-nav=glow] .brand-label,
+:root[data-sidebar=airy][data-nav=glow] .brand-small{display:none}
+:root[data-sidebar=airy][data-nav=glow] .title{flex:none;text-align:left;padding:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+:root[data-sidebar=airy][data-nav=glow] .title h1{font-size:1.28rem;font-weight:500;letter-spacing:.08em;line-height:1.15;white-space:nowrap}
+:root[data-sidebar=airy][data-nav=glow] .title h1:after{
+  content:'HAINAN PORT OPERATIONS';
+  display:block;
+  margin-top:.28rem;
+  font-size:.5rem;
+  font-weight:400;
+  letter-spacing:.26em;
+  line-height:1;
+  color:var(--sb-muted);
+  text-shadow:none;
+}
+:root[data-sidebar=airy][data-nav=glow] .title p{display:none}
+:root[data-sidebar=airy][data-nav=glow] .header-tools{flex:none;margin-left:0;padding:0}
+:root[data-sidebar=airy][data-nav=glow] #navigation{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:auto;
+  min-width:0;
+  gap:2.15rem;
+  padding:0;
+  flex-wrap:nowrap;
+  overflow:visible;
+}
 :root[data-sidebar=airy][data-nav=glow] #navigation button{
   min-width:0;
-  padding:.15rem .15rem .62rem;
+  min-height:0;
+  padding:.15rem .02rem .55rem;
   border:0;
   border-radius:0;
   background:transparent;
   box-shadow:none;
-  letter-spacing:.08em;
-  color:color-mix(in srgb,var(--sb-ink) 72%,transparent);
+  letter-spacing:.04em;
+  font-size:.95rem;
+  color:color-mix(in srgb,var(--sb-ink) 78%,transparent);
   font-weight:400;
   text-shadow:0 1px 3px rgba(0,16,36,.45);
 }

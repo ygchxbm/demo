@@ -1,17 +1,19 @@
 /* Scheme 2 is shared by every topic; personnel also retains comparison layouts. */
 .dashboard-frame { display: contents; }
 
-.prototype-layout-note { margin: 0 0 .85rem; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.prototype-setting-row { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 1rem; }
+.prototype-setting-row + .prototype-setting-row { margin-top: .85rem; }
+.prototype-style-note { margin: .75rem 0 0; color: var(--muted); font-size: .7rem; line-height: 1.6; }
 
-.prototype-layout-options { display: grid; gap: .6rem; }
+.prototype-layout-note { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.6; }
 
-.prototype-layout-options button { display: grid; gap: .3rem; width: 100%; padding: .75rem; text-align: left; color: var(--text); background: var(--glass-control); border: 1px solid var(--glass-edge); border-radius: .5rem; }
+.prototype-layout-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem; }
+
+.prototype-layout-options button { display: grid; place-items: center; width: 100%; min-height: 2.5rem; padding: .4rem .65rem; color: var(--text); background: var(--glass-control); border: 1px solid var(--glass-edge); border-radius: .5rem; }
 
 .prototype-layout-options strong { font-size: .85rem; font-weight: 500; }
 
-.prototype-layout-options span { color: var(--muted); font-size: .75rem; }
-
-.prototype-layout-options button[aria-pressed=true] { border-color: var(--accent); background: var(--glass-highlight); box-shadow: inset 3px 0 var(--accent); }
+.prototype-layout-options button[aria-pressed=true] { border-color: var(--accent); background: var(--glass-highlight); box-shadow: inset 0 0 0 1px var(--accent); }
 
 .prototype-layout-options button:not(:disabled):hover { background: var(--glass-highlight); }
 

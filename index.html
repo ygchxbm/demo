@@ -70,6 +70,8 @@
 <link rel="stylesheet" href="v23.css">
 <link rel="stylesheet" href="homepage.css">
 <link rel="stylesheet" href="dashboard-layouts.css">
+<link rel="stylesheet" href="themes.css">
+<link rel="stylesheet" href="people-airy.css">
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -97,22 +99,30 @@
       <button id="theme-button" class="icon-btn" aria-label="切换配色" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-menu" title="切换配色"><span data-icon="palette"></span></button>
       <div class="theme-menu" id="theme-menu" role="menu" aria-label="界面配色" hidden>
         <button role="menuitemradio" data-theme-choice="ocean" aria-checked="true"><span class="swatch" style="--swatch:#72d5ff"></span>海蓝通透</button>
-        <button role="menuitemradio" data-theme-choice="jade" aria-checked="false"><span class="swatch" style="--swatch:#8ce7df"></span>青绿通透</button>
-        <button role="menuitemradio" data-theme-choice="slate" aria-checked="false"><span class="swatch" style="--swatch:#b6ddff"></span>蓝灰通透</button>
-        <button role="menuitemradio" data-theme-choice="violet" aria-checked="false"><span class="swatch" style="--swatch:#c8b5ff"></span>暮紫通透</button>
-        <button role="menuitemradio" data-theme-choice="amber" aria-checked="false"><span class="swatch" style="--swatch:#f3cf96"></span>砂金通透</button>
+        <button role="menuitemradio" data-theme-choice="jade" aria-checked="false"><span class="swatch" style="--swatch:#7dffe0"></span>青绿通透</button>
+        <button role="menuitemradio" data-theme-choice="lagoon" aria-checked="false"><span class="swatch" style="--swatch:#5cefff"></span>夜澜青</button>
+        <button role="menuitemradio" data-theme-choice="amber" aria-checked="false"><span class="swatch" style="--swatch:#ffc15a"></span>暖金港湾</button>
       </div>
     </div>
     <div class="prototype-wrap">
       <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
         <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
-        <p class="prototype-layout-note" id="dashboard-layout-note">方案2应用于全部菜单；再次点击已选方案恢复原布局。</p>
-        <div class="prototype-layout-options" role="group" aria-label="32:9布局方案">
-          <button type="button" data-dashboard-layout-choice="wide" aria-pressed="false"><strong>方案2 · 全景铺图</strong><span>收紧两侧，扩大中央地图</span></button>
-          <button type="button" data-dashboard-layout-choice="columns" aria-pressed="false"><strong>方案3 · 多列布局</strong><span>业务模块独立成列</span></button>
-          <button type="button" data-dashboard-layout-choice="complete" aria-pressed="false"><strong>方案4 · 完整地图</strong><span>完整港区底图与紧凑侧栏</span></button>
+        <div class="prototype-setting-row">
+          <p class="prototype-layout-note" id="dashboard-layout-note">展示比例</p>
+          <div class="prototype-layout-options" role="group" aria-labelledby="dashboard-layout-note">
+            <button type="button" data-dashboard-layout-choice="default" aria-pressed="false"><strong>16:9</strong></button>
+            <button type="button" data-dashboard-layout-choice="wide" aria-pressed="false"><strong>32:9</strong></button>
+          </div>
         </div>
+        <div class="prototype-setting-row">
+          <p class="prototype-layout-note" id="page-style-label">页面风格</p>
+          <div class="prototype-layout-options" role="group" aria-labelledby="page-style-label" aria-describedby="page-style-note">
+            <button type="button" data-page-style-choice="glass" aria-pressed="true"><strong>当前风格</strong></button>
+            <button type="button" data-page-style-choice="airy" aria-pressed="false" title="参考 cursor/sidebar-shared-extract-4ee7"><strong>融合渐变</strong></button>
+          </div>
+        </div>
+        <p id="page-style-note" class="prototype-style-note">融合渐变支持人员动态的 16:9 与 32:9。</p>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>

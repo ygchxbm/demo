@@ -193,11 +193,21 @@ let current='people', selected=null, enabled=new Set(topics.people.layers), zoom
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
 let trendChoice='吞吐量',objectQuery='';
 const dashboardLayoutKey='hainan-port-dashboard-layout';
-const dashboardLayouts=new Set(['wide','columns','complete']);
+const dashboardLayouts=new Set(['wide']);
 let dashboardLayout='wide',previewScale=1;
 try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||dashboardLayouts.has(saved))dashboardLayout=saved;}catch{}
-// The whole project uses scheme 2; personnel retains its comparison layouts.
-function activeDashboardLayout(){return current==='people'||dashboardLayout==='default'?dashboardLayout:'wide';}
+// Display ratio is shared by every topic; 32:9 uses scheme 2.
+function activeDashboardLayout(){return dashboardLayout;}
+const pageStyleKey='hainan-port-people-page-style';
+let pageStyle='glass';
+try{if(localStorage.getItem(pageStyleKey)==='airy')pageStyle='airy';}catch{}
+function syncPageStyle(){
+ const supported=current==='people';
+ if(supported&&pageStyle==='airy')document.documentElement.dataset.pageStyle='airy';
+ else delete document.documentElement.dataset.pageStyle;
+ document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pageStyleChoice===pageStyle)));
+ $('#page-style-note').textContent=pageStyle==='airy'&&!supported?'已记住融合渐变；切回人员动态时生效。':'融合渐变支持人员动态的 16:9 与 32:9。';
+}
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
 function linkedRows(rows){return `<div class="linked-rows od-stack">${rows.map(([title,detail,attr,value])=>`<button ${attr}="${value}" class="linked-row od-row"><span class="od-field od-fill"><strong>${esc(title)}</strong><small>${esc(detail)}</small></span>${icon('arrow')}</button>`).join('')}</div>`;}
@@ -430,24 +440,28 @@ function syncDashboardLayout(){
   }
  }else restorePeoplePanels();
  document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>{
-  button.disabled=current!=='people'&&button.dataset.dashboardLayoutChoice!=='wide';
-  button.setAttribute('aria-pressed',String(active&&button.dataset.dashboardLayoutChoice===activeDashboardLayout()));
+  button.setAttribute('aria-pressed',String(button.dataset.dashboardLayoutChoice===activeDashboardLayout()));
  });
- $('#dashboard-layout-note').textContent=current==='people'?'方案2应用于全部菜单；再次点击已选方案恢复原布局。':active?'当前使用全局方案2；方案3、4仅在人员页提供比较预览。':'当前为原布局；点击方案2恢复全局32:9展示。';
+ $('#dashboard-layout-note').textContent='展示比例';
  if(active){
   for(const id of ['left-panels','right-panels']){
    const wing=$('#'+id);wing.style.setProperty('--layout-panel-count',wing.querySelectorAll(':scope > .panel').length);
   }
  }
- syncPreviewPopovers();fitMap();
+ syncPageStyle();syncPreviewPopovers();fitMap();
 }
+document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
+ pageStyle=button.dataset.pageStyleChoice;
+ try{localStorage.setItem(pageStyleKey,pageStyle);}catch{}
+ syncPageStyle();fitMap();
+ $('#live-status').textContent=pageStyle==='airy'&&current!=='people'?'已记住融合渐变，适用于人员动态':'已切换为'+button.textContent.trim();
+}));
 document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
  const choice=button.dataset.dashboardLayoutChoice;
- if(current!=='people'&&choice!=='wide')return;
- dashboardLayout=activeDashboardLayout()===choice?'default':choice;
+ dashboardLayout=choice;
  try{localStorage.setItem(dashboardLayoutKey,dashboardLayout);localStorage.removeItem('hainan-port-people-layout');}catch{}
  syncDashboardLayout();button.focus({preventScroll:true});
- $('#live-status').textContent=dashboardLayout==='default'?'已恢复原布局':'已切换为'+button.querySelector('strong').textContent+'，32:9画布';
+ $('#live-status').textContent='已切换为'+button.querySelector('strong').textContent+(dashboardLayout==='wide'?'全景布局':'标准布局');
 }));
 window.addEventListener('resize',()=>{if(dashboardLayouts.has(activeDashboardLayout()))syncDashboardLayout();});
 const settingsPanel=$('#prototype-settings-panel'),settingsButton=$('#prototype-settings-button');
@@ -479,10 +493,10 @@ document.addEventListener('click',e=>{
  if(b.dataset.wallChannel!==undefined){wallChannel=Number(b.dataset.wallChannel);renderSceneWorkspace();document.querySelector(`.video-channel-card[data-wall-channel="${wallChannel}"]`)?.focus({preventScroll:true});}
  if(b.hasAttribute('data-wall-toggle')){wallPlaying=!wallPlaying;renderSceneWorkspace();document.querySelector('[data-wall-toggle]')?.focus({preventScroll:true});}
 });
-const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透',violet:'暮紫通透',amber:'砂金通透'};
-function applyTheme(value){if(!themeNames[value])value='ocean';document.documentElement.dataset.theme=value;document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.themeChoice===value)));$('#theme-button').setAttribute('aria-label','切换配色，当前'+themeNames[value]);try{localStorage.setItem('hainan-port-panorama-v21-theme',value);}catch{}}
+const themeNames={ocean:'海蓝通透',jade:'青绿通透',lagoon:'夜澜青',amber:'暖金港湾'};
+function applyTheme(value){value=({slate:'ocean',violet:'lagoon'})[value]||value;if(!themeNames[value])value='ocean';document.documentElement.dataset.theme=value;document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.themeChoice===value)));$('#theme-button').setAttribute('aria-label','切换配色，当前'+themeNames[value]);try{localStorage.setItem('hainan-port-panorama-v21-theme',value);}catch{}}
 try{applyTheme(localStorage.getItem('hainan-port-panorama-v21-theme')||'ocean');}catch{applyTheme('ocean');}
-$('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show)$('#theme-menu button').focus();});
+$('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show){closePrototypeSettings();$('#theme-menu [aria-checked="true"]').focus();}});
 document.querySelectorAll('[data-theme-choice]').forEach(el=>el.addEventListener('click',()=>{applyTheme(el.dataset.themeChoice);$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');$('#theme-button').focus();toast('已切换为'+themeNames[el.dataset.themeChoice]);}));
 document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap,#theme-menu')){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(!detail.open&&!$('#video-dialog').open)closeSelection();}});

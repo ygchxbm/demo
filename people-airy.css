@@ -1,0 +1,90 @@
+/* Reference: cursor/sidebar-shared-extract-4ee7 (67c2360).
+   Only enabled by syncPageStyle for personnel, at either display ratio.
+   Business DOM, chart colors and the original glass skin remain unchanged. */
+:root[data-page-style=airy] {
+  --airy-veil:
+    linear-gradient(90deg,rgba(4,22,48,.78) 0%,rgba(5,28,56,.74) 14%,rgba(6,32,62,.66) 26%,rgba(8,36,68,.28) 34%,transparent 42%),
+    linear-gradient(270deg,rgba(4,22,48,.82) 0%,rgba(5,28,56,.78) 15%,rgba(6,32,62,.7) 28%,rgba(8,36,68,.32) 36%,transparent 44%);
+  --airy-map-scrim: linear-gradient(180deg,rgba(2,22,44,.2),transparent 12%,transparent 88%,rgba(2,22,44,.28));
+  --airy-map-filter: brightness(1.06) saturate(1.02) contrast(1.03);
+  --airy-text-shadow: 0 1px 2px rgba(var(--theme-shadow-rgb),.72),0 0 10px rgba(var(--theme-shadow-rgb),.45);
+  --airy-line: color-mix(in srgb,var(--theme-text) 16%,transparent);
+}
+:root[data-page-style=airy][data-theme=jade] {
+  --airy-veil:
+    linear-gradient(90deg,rgba(4,46,42,.84) 0%,rgba(6,54,48,.78) 14%,rgba(8,62,54,.68) 26%,rgba(10,70,60,.3) 34%,transparent 42%),
+    linear-gradient(270deg,rgba(4,46,42,.86) 0%,rgba(6,54,48,.8) 15%,rgba(8,62,54,.7) 28%,rgba(10,70,60,.34) 36%,transparent 44%);
+  --airy-map-scrim: linear-gradient(180deg,rgba(4,40,36,.28),transparent 12%,transparent 88%,rgba(4,40,36,.38));
+}
+:root[data-page-style=airy][data-theme=lagoon] {
+  --airy-veil:
+    linear-gradient(90deg,rgba(1,14,24,.9) 0%,rgba(2,20,34,.84) 14%,rgba(2,28,42,.72) 26%,rgba(4,36,52,.34) 34%,transparent 42%),
+    linear-gradient(270deg,rgba(1,14,24,.92) 0%,rgba(2,20,34,.86) 15%,rgba(2,28,42,.74) 28%,rgba(4,36,52,.38) 36%,transparent 44%);
+  --airy-map-scrim: linear-gradient(180deg,rgba(1,16,28,.42),transparent 14%,transparent 86%,rgba(1,16,28,.5));
+  --airy-map-filter: brightness(.9) saturate(.86) contrast(1.06);
+}
+:root[data-page-style=airy][data-theme=amber] {
+  --airy-veil:
+    linear-gradient(90deg,rgba(36,16,6,.88) 0%,rgba(48,22,8,.82) 14%,rgba(58,26,10,.7) 26%,rgba(70,32,12,.32) 34%,transparent 42%),
+    linear-gradient(270deg,rgba(36,16,6,.9) 0%,rgba(48,22,8,.84) 15%,rgba(58,26,10,.72) 28%,rgba(70,32,12,.36) 36%,transparent 44%);
+  --airy-map-scrim: linear-gradient(180deg,rgba(40,18,6,.34),transparent 14%,transparent 86%,rgba(40,18,6,.46));
+  --airy-map-filter: brightness(.94) saturate(1.08) sepia(.14) contrast(1.04);
+}
+
+/* Full-canvas shading sits above the photograph and below all UI. */
+:root[data-page-style=airy] .app::after { z-index: 1; background: var(--airy-veil); }
+/* Wide sidebars occupy 17% each. Scale each edge veil independently so its
+   dark plateau covers the sidebar and fades out near 28% of the full canvas.
+   Keep the approved 16:9 stops and every theme's colors unchanged. */
+:root[data-page-style=airy][data-dashboard-layout=wide] .app::after {
+  background-size: 65% 100%,65% 100%;
+  background-position: left top,right top;
+  background-repeat: no-repeat;
+}
+:root[data-page-style=airy] .panorama-layer .port-image { filter: var(--airy-map-filter); }
+:root[data-page-style=airy] .panorama-layer::after { background: var(--airy-map-scrim); }
+:root[data-page-style=airy] .wing {
+  padding: .6rem .35rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: var(--text);
+}
+:root[data-page-style=airy] .wing .panel { padding-inline: .15rem; }
+:root[data-page-style=airy] .panel + .panel { border-top-color: var(--airy-line); }
+:root[data-page-style=airy] .panel-head { min-height: 0; border: 0; margin-bottom: .45rem; padding-bottom: 0; }
+:root[data-page-style=airy] .panel-head h2 { font-size: 1rem; font-weight: 500; letter-spacing: .1em; text-shadow: var(--airy-text-shadow); }
+:root[data-page-style=airy] .panel-link { color: var(--muted); font-size: .7rem; text-shadow: var(--airy-text-shadow); }
+:root[data-page-style=airy] :is(.person-number strong,.person-peak strong,.person-role-grid strong,.person-ring-center strong,.person-share-row strong,.person-mini-head b,.person-change strong) {
+  color: var(--text);
+  font-weight: 300;
+  text-shadow: var(--airy-text-shadow);
+}
+:root[data-page-style=airy] :is(.person-number>span,.person-peak>span,.person-share-row,.person-mini-head,.person-trend-dates) { text-shadow: 0 1px 3px rgba(var(--theme-shadow-rgb),.6); }
+:root[data-page-style=airy] :is(.person-peak,.person-change) { border-left: 0; }
+:root[data-page-style=airy] .person-role-grid { border-top-color: var(--airy-line); padding-bottom: .8rem; }
+:root[data-page-style=airy] .person-role-grid strong { padding-left: 1.05rem; }
+:root[data-page-style=airy] .person-mini-trend { border-bottom-color: var(--airy-line); }
+:root[data-page-style=airy] .person-trend-line { stroke-width: 1.75; filter: drop-shadow(0 1px 1px rgba(var(--theme-shadow-rgb),.75)); }
+:root[data-page-style=airy] .person-trend-dates { padding-bottom: .7rem; }
+:root[data-page-style=airy] .person-columns .person-gridline { stroke: var(--airy-line); }
+
+/* Keep controls discrete while the surrounding information blends into the map. */
+:root[data-page-style=airy] #navigation button { background: color-mix(in srgb,var(--theme-text) 5%,transparent); box-shadow: none; }
+:root[data-page-style=airy] #navigation button[aria-current=page] { background: color-mix(in srgb,var(--theme-text) 20%,transparent); border-color: color-mix(in srgb,var(--theme-text) 82%,transparent); box-shadow: none; }
+:root[data-page-style=airy] .summary {
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg,transparent,rgba(var(--theme-shadow-rgb),.42));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+:root[data-page-style=airy] .summary-item + .summary-item { border-left-color: color-mix(in srgb,var(--theme-text) 22%,transparent); }
+:root[data-page-style=airy] .summary-item .value { font-weight: 300; text-shadow: var(--airy-text-shadow); }
+
+@media (hover:hover) {
+  :root[data-page-style=airy] #navigation button:hover { background: color-mix(in srgb,var(--theme-text) 14%,transparent); border-color: color-mix(in srgb,var(--theme-text) 70%,transparent); }
+}

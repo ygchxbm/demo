@@ -1,0 +1,129 @@
+/* Appearance only: shared by every topic and both display ratios. */
+:root[data-theme] {
+  --bg: #075174;
+  --surface: #073651;
+  --panel: rgba(5,61,93,.38);
+  --accent: #72d5ff;
+  --accent2: #6ce6cf;
+  --gold: #f1cd75;
+  --theme-text: #f2fbff;
+  --theme-muted: #d6edfa;
+  --theme-wing-top: rgba(12,113,167,.6);
+  --theme-wing-bottom: rgba(5,106,152,.46);
+  --theme-map-filter: brightness(1.08) saturate(1.12) contrast(1.02);
+  --theme-scene-rgb: 0,76,120;
+  --theme-shadow-rgb: 0,30,55;
+  --label-bg: rgba(3,35,49,.86);
+
+  --text: var(--theme-text);
+  --muted: var(--theme-muted);
+  --dim: color-mix(in srgb,var(--theme-muted) 82%,var(--surface));
+  --border: color-mix(in srgb,var(--accent) 24%,transparent);
+  --person-chart-line: color-mix(in srgb,var(--accent) 30%,transparent);
+  --scene-shadow: var(--bg);
+  --scene-light: color-mix(in srgb,var(--accent) 8%,transparent);
+  --theme-map-veil:
+    linear-gradient(90deg,rgba(var(--theme-scene-rgb),.3),transparent 33%,transparent 67%,rgba(var(--theme-scene-rgb),.3)),
+    linear-gradient(180deg,rgba(var(--theme-scene-rgb),.4),transparent 30%,transparent 82%,rgba(var(--theme-scene-rgb),.2));
+  --glass-edge: color-mix(in srgb,var(--accent) 40%,transparent);
+  --glass-control: color-mix(in srgb,var(--surface) 42%,transparent);
+  --glass-highlight: color-mix(in srgb,var(--accent) 18%,transparent);
+  --menu-pill-bottom: color-mix(in srgb,var(--surface) 85%,var(--bg));
+
+  /* Semantic status colors never inherit the selected theme. Category series
+     remain defined in homepage.css, including rings and their legends. */
+  --ok: #62dac3;
+  --warning: #f4bd60;
+  --danger: #ff777c;
+  --status-neutral: #d6edfa;
+  --status-simulation: #72d5ff;
+}
+
+:root[data-theme=jade] {
+  --bg: #0d4e49;
+  --surface: #083833;
+  --panel: rgba(8,72,66,.42);
+  --accent: #7dffe0;
+  --gold: #f3d48a;
+  --theme-text: #f3fffb;
+  --theme-muted: #d7f6ee;
+  --theme-wing-top: rgba(16,112,100,.65);
+  --theme-wing-bottom: rgba(6,78,72,.52);
+  --theme-map-filter: brightness(1.01) saturate(.98) contrast(1.03);
+  --theme-scene-rgb: 4,82,66;
+  --theme-shadow-rgb: 0,28,24;
+  --label-bg: rgba(4,42,38,.9);
+}
+
+:root[data-theme=lagoon] {
+  --bg: #021820;
+  --surface: #032833;
+  --panel: rgba(3,40,54,.5);
+  --accent: #5cefff;
+  --gold: #d7e7ff;
+  --theme-text: #eefcff;
+  --theme-muted: #b7e7f2;
+  --theme-wing-top: rgba(3,42,59,.8);
+  --theme-wing-bottom: rgba(2,24,38,.72);
+  --theme-map-filter: brightness(.78) saturate(.8) contrast(1.08);
+  --theme-scene-rgb: 1,18,32;
+  --theme-shadow-rgb: 0,8,16;
+  --label-bg: rgba(2,20,30,.94);
+}
+
+:root[data-theme=amber] {
+  --bg: #2a160c;
+  --surface: #3a2214;
+  --panel: rgba(62,36,16,.48);
+  --accent: #ffc15a;
+  --gold: #ffe1a3;
+  --theme-text: #fff6ea;
+  --theme-muted: #f0d7b8;
+  --theme-wing-top: rgba(113,76,34,.72);
+  --theme-wing-bottom: rgba(65,39,20,.62);
+  --theme-map-filter: brightness(.96) saturate(.9) sepia(.28) contrast(1.04);
+  --theme-scene-rgb: 76,40,12;
+  --theme-shadow-rgb: 28,10,2;
+  --label-bg: rgba(36,18,8,.92);
+}
+
+/* Tint the photograph and its backdrop only, never the data or status icons. */
+:root[data-theme] .panorama-layer .port-image { filter: var(--theme-map-filter); }
+:root[data-theme] .panorama-layer::after { background: var(--theme-map-veil); }
+:root[data-theme][data-dashboard-layout=wide]:is([data-topic=map],[data-topic=video]) .panorama-layer { background: var(--bg); }
+:root[data-theme][data-dashboard-layout=wide]:is([data-topic=map],[data-topic=video]) .panorama-layer::before {
+  background: linear-gradient(rgba(var(--theme-scene-rgb),.4),rgba(var(--theme-scene-rgb),.6)),url('背景图.png') center/cover;
+}
+:root[data-theme][data-dashboard-layout=wide]:is([data-topic=map],[data-topic=video]) .panorama-layer::after { background: var(--theme-map-veil); }
+:root[data-theme][data-dashboard-layout=wide][data-topic=map] .map-viewport { border-color: var(--glass-edge); box-shadow: 0 20px 80px rgba(var(--theme-shadow-rgb),.38); }
+
+:root[data-theme] .masthead { background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 55%,transparent),transparent); }
+:root[data-theme] .title h1 { text-shadow: 0 1px 8px rgba(var(--theme-shadow-rgb),.5); }
+:root[data-theme] .wing {
+  box-shadow: inset 0 0 2rem color-mix(in srgb,var(--accent) 8%,transparent),0 .3rem 2rem rgba(var(--theme-shadow-rgb),.16);
+}
+:root[data-theme] #navigation button { text-shadow: 0 1px 3px rgba(var(--theme-shadow-rgb),.7); }
+:root[data-theme] #navigation button[aria-current=page] {
+  background: linear-gradient(180deg,color-mix(in srgb,var(--accent) 44%,var(--surface)),color-mix(in srgb,var(--accent) 14%,var(--surface)) 55%,color-mix(in srgb,var(--accent) 32%,var(--surface)));
+  box-shadow: inset 0 1px 2px color-mix(in srgb,var(--theme-text) 65%,transparent),inset 0 -2px 5px var(--menu-pill-glow),0 0 .5rem var(--menu-pill-glow);
+}
+:root[data-theme] .header-tools .icon-btn { border-color: var(--glass-edge); background: var(--glass-control); }
+:root[data-theme] .header-tools .icon-btn[aria-expanded=true] { border-color: var(--accent); background: var(--glass-highlight); }
+:root[data-theme] :is(dialog,.theme-menu,.prototype-panel) {
+  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--theme-text) 12%,transparent),0 1.2rem 4rem rgba(var(--theme-shadow-rgb),.3);
+}
+:root[data-theme] .summary-item :is(.label,.value .unit) { color: var(--muted); }
+:root[data-theme] .map-marker:not([data-alert=true]) { background: var(--label-bg); }
+:root[data-theme] .map-marker.selected:not([data-alert=true]) { background: var(--surface); }
+:root[data-theme] .map-legend { background: var(--label-bg); }
+
+/* Simulation imagery uses the same glass surfaces; playback/status colors stay fixed. */
+:root[data-theme][data-topic=video] :is(.video-screen-center,.video-screen-label,.wall-header) { background: color-mix(in srgb,var(--surface) 78%,transparent); }
+:root[data-theme][data-topic=video] .wall-main { background-image: linear-gradient(rgba(var(--theme-scene-rgb),.1),rgba(var(--theme-scene-rgb),.24)),url('背景图.png'); }
+:root[data-theme][data-topic=video] :is(.video-sim-state,.video-wall-state) { color: var(--status-simulation); }
+:root[data-theme][data-topic=safety] .safety-state[data-state=已结束] { color: var(--status-neutral); }
+:root[data-theme] .map-marker[data-alert=true] { color: #ffe4a9; border-color: rgba(239,198,107,.65); background: rgba(72,58,26,.82); }
+
+@media (hover:hover) {
+  :root[data-theme] .header-tools .icon-btn:hover { border-color: var(--accent); background: var(--glass-highlight); }
+}

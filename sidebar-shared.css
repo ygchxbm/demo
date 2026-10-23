@@ -491,6 +491,25 @@
   box-shadow:0 0 .35rem #fff,0 0 .7rem var(--accent),0 .2rem 1rem var(--accent),0 .45rem 1.5rem var(--accent);
 }
 
+/* 32:9：3840×1080 画布按窗口装入。左右栏各 24.65%，底图改为铺满。字号锁在 16px，和 16:9 同一套通透侧栏。 */
+:root[data-sidebar=airy][data-ratio="32"],
+:root[data-sidebar=airy][data-ratio="32"] body{height:100%;overflow:hidden;background:var(--bg)}
+:root[data-sidebar=airy][data-ratio="32"]{font-size:16px}
+:root[data-sidebar=airy][data-ratio="32"] .app{
+  position:absolute;top:0;left:0;width:3840px;height:1080px;min-height:0;max-width:none;
+  overflow:hidden;transform-origin:0 0;
+}
+:root[data-sidebar=airy][data-ratio="32"]:not([data-layout=map]):not([data-layout=video]) .workspace{
+  grid-template-columns:minmax(0,24.65%) minmax(0,1fr) minmax(0,24.65%);
+}
+:root[data-sidebar=airy][data-ratio="32"] .workspace,
+:root[data-sidebar=airy][data-ratio="32"] .wing,
+:root[data-sidebar=airy][data-ratio="32"] .center,
+:root[data-sidebar=airy][data-ratio="32"] .map-stage{height:100%;min-height:0}
+:root[data-sidebar=airy][data-ratio="32"] .summary{width:min(100%,76%);justify-self:center}
+:root[data-sidebar=airy][data-ratio="32"] .sb-spark-chart{width:100%;height:2.65rem;max-height:2.65rem}
+:root[data-sidebar=airy][data-ratio="32"] #right-panels .panel:last-child .sb-columns{width:100%;height:100%;min-height:0;flex:1}
+
 @media(min-width:1200px){
   :root[data-sidebar=airy] .app{height:100svh;min-height:0;grid-template-rows:4.5rem auto minmax(0,1fr) 1.5rem}
   :root[data-sidebar=airy] .workspace{height:100%;min-height:0;align-items:stretch}

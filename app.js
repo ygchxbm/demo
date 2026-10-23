@@ -337,7 +337,8 @@ function paintTransform(){
 function fitMap(){
  const w=panoramaLayer.clientWidth,h=panoramaLayer.clientHeight;
  if(!w||!h)return;
- baseWidth=Math.min(w,h*2);
+ const cover=document.documentElement.dataset.ratio==='32';
+ baseWidth=cover?Math.max(w,h*2):Math.min(w,h*2);
  mapWorld.style.width=baseWidth+'px';paintTransform();
 }
 function doZoom(delta){zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
@@ -395,6 +396,25 @@ const navStyleNames={solid:'原版',light:'轻量版',glow:'光条版'};
 function applyNavStyle(value){if(!navStyleNames[value])value='solid';document.documentElement.dataset.nav=value;const nav=$('#navigation'),strip=document.querySelector('.navigation'),mast=document.querySelector('.masthead'),tools=document.querySelector('.header-tools');if(value==='glow'){if(nav.parentElement!==mast)mast.insertBefore(nav,tools);}else if(nav.parentElement!==strip)strip.insertBefore(nav,strip.querySelector('.demo-label'));document.querySelectorAll('[data-nav-style]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.navStyle===value)));try{localStorage.setItem('hainan-port-panorama-v21-nav',value);}catch{}}
 try{applyNavStyle(localStorage.getItem('hainan-port-panorama-v21-nav')||'solid');}catch{applyNavStyle('solid');}
 document.querySelectorAll('[data-nav-style]').forEach(el=>el.addEventListener('click',()=>{applyNavStyle(el.dataset.navStyle);toast('顶栏导航已切换为'+navStyleNames[el.dataset.navStyle]);}));
+const ratioNames={'16':'16:9','32':'32:9'};
+function layoutRatio(){
+  const app=document.querySelector('.app');
+  if(!app)return;
+  if(document.documentElement.dataset.ratio!=='32'){app.style.transform='';fitMap();return;}
+  const scale=Math.min(innerWidth/3840,innerHeight/1080);
+  app.style.transform=`translate(${(innerWidth-3840*scale)/2}px,${(innerHeight-1080*scale)/2}px) scale(${scale})`;
+  fitMap();
+}
+function applyRatio(value){
+  if(!ratioNames[value])value='16';
+  document.documentElement.dataset.ratio=value;
+  document.querySelectorAll('[data-ratio-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.ratioChoice===value)));
+  try{localStorage.setItem('hainan-port-panorama-v21-ratio',value);}catch{}
+  layoutRatio();
+}
+try{applyRatio(localStorage.getItem('hainan-port-panorama-v21-ratio')||'16');}catch{applyRatio('16');}
+document.querySelectorAll('[data-ratio-choice]').forEach(el=>el.addEventListener('click',()=>{applyRatio(el.dataset.ratioChoice);toast('画面比例已切换为'+ratioNames[el.dataset.ratioChoice]);}));
+window.addEventListener('resize',layoutRatio);
 $('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show)$('#theme-menu button').focus();});
 document.querySelectorAll('[data-theme-choice]').forEach(el=>el.addEventListener('click',()=>{applyTheme(el.dataset.themeChoice);$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');$('#theme-button').focus();toast('已切换为'+themeNames[el.dataset.themeChoice]);}));
 document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap')){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');}});

@@ -107,39 +107,61 @@ const todayEntry=dailyEntries.at(-1),previousEntry=dailyEntries.at(-2);
 const entryDelta=todayEntry-previousEntry;
 const entryPct=(Math.abs(entryDelta)/previousEntry*100).toFixed(1);
 const peakNote=onSiteGap>0?`当前较峰值少 ${onSiteGap} 人`:onSiteGap<0?`当前较峰值多 ${-onSiteGap} 人`:'与今日峰值持平';
-function personnelRoleGrid(rows){return `<div class="person-role-grid">${rows.map(([label,value],i)=>`<div class="od-stat"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${label}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong></div>`).join('')}</div>`;}
-function personnelTrendChart(values,name){
- const min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,1),w=280,n=values.length;
- const coords=values.map((value,i)=>[((i+.5)/n)*w,6+(max-value)/span*18]);
- const path=coords.map(([x,y],i)=>(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)).join(' ');
- return `<svg class="person-trend-chart" viewBox="0 0 ${w} 32" role="img" aria-label="${name}近七日入场人数：${values.join('、')}人"><title>${name}近七日入场趋势，纵轴单位为人，范围 ${min}–${max}</title><path d="${path}" class="person-trend-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(days[i]+'\n'+name+'入场：'+values[i]+' 人')}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="person-trend-dot"/></g>`).join('')}</svg>`;
+function sbKpi(item){
+ if(item.delta)return `<div class="sb-delta od-field"><span>${esc(item.label)}</span><strong class="od-nowrap">${esc(item.delta)}</strong></div>`;
+ const value=`<strong${item.lead?' class="od-nowrap"':''}>${fmt(item.value)}<small> ${esc(item.unit)}</small></strong>`;
+ const label=`<span>${esc(item.label)}</span>`;
+ const note=item.note?`<span class="sb-note">${esc(item.note)}</span>`:'';
+ return `<div class="sb-kpi od-stat">${item.lead?value+label:label+value}${note}</div>`;
 }
-function personnelShare(rows,center,tight){
+function sbDual(left,right,tight){return `<div class="sb-dual${tight?' sb-dual-tight':''}">${sbKpi(left)}${sbKpi(right)}</div>`;}
+function sbChips(rows,unit){return `<div class="sb-chips">${rows.map(([label,value],i)=>`<div class="od-stat"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(label)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong></div>`).join('')}</div>`;}
+function sbDonut(rows,center,{unit='人',tight=false}={}){
  const total=rows.reduce((sum,[,n])=>sum+n,0),radius=72,circumference=2*Math.PI*radius;
  let offset=0;
  const geometry=rows.map(([name,value],i)=>{
-  const info=esc(name+'：'+value+' 人，'+(value/total*100).toFixed(1)+'%');
+  const info=esc(name+'：'+value+' '+unit+'，'+(value/total*100).toFixed(1)+'%');
   const dash=`${Math.max(0,value/total*circumference-2)} ${circumference}`,shift=-(offset/total*circumference);
   offset+=value;
-  return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--person-series-${i})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
+  return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--sb-series-${i})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
  }).join('');
  const viewBox=tight?'18 18 164 164':'0 0 200 200';
- return `<div class="person-share"><div class="person-share-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${center}，合计 ${total} 人"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="person-ring-center od-stat"><strong>${fmt(total)}</strong><span>${center}</span></div></div><div class="person-share-legend">${rows.map(([name,value],i)=>`<div class="person-share-row"><span class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</span><strong class="od-nowrap">${fmt(value)}<small> 人</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
+ return `<div class="sb-donut"><div class="sb-donut-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${esc(center+'，合计 '+total+' '+unit)}"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="sb-donut-center od-stat"><strong>${fmt(total)}</strong><span>${esc(center)}</span></div></div><div class="sb-legend">${rows.map(([name,value],i)=>`<div class="sb-legend-row"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`).join('')}</div></div>`;
 }
-function personnelColumns(rows){
- const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/100)*100||1,left=46,right=628,base=236,top=24,plot=base-top;
- const guides=[0,.5,1].map(r=>{const y=base-r*plot;return `<line class="person-gridline" x1="${left}" x2="${right}" y1="${y}" y2="${y}"/><text x="2" y="${y+5}">${Math.round(max*r)}</text>`;}).join('');
- const cols=rows.map(([name,value],i)=>{const x=left+(i+.5)*(right-left)/rows.length,h=Math.max(value/max*plot,1),w=48;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' 人')}"><rect x="${x-w/2}" y="${base-h}" width="${w}" height="${h}" rx="1.5" fill="var(--person-series-${i})"/><text x="${x}" y="${base-h-8}" text-anchor="middle" class="person-bar-value">${value}</text><text x="${x}" y="${base+24}" text-anchor="middle">${name.replace('人员','')}</text></g>`;}).join('');
- return `<svg class="person-columns" viewBox="0 0 640 268" preserveAspectRatio="none" role="img" aria-label="今日四类人员入场：${rows.map(([n,v])=>n+v+'人').join('、')}"><title>今日分类入场，单位：人，各柱共用零起点，刻度上限 ${max}</title>${guides}${cols}</svg>`;
+function sbColumns(rows,{unit='人',step=100,aria,title}={}){
+ const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/step)*step||1,left=46,right=628,base=236,top=24,plot=base-top;
+ const guides=[0,.5,1].map(r=>{const y=base-r*plot;return `<line class="sb-gridline" x1="${left}" x2="${right}" y1="${y}" y2="${y}"/><text x="2" y="${y+5}">${Math.round(max*r)}</text>`;}).join('');
+ const cols=rows.map(([name,value,short],i)=>{const x=left+(i+.5)*(right-left)/rows.length,h=Math.max(value/max*plot,1),w=48;return `<g tabindex="0" data-tip="${esc(name+'：'+value+' '+unit)}"><rect x="${x-w/2}" y="${base-h}" width="${w}" height="${h}" rx="1.5" fill="var(--sb-series-${i})"/><text x="${x}" y="${base-h-8}" text-anchor="middle" class="sb-bar-value">${value}</text><text x="${x}" y="${base+24}" text-anchor="middle">${esc(short??name)}</text></g>`;}).join('');
+ const ariaText=aria||rows.map(([name,value])=>name+value+unit).join('、');
+ const titleText=title?title(max):`分类对比，单位：${unit}，各柱共用零起点，刻度上限 ${max}`;
+ return `<svg class="sb-columns" viewBox="0 0 640 268" preserveAspectRatio="none" role="img" aria-label="${esc(ariaText)}"><title>${esc(titleText)}</title>${guides}${cols}</svg>`;
+}
+function sbSparkline(values,name,opt){
+ const unit=opt.unit??'人',labels=opt.labels??days;
+ const min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,1),w=280,n=values.length;
+ const coords=values.map((value,i)=>[((i+.5)/n)*w,6+(max-value)/span*18]);
+ const path=coords.map(([x,y],i)=>(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)).join(' ');
+ const aria=(opt.aria||((label,series)=>label+'：'+series.join('、')+unit))(name,values);
+ const title=(opt.title||((label,lo,hi)=>label+'趋势，纵轴单位为'+unit+'，范围 '+lo+'–'+hi))(name,min,max);
+ const tip=opt.tip||((label,seriesName,value)=>label+'\n'+seriesName+'：'+value+' '+unit);
+ return `<svg class="sb-spark-chart" viewBox="0 0 ${w} 32" role="img" aria-label="${esc(aria)}"><title>${esc(title)}</title><path d="${path}" class="sb-spark-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(tip(labels[i],name,values[i]))}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="sb-spark-dot"/></g>`).join('')}</svg>`;
+}
+function sbSparks(items,opt={}){
+ const unit=opt.unit??'人',labels=opt.labels??days;
+ const delta=opt.delta||(change=>`${change>=0?'+':''}${change} ${unit}`);
+ const sectionLabel=opt.sectionLabel||(name=>name+'近七日趋势');
+ const rows=items.map(([name,values],i)=>{const change=values.at(-1)-values.at(-2);return `<section class="sb-spark" style="--trend-color:var(--sb-series-${i})" aria-label="${esc(sectionLabel(name))}"><div class="sb-spark-head"><strong class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> ${esc(unit)}</small></b><small class="sb-spark-delta">${esc(delta(change,name,values))}</small></div>${sbSparkline(values,name,opt)}</section>`;}).join('');
+ return `<div class="sb-sparks">${rows}<div class="sb-axis">${labels.map(day=>`<span>${esc(day)}</span>`).join('')}</div></div>`;
 }
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
 const personTrendKeys=Object.keys(personSeries);
+const entryBars=Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),name.replace('人员','')]);
 Object.assign(panels,{
- people:{title:'在场规模',topic:'people',kind:'人员',rows:[['当前在场人数',onSiteTotal,'人'],['今日在场峰值',onSitePeak,'人'],['当前较峰值少',onSiteGap,'人'],...onSiteRoles.map(([name,value])=>[name+'在场',value,'人'])],render:()=>`<div class="person-stock"><div class="person-number od-stat"><span>当前在场人数</span><strong>${fmt(onSiteTotal)}<small> 人</small></strong></div><div class="person-peak od-stat"><span>今日在场峰值</span><strong>${fmt(onSitePeak)}<small> 人</small></strong><span class="person-gap">${peakNote}</span></div></div>`+personnelRoleGrid(onSiteRoles)},
- peopleAffiliation:{title:'海油内 / 海油外',topic:'people',kind:'人员',rows:[...affiliation.map(([name,value])=>[name,value,'人']),['当前在场合计',affiliationTotal,'人']],render:()=>personnelShare(affiliation,'总计人数',true)},
- peopleEntry:{title:'今日入场情况',topic:'people',kind:'人员',rows:[['今日入场人数',todayEntry,'人'],['前一日入场人数',previousEntry,'人'],...Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),'人'])],render:()=>`<div class="person-entry-head"><div class="person-number od-stat"><strong class="od-nowrap">${fmt(todayEntry)}<small> 人</small></strong><span>今日累计入场</span></div><div class="person-change od-field"><span>较前一日${entryDelta>=0?'增加':'减少'}</span><strong class="od-nowrap">${entryDelta>0?'+':''}${entryDelta} 人 / ${entryPct}%</strong></div></div>`+personnelColumns(Object.entries(personSeries).map(([name,values])=>[name,values.at(-1)]))},
- peopleTrends:{title:'近七日分类入场趋势',topic:'people',kind:'人员',headers:['日期',...personTrendKeys],rows:days.map((d,i)=>[d,...personTrendKeys.map(name=>personSeries[name][i])]),render:()=>`<div class="person-small-multiples">${personTrendKeys.map((name,i)=>{const values=personSeries[name],change=values.at(-1)-values.at(-2);return `<section class="person-mini-trend" style="--trend-color:var(--person-series-${i})" aria-label="${name}近七日趋势"><div class="person-mini-head"><strong class="person-series-label" style="--item-color:var(--person-series-${i})">${name}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> 人</small></b><small class="person-mini-delta">较前日${change>=0?'增加':'减少'} ${Math.abs(change)} 人</small></div>${personnelTrendChart(values,name)}</section>`;}).join('')}<div class="person-date-axis">${days.map(day=>`<span>${day}</span>`).join('')}</div></div>`},
- peopleWeekComposition:{title:'近七日入场构成',topic:'people',kind:'人员',rows:weeklyRoles.map(([name,value])=>[name,value,'人']),render:()=>personnelShare(weeklyRoles,'七日累计入场')}
+ people:{title:'在场规模',topic:'people',kind:'人员',rows:[['当前在场人数',onSiteTotal,'人'],['今日在场峰值',onSitePeak,'人'],['当前较峰值少',onSiteGap,'人'],...onSiteRoles.map(([name,value])=>[name+'在场',value,'人'])],render:()=>sbDual({label:'当前在场人数',value:onSiteTotal,unit:'人'},{label:'今日在场峰值',value:onSitePeak,unit:'人',note:peakNote},true)+sbChips(onSiteRoles,'人')},
+ peopleAffiliation:{title:'海油内 / 海油外',topic:'people',kind:'人员',rows:[...affiliation.map(([name,value])=>[name,value,'人']),['当前在场合计',affiliationTotal,'人']],render:()=>sbDonut(affiliation,'总计人数',{tight:true})},
+ peopleEntry:{title:'今日入场情况',topic:'people',kind:'人员',rows:[['今日入场人数',todayEntry,'人'],['前一日入场人数',previousEntry,'人'],...Object.entries(personSeries).map(([name,values])=>[name,values.at(-1),'人'])],render:()=>sbDual({label:'今日累计入场',value:todayEntry,unit:'人',lead:true},{label:`较前一日${entryDelta>=0?'增加':'减少'}`,delta:`${entryDelta>0?'+':''}${entryDelta} 人 / ${entryPct}%`})+sbColumns(entryBars,{aria:'今日四类人员入场：'+entryBars.map(([name,value])=>name+value+'人').join('、'),title:max=>`今日分类入场，单位：人，各柱共用零起点，刻度上限 ${max}`})},
+ peopleTrends:{title:'近七日分类入场趋势',topic:'people',kind:'人员',headers:['日期',...personTrendKeys],rows:days.map((d,i)=>[d,...personTrendKeys.map(name=>personSeries[name][i])]),render:()=>sbSparks(personTrendKeys.map(name=>[name,personSeries[name]]),{delta:change=>`较前日${change>=0?'增加':'减少'} ${Math.abs(change)} 人`,aria:(name,values)=>`${name}近七日入场人数：${values.join('、')}人`,title:(name,min,max)=>`${name}近七日入场趋势，纵轴单位为人，范围 ${min}–${max}`,tip:(day,name,value)=>`${day}\n${name}入场：${value} 人`})},
+ peopleWeekComposition:{title:'近七日入场构成',topic:'people',kind:'人员',rows:weeklyRoles.map(([name,value])=>[name,value,'人']),render:()=>sbDonut(weeklyRoles,'七日累计入场')}
 });
  Object.assign(panels,{
   vehicleFlow:{title:'今日车辆进出',topic:'vehicles',kind:'拖车',rows:[['进场',142,'车次'],['出场',126,'车次'],['合计',268,'车次']],render:()=>bars([['进场',142,'车次'],['出场',126,'车次']],160)+caption('进出合计 268 车次','今日')},
@@ -193,7 +215,10 @@ $('#navigation').innerHTML=Object.entries(topics).map(([key,t])=>`<button data-t
 $('#layer-controls').innerHTML='<span class="layer-caption">'+icon('layers')+' 图层</span>'+Object.entries(layerKinds).map(([kind,i])=>`<button class="layer-btn" data-layer="${kind}" aria-pressed="${enabled.has(kind)}">${icon(i)}<span>${kind}</span></button>`).join('');
 $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
 function renderPanels(){
- document.documentElement.dataset.topic=current;const keys=activeView().panels,half=Math.ceil(keys.length/2);
+ const root=document.documentElement;
+ root.dataset.topic=current;
+ if(current==='people')root.dataset.sidebar='airy';else delete root.dataset.sidebar;
+ const keys=activeView().panels,half=Math.ceil(keys.length/2);
  ['left-panels','right-panels'].forEach((id,index)=>{const wing=$('#'+id),items=keys.slice(index*half,index*half+half);wing.style.setProperty('--panel-count',items.length);wing.innerHTML=items.map(key=>{const p=panels[key];return `<section class="panel" data-panel="${key}"><div class="panel-head"><h2>${p.title}</h2><button class="panel-link" data-detail="${key}" aria-label="查看${p.title}详情">详情 ${icon('arrow')}</button></div><div class="panel-body">${p.render()}</div></section>`}).join('');});
 }
 function updateMarkers(){document.querySelectorAll('[data-point]').forEach(el=>{el.hidden=!enabled.has(el.dataset.kind);el.classList.toggle('selected',el.dataset.point===selected);el.setAttribute('aria-pressed',String(el.dataset.point===selected));});document.querySelectorAll('[data-layer]').forEach(el=>el.setAttribute('aria-pressed',String(enabled.has(el.dataset.layer))));$('#visible-count').textContent=points.filter(p=>enabled.has(p.kind)).length;if($('#object-results'))$('#object-results').innerHTML=objectResults();if(activeView().layout==='map')renderSummary();}

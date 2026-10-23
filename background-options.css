@@ -17,8 +17,7 @@
 .wing,
 .navigation button,
 .scene-ui button,
-.selection-panel,
-.media-dock{pointer-events:auto}
+.selection-panel{pointer-events:auto}
 .map-stage{pointer-events:none;overflow:visible;background:none;border:0}
 .map-stage:after{display:none}
 .wing:before{opacity:.72}

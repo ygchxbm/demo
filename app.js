@@ -36,14 +36,12 @@ function lineChart(values, values2, labels=days, names=['入场人数','作业�
  const pts=v=>v.map((x,i)=>[32+i*308/(n-1),94-x/max*73]);
  const p=pts(values), q=values2?pts(values2):[];
  const path=v=>v.map((a,i)=>(i?'L':'M')+a.join(',')).join(' ');
- return `<svg class="chart" viewBox="0 0 370 124" role="img" aria-label="${esc(names.join('与'))}趋势，${esc(values.join('、'))}"><title>${esc(names[0])}趋势（演示）</title><defs><linearGradient id="${chartId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".13"/><stop offset="1" stop-color="var(--accent)" stop-opacity=".005"/></linearGradient></defs>${[0,.5,1].map(x=>`<line class="gridline" x1="32" y1="${94-x*73}" x2="340" y2="${94-x*73}"/><text x="0" y="${98-x*73}" style="font-size:10px">${Math.round(max*x)}</text>`).join('')}<path d="${path(p)} L340,94 L32,94 Z" fill="url(#${chartId})"/><path class="line-a" d="${path(p)}"/>${q.length?`<path class="line-b" d="${path(q)}"/>`:''}${p.map(([x,y],i)=>`<g data-tip="${esc(labels[i]+'\n'+names[0]+'：'+values[i]+(values2?'\n'+names[1]+'：'+values2[i]:''))}" tabindex="0"><circle cx="${x}" cy="${y}" r="8" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.5" fill="var(--accent)"/><text x="${x}" y="115" text-anchor="middle" style="font-size:10px">${esc(labels[i])}</text></g>`).join('')}</svg>`;
+ return `<svg class="chart" viewBox="0 0 370 124" role="img" aria-label="${esc(names.join('与'))}趋势，${esc(values.join('、'))}"><title>${esc(names[0])}趋势（演示）</title><defs><linearGradient id="${chartId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--person-series-0)" stop-opacity=".13"/><stop offset="1" stop-color="var(--person-series-0)" stop-opacity=".005"/></linearGradient></defs>${[0,.5,1].map(x=>`<line class="gridline" x1="32" y1="${94-x*73}" x2="340" y2="${94-x*73}"/><text x="0" y="${98-x*73}" style="font-size:10px">${Math.round(max*x)}</text>`).join('')}<path d="${path(p)} L340,94 L32,94 Z" fill="url(#${chartId})"/><path class="line-a" d="${path(p)}"/>${q.length?`<path class="line-b" d="${path(q)}"/>`:''}${p.map(([x,y],i)=>`<g data-tip="${esc(labels[i]+'\n'+names[0]+'：'+values[i]+(values2?'\n'+names[1]+'：'+values2[i]:''))}" tabindex="0"><circle cx="${x}" cy="${y}" r="8" fill="transparent"/><circle cx="${x}" cy="${y}" r="2.5" fill="var(--person-series-0)"/><text x="${x}" y="115" text-anchor="middle" style="font-size:10px">${esc(labels[i])}</text></g>`).join('')}</svg>`;
 }
 function bars(rows,max){max=max||Math.max(...rows.map(x=>x[1]));return `<div class="bar-list" style="--max:${max}">${rows.map(([name,v,unit=''])=>`<div class="bar-row"><span>${name}</span><div class="bar-track"><div class="bar-fill" style="--value:${v}"></div></div><b class="od-nowrap">${fmt(v)}${unit}</b></div>`).join('')}</div>`;}
-function donut(value,label,rows){const c=276.46;return `<div class="chart-layout"><div class="donut"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49" fill="none" stroke="var(--accent)" stroke-width=".5" opacity=".08" stroke-dasharray="2 5"/><circle cx="50" cy="50" r="37" fill="none" stroke="var(--accent)" stroke-width=".5" opacity=".06"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--border)" stroke-width="3"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="${value/100*c} ${c}" stroke-linecap="round"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--accent2)" stroke-width="3" stroke-dasharray="${Math.min(9,value)/100*c} ${c}" stroke-dashoffset="${-Math.max(0,value-9)/100*c}"/></svg><div class="od-stat"><strong>${value}%</strong><small>${label}</small></div></div><div class="breakdown">${rows.map(([k,v])=>`<div class="breakdown-row"><span>${k}</span><b>${v}</b></div>`).join('')}</div></div>`;}
 const table=(headers,rows)=>`<table class="status-table"><thead><tr>${headers.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 const caption=(a,b='今日 · 演示')=>`<div class="chart-caption"><span>${a}</span><span>${b}</span></div>`;
 const tickets=[['能源隔离',3],['动火',4],['有限空间',2],['吊装',8],['高处',5],['临时用电',2]];
-const ticketGrid=()=>`<div class="ticket-list">${tickets.map(([k,v])=>`<div class="ticket-item"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
 // Vessel charts use the existing metrics and the four map demonstration vessels.
 const shipVoyageValues=[27,32,29,35,31,36,38];
 function shipOverview(){
@@ -288,7 +286,7 @@ function topicSummary(){
  if(current==='ships')return panels.ships.rows.map(([label,value,unit])=>[label,value,unit,'','ship','ships']);
  if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['已开启图层',enabled.size,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
  if(view.layout==='video')return [['模拟通道',3,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
- const keys={vehicles:['vehicles','vehicleFlow','approvals'],ships:['ships','voyages','berths'],energy:['electricity','solar','carbon'],safety:['safety','permits'],production:['production','shipWork','cargo']}[current];
+ const keys={energy:['electricity','solar','carbon'],production:['production','shipWork','cargo']}[current];
  return keys.flatMap(k=>panels[k].rows.filter(r=>typeof r[1]==='number').slice(0,2).map(([l,v,u])=>[l,v,u,'','chart',k])).slice(0,6);
 }
 function renderSummary(){const rows=topicSummary();$('#summary').style.setProperty('--summary-count',rows.length);$('#summary').innerHTML=rows.map(([l,v,u,h,i,key])=>`<button class="summary-item" data-detail="${key}" aria-label="查看${l}"><span class="label">${l}</span><span class="mini-icon">${icon(i)}</span><strong class="value od-nowrap">${fmt(v)}<small class="unit">${u}</small></strong><span class="hint">${h||''}</span></button>`).join('');}
@@ -321,7 +319,6 @@ function locateObject(id){
  document.querySelector(`[data-point="${id}"]`)?.focus({preventScroll:true});
 }
 
-$('#navigation').innerHTML=Object.entries(topics).map(([key,t])=>`<button data-topic="${key}" ${key===current?'aria-current="page"':''}>${t.name}</button>`).join('');
 renderLayerControls();
 $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
 function renderPanels(){
@@ -413,7 +410,7 @@ document.addEventListener('click',e=>{
  if(b.dataset.wallChannel!==undefined){wallChannel=Number(b.dataset.wallChannel);renderSceneWorkspace();document.querySelector(`.video-channel-card[data-wall-channel="${wallChannel}"]`)?.focus({preventScroll:true});}
  if(b.hasAttribute('data-wall-toggle')){wallPlaying=!wallPlaying;renderSceneWorkspace();document.querySelector('[data-wall-toggle]')?.focus({preventScroll:true});}
 });
-const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透'};
+const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透',violet:'暮紫通透',amber:'砂金通透'};
 function applyTheme(value){if(!themeNames[value])value='ocean';document.documentElement.dataset.theme=value;document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.themeChoice===value)));$('#theme-button').setAttribute('aria-label','切换配色，当前'+themeNames[value]);try{localStorage.setItem('hainan-port-panorama-v21-theme',value);}catch{}}
 try{applyTheme(localStorage.getItem('hainan-port-panorama-v21-theme')||'ocean');}catch{applyTheme('ocean');}
 $('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show)$('#theme-menu button').focus();});

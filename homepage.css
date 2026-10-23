@@ -1,20 +1,64 @@
+/* Interface themes are independent of chart series and business status colors. */
+:root {
+  --theme-text: #f2fbff;
+  --theme-muted: #d6edfa;
+  --theme-wing-top: rgba(12,113,167,.6);
+  --theme-wing-bottom: rgba(5,106,152,.46);
+}
+:root[data-theme=jade] {
+  --theme-text: #f4fffe;
+  --theme-muted: #dbf0ee;
+  --theme-wing-top: rgba(20,126,120,.6);
+  --theme-wing-bottom: rgba(8,94,92,.46);
+}
+:root[data-theme=slate] {
+  --theme-text: #f6fbff;
+  --theme-muted: #e1edf8;
+  --theme-wing-top: rgba(61,102,134,.6);
+  --theme-wing-bottom: rgba(43,76,107,.46);
+}
+:root[data-theme=violet] {
+  --bg: #29234d;
+  --surface: #302952;
+  --accent: #c8b5ff;
+  --theme-text: #faf7ff;
+  --theme-muted: #e5def7;
+  --theme-wing-top: rgba(100,77,157,.6);
+  --theme-wing-bottom: rgba(64,51,114,.46);
+  --label-bg: rgba(36,28,65,.84);
+}
+:root[data-theme=amber] {
+  --bg: #49392a;
+  --surface: #443729;
+  --accent: #f3cf96;
+  --theme-text: #fffaf2;
+  --theme-muted: #eee1cf;
+  --theme-wing-top: rgba(139,107,64,.6);
+  --theme-wing-bottom: rgba(91,71,44,.46);
+  --label-bg: rgba(49,37,24,.84);
+}
+:root[data-theme] {
+  --border: color-mix(in srgb,var(--accent) 24%,transparent);
+  --dim: var(--theme-muted);
+  --scene-shadow: var(--bg);
+}
 /* Shared glass dashboard shell for personnel and energy topics. */
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) {
   --person-series-0: #79d6ff;
   --person-series-1: #77efcf;
   --person-series-2: #ffe28b;
   --person-series-3: #afbaff;
-  --text: #f2fbff;
-  --muted: #d6edfa;
+  --text: var(--theme-text);
+  --muted: var(--theme-muted);
   --person-chart-line: rgba(182,226,247,.3);
 }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { filter: brightness(1.04) saturate(1.15); mask-image: none; }
+:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { mask-image: none; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer:after { background: linear-gradient(180deg,rgba(0,57,95,.08),transparent 30%,transparent 85%,rgba(0,58,84,.08)); }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing {
-  border: 1px solid rgba(169,226,255,.4);
+  border: 1px solid color-mix(in srgb,var(--accent) 40%,transparent);
   border-radius: .8rem;
-  background: linear-gradient(120deg,rgba(24,111,164,.62),rgba(12,99,143,.48));
-  box-shadow: inset 0 0 2rem rgba(114,215,255,.08),0 .3rem 2rem rgba(0,37,65,.08);
+  background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom));
+  box-shadow: inset 0 0 2rem color-mix(in srgb,var(--accent) 8%,transparent),0 .3rem 2rem rgba(0,37,65,.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1.1rem 1.2rem;
@@ -29,13 +73,13 @@
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: .08em; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-link { font-size: .75rem; color: var(--text); }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-body { gap: .6rem; }
-:root[data-topic=people] .person-number strong { font-size: 2.6rem; color: var(--person-series-0); line-height: 1.1; }
+:root[data-topic=people] .person-number strong { font-size: 2.6rem; color: var(--accent); line-height: 1.1; }
 :root[data-topic=people] .person-number strong small { color: var(--text); font-size: 1rem; margin-left: .3rem; }
 :root[data-topic=people] .person-number>span,
 :root[data-topic=people] .person-peak>span { font-size: .85rem; }
 :root[data-topic=people] .person-stock { gap: 0; align-items: stretch; }
 :root[data-topic=people] .person-stock>.person-number { flex: 1; align-content: start; gap: .3rem; }
-:root[data-topic=people] .person-peak { flex: 1; padding-left: 2rem; border-left: 1px solid rgba(177,226,255,.45); text-align: left; align-content: start; }
+:root[data-topic=people] .person-peak { flex: 1; padding-left: 2rem; border-left: 1px solid color-mix(in srgb,var(--accent) 45%,transparent); text-align: left; align-content: start; }
 :root[data-topic=people] .person-peak strong { font-size: 2.25rem; line-height: 1.05; }
 :root[data-topic=people] .person-peak strong small { font-size: 1rem; }
 :root[data-topic=people] .person-role-grid { border-top: 1px solid var(--person-chart-line); padding-top: .8rem; padding-bottom: .9rem; gap: .6rem; }
@@ -66,7 +110,7 @@
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .chart-caption { display: none; }
 :root[data-topic=people] .person-entry-head { align-items: stretch; gap: 0; }
 :root[data-topic=people] .person-entry-head>.person-number { flex: 1; }
-:root[data-topic=people] .person-change { flex: 1; border-left: 1px solid rgba(177,226,255,.45); text-align: left; padding-left: 2rem; align-content: start; }
+:root[data-topic=people] .person-change { flex: 1; border-left: 1px solid color-mix(in srgb,var(--accent) 45%,transparent); text-align: left; padding-left: 2rem; align-content: start; }
 :root[data-topic=people] .person-change span { font-size: .75rem; }
 :root[data-topic=people] .person-change strong { font-size: 1.25rem; }
 :root[data-topic=people] .person-columns { min-height: 0; max-height: 9rem; }
@@ -91,12 +135,12 @@
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .demo-label,
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .footer { display: none; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation { gap: .65rem; padding: .2rem 0 .4rem; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-width: 6rem; min-height: 1.8rem; padding: .2rem .8rem; border-color: rgba(177,231,255,.5); background: linear-gradient(180deg,rgba(57,144,185,.55),rgba(0,59,100,.7)); box-shadow: inset 0 1px 1px rgba(226,249,255,.2); font-weight: 400; }
+:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-width: 6rem; min-height: 1.8rem; padding: .2rem .8rem; border-color: color-mix(in srgb,var(--accent) 50%,transparent); background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 55%,transparent),color-mix(in srgb,var(--surface) 70%,transparent)); box-shadow: inset 0 1px 1px rgba(226,249,255,.2); font-weight: 400; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button:after { display: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button[aria-current=page] { border-color: #65e0ff; background: linear-gradient(180deg,rgba(13,139,235,.85),rgba(24,178,250,.6)); box-shadow: inset 0 0 .45rem #77e3ff,0 0 .9rem #16bdff99; }
+:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button[aria-current=page] { border-color: var(--accent); background: linear-gradient(180deg,color-mix(in srgb,var(--accent) 75%,var(--surface)),color-mix(in srgb,var(--accent) 50%,transparent)); box-shadow: inset 0 0 .45rem var(--accent),0 0 .9rem color-mix(in srgb,var(--accent) 60%,transparent); }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title { position: relative; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { content: ''; position: absolute; top: 72%; height: 2px; width: 2.75rem; background: linear-gradient(90deg,transparent,#a7e7ff); }
+:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { content: ''; position: absolute; top: 72%; height: 2px; width: 2.75rem; background: linear-gradient(90deg,transparent,var(--accent)); }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 20%; }
 :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 20%; transform: rotate(180deg); }
 @media (min-width:1200px) {
@@ -122,9 +166,9 @@
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading { align-self: end; padding: 0; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools { margin-left: auto; margin-right: 22%; gap: .2rem; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools .icon-btn { width: 2rem; height: 2rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary { width: 76%; justify-self: center; padding: .7rem .5rem; background: rgba(9,91,132,.65); border: 1px solid rgba(178,231,255,.35); border-radius: .65rem; backdrop-filter: blur(8px); gap: 0; }
+  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary { width: 76%; justify-self: center; padding: .7rem .5rem; background: color-mix(in srgb,var(--surface) 65%,transparent); border: 1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius: .65rem; backdrop-filter: blur(8px); gap: 0; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item { background: none; border-radius: 0; padding: 0 .5rem!important; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item+.summary-item { border-left: 1px solid rgba(181,227,253,.4); }
+  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item+.summary-item { border-left: 1px solid color-mix(in srgb,var(--accent) 40%,transparent); }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .label { font-size: .8rem; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value { font-size: 1.5rem; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value .unit { font-size: .8rem; }
@@ -157,8 +201,7 @@
   :root[data-topic=people] .person-ring-center span { font-size: .65rem; }
 }
 /* Match the reference's bright cyan water and translucent blue glass. */
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { filter: brightness(1.06) saturate(1.5) contrast(1.04); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { background: linear-gradient(120deg,rgba(12,113,167,.6),rgba(5,106,152,.46)); }
+:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom)); }
 :root[data-topic=people] .person-share { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); }
 :root[data-topic=people] .person-columns text { font-size: 22px; }
 :root[data-topic=people] .person-trend-dates { font: .8rem var(--font); }
@@ -175,7 +218,7 @@
   :root[data-topic=people] #right-panels { grid-template-rows: minmax(0,1.9fr) minmax(0,1fr); }
   :root[data-topic=people] .person-role-grid { padding-bottom: 1.6rem; }
   :root[data-topic=people] .person-peak { padding-left: 2.5rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { background: linear-gradient(180deg,rgba(0,80,130,.48),transparent); }
+  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 48%,transparent),transparent); }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 22%; }
   :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 22%; }
 }
@@ -206,7 +249,7 @@
   font: 500 1.6rem/1.25 'DIN Alternate','Arial Narrow','Avenir Next Condensed',sans-serif;
   color: var(--text);
 }
-:root:is([data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=production],[data-topic=safety]) .metric:first-child .metric-value { color: var(--person-series-0); }
+:root:is([data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=production],[data-topic=safety]) .metric:first-child .metric-value { color: var(--accent); }
 :root:is([data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=production],[data-topic=safety]) .metric .metric-value small { font-size: .6rem; margin-left: .2rem; }
 :root:is([data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=production],[data-topic=safety]) .bar-list { gap: .75rem; }
 :root:is([data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=production],[data-topic=safety]) .bar-row { grid-template-columns: 4.2rem minmax(0,1fr) 3.7rem; font-size: .8rem; gap: .5rem; }
@@ -266,9 +309,9 @@
 }
 :root[data-topic=ships] .linked-row strong { font-size: 1rem; }
 :root[data-topic=ships] .linked-row small { font-size: .8rem; }
-:root[data-topic=ships] .linked-row .od-icon { color: var(--person-series-0); }
+:root[data-topic=ships] .linked-row .od-icon { color: var(--accent); }
 :root[data-topic=ships] .linked-row:hover,
-:root[data-topic=ships] .linked-row:focus-visible { background: rgba(114,213,255,.14); }
+:root[data-topic=ships] .linked-row:focus-visible { background: color-mix(in srgb,var(--accent) 14%,transparent); }
 :root[data-topic=ships] .selection-panel { bottom: 7rem; border-radius: .65rem; }
 @media (min-width:1200px) {
   :root[data-topic=ships] #left-panels,
@@ -355,13 +398,13 @@
 :root[data-topic=vehicles] [data-panel=vehicleObjects] .panel-body { gap: .65rem; }
 :root[data-topic=vehicles] .vehicle-object-list { display: grid; grid-template-rows: repeat(5,minmax(0,1fr)); flex: 1; min-height: 0; }
 :root[data-topic=vehicles] .vehicle-object-row { display: grid; grid-template-columns: 1.4rem minmax(0,1fr) auto 1rem; align-items: center; gap: .6rem; width: 100%; padding: .55rem .3rem; background: transparent; border: 0; border-bottom: 1px solid var(--person-chart-line); border-radius: .3rem; text-align: left; }
-:root[data-topic=vehicles] .vehicle-object-row>.od-icon { color: var(--person-series-0); }
+:root[data-topic=vehicles] .vehicle-object-row>.od-icon { color: var(--accent); }
 :root[data-topic=vehicles] .vehicle-object-row strong { font-size: .9rem; font-weight: 500; }
 :root[data-topic=vehicles] .vehicle-object-row small { font-size: .65rem; color: var(--muted); }
 :root[data-topic=vehicles] .vehicle-object-status { font-size: .7rem; color: var(--person-series-1); }
 :root[data-topic=vehicles] .vehicle-object-status[data-status=空闲] { color: var(--person-series-2); }
 :root[data-topic=vehicles] .vehicle-object-row:hover,
-:root[data-topic=vehicles] .vehicle-object-row:focus-visible { background: rgba(114,213,255,.14); }
+:root[data-topic=vehicles] .vehicle-object-row:focus-visible { background: color-mix(in srgb,var(--accent) 14%,transparent); }
 :root[data-topic=vehicles] .vehicle-traffic-columns g:focus-visible,
 :root[data-topic=vehicles] .vehicle-approval-ring circle:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 @media (min-width:1200px) {
@@ -384,7 +427,7 @@
 :root[data-topic=vehicles] .vehicle-compact-overview { display: grid; grid-template-columns: 1fr 1.15fr; align-items: center; gap: 1rem; height: 100%; }
 :root[data-topic=vehicles] .vehicle-main-count { display: grid; gap: .2rem; }
 :root[data-topic=vehicles] .vehicle-main-count>span { font-size: .8rem; color: var(--muted); }
-:root[data-topic=vehicles] .vehicle-main-count strong { font: 3.2rem/1.05 var(--number); color: var(--person-series-0); }
+:root[data-topic=vehicles] .vehicle-main-count strong { font: 3.2rem/1.05 var(--number); color: var(--accent); }
 :root[data-topic=vehicles] .vehicle-main-count small { font: .9rem var(--font); color: var(--text); }
 :root[data-topic=vehicles] .vehicle-secondary-counts { display: grid; gap: .6rem; border-left: 1px solid var(--person-chart-line); padding-left: 1rem; }
 :root[data-topic=vehicles] .vehicle-secondary-counts>div { display: flex; align-items: baseline; justify-content: space-between; gap: .4rem; }
@@ -417,31 +460,31 @@
 :root[data-topic=map] [data-panel=mapObjects] .panel-body { display: flex; flex-direction: column; }
 :root[data-topic=map] .object-search { flex: none; }
 :root[data-topic=map] .object-search label { font-size: .8rem; }
-:root[data-topic=map] .object-search input { background: rgba(0,64,105,.36); border-color: var(--person-chart-line); border-radius: .4rem; font-size: .85rem; padding: .65rem .7rem; }
+:root[data-topic=map] .object-search input { background: color-mix(in srgb,var(--surface) 36%,transparent); border-color: var(--person-chart-line); border-radius: .4rem; font-size: .85rem; padding: .65rem .7rem; }
 :root[data-topic=map] .map-result-count { font-size: .65rem; color: var(--muted); line-height: 1.6; flex: none; }
-:root[data-topic=map] .object-results { flex: 1; max-height: none; min-height: 0; scrollbar-width: thin; scrollbar-color: rgba(159,222,249,.45) transparent; }
+:root[data-topic=map] .object-results { flex: 1; max-height: none; min-height: 0; scrollbar-width: thin; scrollbar-color: color-mix(in srgb,var(--accent) 45%,transparent) transparent; }
 :root[data-topic=map] .map-object-list { display: grid; gap: .15rem; }
 :root[data-topic=map] .map-object-row { display: grid; grid-template-columns: 1.25rem minmax(0,1fr) 1rem; align-items: center; gap: .55rem; background: transparent; border: 0; border-bottom: 1px solid var(--person-chart-line); border-radius: .3rem; padding: .6rem .35rem; text-align: left; }
-:root[data-topic=map] .map-object-row>.od-icon { color: var(--person-series-0); }
+:root[data-topic=map] .map-object-row>.od-icon { color: var(--accent); }
 :root[data-topic=map] .map-object-row strong { font-size: .85rem; font-weight: 500; }
 :root[data-topic=map] .map-object-row small { font-size: .65rem; color: var(--muted); }
 :root[data-topic=map] .map-object-row:hover,
-:root[data-topic=map] .map-object-row.is-selected { background: rgba(111,215,255,.18); }
-:root[data-topic=map] .map-object-row.is-selected { box-shadow: inset 2px 0 var(--person-series-0); }
+:root[data-topic=map] .map-object-row.is-selected { background: color-mix(in srgb,var(--accent) 18%,transparent); }
+:root[data-topic=map] .map-object-row.is-selected { box-shadow: inset 2px 0 var(--accent); }
 :root[data-topic=map] #layer-controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .4rem; padding: 0; margin: 0; border: 0; background: transparent; }
-:root[data-topic=map] #layer-controls .layer-btn { display: grid; grid-template-columns: 1rem minmax(0,1fr) auto; align-items: center; gap: .35rem; padding: .5rem; font-size: .75rem; border: 1px solid rgba(170,225,249,.2); border-radius: .35rem; color: var(--muted); }
-:root[data-topic=map] #layer-controls .layer-btn[aria-pressed=true] { background: rgba(85,194,233,.18); border-color: rgba(138,224,255,.5); color: var(--text); box-shadow: none; }
+:root[data-topic=map] #layer-controls .layer-btn { display: grid; grid-template-columns: 1rem minmax(0,1fr) auto; align-items: center; gap: .35rem; padding: .5rem; font-size: .75rem; border: 1px solid color-mix(in srgb,var(--accent) 20%,transparent); border-radius: .35rem; color: var(--muted); }
+:root[data-topic=map] #layer-controls .layer-btn[aria-pressed=true] { background: color-mix(in srgb,var(--accent) 18%,transparent); border-color: color-mix(in srgb,var(--accent) 50%,transparent); color: var(--text); box-shadow: none; }
 :root[data-topic=map] #layer-controls .layer-btn[aria-pressed=false] { opacity: .6; }
-:root[data-topic=map] #layer-controls b { font: 1rem var(--number); color: var(--person-series-0); }
+:root[data-topic=map] #layer-controls b { font: 1rem var(--number); color: var(--accent); }
 :root[data-topic=map] #map-selection-slot { display: flex; flex-direction: column; min-height: 0; overflow: auto; }
 :root[data-topic=map] #selection { position: static; width: 100%; padding: .3rem 0; margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; flex: none; }
-:root[data-topic=map] #selection .selection-head strong { font-size: 1rem; color: var(--person-series-0); }
+:root[data-topic=map] #selection .selection-head strong { font-size: 1rem; color: var(--accent); }
 :root[data-topic=map] #selection dl { grid-template-columns: 4.4rem minmax(0,1fr); font-size: .8rem; line-height: 1.5; gap: .5rem; margin: .75rem 0; }
-:root[data-topic=map] #selection .text-btn { border-radius: .35rem; padding: .5rem; font-size: .75rem; }
+:root[data-topic=map] #selection .text-btn { border-radius: .5rem; padding: .5rem; font-size: .75rem; }
 :root[data-topic=map] #selection .selection-actions { margin-top: .4rem; }
 :root[data-topic=map] .map-selection-empty { display: grid; justify-items: center; align-content: center; gap: .75rem; min-height: 11rem; height: 100%; text-align: center; color: var(--muted); padding: .7rem; }
 :root[data-topic=map] .map-selection-empty[hidden] { display: none; }
-:root[data-topic=map] .map-selection-empty>.od-icon { --od-icon-size: 2rem; color: var(--person-series-0); opacity: .8; }
+:root[data-topic=map] .map-selection-empty>.od-icon { --od-icon-size: 2rem; color: var(--accent); opacity: .8; }
 :root[data-topic=map] .map-selection-empty strong { font-size: .9rem; font-weight: 500; color: var(--text); }
 :root[data-topic=map] .map-selection-empty span { font-size: .75rem; line-height: 1.8; }
 :root[data-topic=map] .map-scope-note { margin: 0; font-size: .65rem; line-height: 1.65; color: var(--muted); }
@@ -478,38 +521,38 @@
 :root[data-topic=video] .panel-body { min-height: 0; gap: .75rem; }
 :root[data-topic=video] .video-scope-note { margin: 0; font-size: .7rem; color: var(--muted); line-height: 1.8; }
 :root[data-topic=video] .video-channel-list { display: grid; gap: .8rem; overflow: auto; min-height: 0; }
-:root[data-topic=video] .video-channel-card { position: relative; display: grid; padding: .5rem; gap: .65rem; border: 1px solid rgba(165,222,247,.26); border-radius: .55rem; background: rgba(0,59,100,.24); text-align: left; }
-:root[data-topic=video] .video-channel-card[aria-pressed=true] { border-color: var(--person-series-0); background: rgba(40,150,203,.23); box-shadow: inset 0 0 0 1px rgba(121,214,255,.2); }
+:root[data-topic=video] .video-channel-card { position: relative; display: grid; padding: .5rem; gap: .65rem; border: 1px solid color-mix(in srgb,var(--accent) 26%,transparent); border-radius: .55rem; background: color-mix(in srgb,var(--surface) 24%,transparent); text-align: left; }
+:root[data-topic=video] .video-channel-card[aria-pressed=true] { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 23%,transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent); }
 :root[data-topic=video] .video-channel-thumb { position: relative; display: grid; place-items: center; height: 7.2rem; border-radius: .3rem; overflow: hidden; background: linear-gradient(rgba(0,42,65,.1),rgba(0,25,43,.28)),url('背景图.png') var(--camera-position)/240% auto; }
 :root[data-topic=video] .video-channel-thumb>span { position: absolute; top: .35rem; left: .35rem; padding: .15rem .35rem; border-radius: .2rem; font: .7rem var(--number); background: rgba(0,30,49,.65); }
 :root[data-topic=video] .video-channel-thumb>.od-icon { --od-icon-size: 1.5rem; filter: drop-shadow(0 1px 3px #002337); opacity: .8; }
 :root[data-topic=video] .video-channel-meta { display: grid; gap: .15rem; padding: 0 .2rem .2rem; }
 :root[data-topic=video] .video-channel-meta strong { font-size: .9rem; font-weight: 500; }
 :root[data-topic=video] .video-channel-meta small { font-size: .65rem; color: var(--muted); }
-:root[data-topic=video] .video-channel-selected { display: none; position: absolute; right: .65rem; bottom: .7rem; font-size: .65rem; color: var(--person-series-0); }
+:root[data-topic=video] .video-channel-selected { display: none; position: absolute; right: .65rem; bottom: .7rem; font-size: .65rem; color: var(--accent); }
 :root[data-topic=video] .video-channel-card[aria-pressed=true] .video-channel-selected { display: block; }
 :root[data-topic=video] .video-current-title { display: flex; align-items: center; gap: .8rem; }
-:root[data-topic=video] .video-current-title>.od-icon { --od-icon-size: 1.8rem; color: var(--person-series-0); }
+:root[data-topic=video] .video-current-title>.od-icon { --od-icon-size: 1.8rem; color: var(--accent); }
 :root[data-topic=video] .video-current-title>div { display: grid; gap: .25rem; }
 :root[data-topic=video] .video-current-title strong { font-size: 1rem; font-weight: 500; }
 :root[data-topic=video] .video-current-title span { font: .8rem var(--number); color: var(--muted); }
 :root[data-topic=video] .video-channel-info dl { display: grid; grid-template-columns: 1fr auto; gap: .7rem; font-size: .8rem; margin: .7rem 0 0; }
 :root[data-topic=video] .video-channel-info dt { color: var(--muted); }
 :root[data-topic=video] .video-channel-info dd { margin: 0; }
-:root[data-topic=video] .video-sim-state { color: var(--person-series-0); }
+:root[data-topic=video] .video-sim-state { color: var(--accent); }
 :root[data-topic=video] .video-quick-actions { display: flex; flex-direction: column; justify-content: flex-start; }
-:root[data-topic=video] .video-quick-actions .text-btn { display: flex; align-items: center; justify-content: center; gap: .6rem; width: 100%; min-height: 2.5rem; border-radius: .4rem; background: rgba(14,95,143,.3); font-size: .85rem; }
-:root[data-topic=video] .video-quick-actions .text-btn:first-child { background: rgba(76,177,219,.2); border-color: rgba(121,214,255,.6); }
+:root[data-topic=video] .video-quick-actions .text-btn { display: flex; align-items: center; justify-content: center; gap: .6rem; width: 100%; min-height: 2.5rem; border-radius: .4rem; background: color-mix(in srgb,var(--surface) 30%,transparent); font-size: .85rem; }
+:root[data-topic=video] .video-quick-actions .text-btn:first-child { background: color-mix(in srgb,var(--accent) 20%,transparent); border-color: color-mix(in srgb,var(--accent) 60%,transparent); }
 :root[data-topic=video] .video-help p { margin: 0; font-size: .8rem; line-height: 1.9; color: var(--muted); }
 :root[data-topic=video] .video-help p.video-scope-note { font-size: .7rem; color: var(--person-series-2); }
 :root[data-topic=video] .map-heading,
 :root[data-topic=video] #markers { display: none; }
 :root[data-topic=video] .scene-space { display: flex; min-height: 0; pointer-events: auto; }
-:root[data-topic=video] .video-workspace { display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-height: 0; padding: 1rem; gap: .8rem; border: 1px solid rgba(169,226,255,.35); border-radius: .8rem; background: rgba(4,69,108,.42); backdrop-filter: blur(8px); }
+:root[data-topic=video] .video-workspace { display: grid; grid-template-rows: auto minmax(0,1fr) auto; min-height: 0; padding: 1rem; gap: .8rem; border: 1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius: .8rem; background: color-mix(in srgb,var(--surface) 42%,transparent); backdrop-filter: blur(8px); }
 :root[data-topic=video] .wall-header strong { font-size: 1rem; }
 :root[data-topic=video] .wall-header small { font-size: .7rem; }
-:root[data-topic=video] .video-wall-state { font-size: .7rem; color: var(--person-series-0); background: rgba(0,44,70,.5); padding: .35rem .5rem; border-radius: .3rem; }
-:root[data-topic=video] .wall-main { position: relative; min-height: 0; height: 100%; border: 1px solid rgba(178,231,255,.35); border-radius: .5rem; overflow: hidden; background: linear-gradient(rgba(0,39,63,.1),rgba(0,26,43,.24)),url('背景图.png') var(--camera-position)/190% auto no-repeat; }
+:root[data-topic=video] .video-wall-state { font-size: .7rem; color: var(--accent); background: color-mix(in srgb,var(--surface) 50%,transparent); padding: .35rem .5rem; border-radius: .3rem; }
+:root[data-topic=video] .wall-main { position: relative; min-height: 0; height: 100%; border: 1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius: .5rem; overflow: hidden; background: linear-gradient(rgba(0,39,63,.1),rgba(0,26,43,.24)),url('背景图.png') var(--camera-position)/190% auto no-repeat; }
 :root[data-topic=video] .wall-main.is-paused { filter: saturate(.65); }
 :root[data-topic=video] .video-screen-label,
 :root[data-topic=video] .video-screen-expand,
@@ -517,8 +560,8 @@
 :root[data-topic=video] .video-screen-label { top: .7rem; left: .7rem; }
 :root[data-topic=video] .video-screen-expand { top: .7rem; right: .7rem; }
 :root[data-topic=video] .video-screen-note { bottom: .7rem; left: .7rem; font-size: .6rem; letter-spacing: .08em; }
-:root[data-topic=video] .video-screen-center { display: grid; justify-items: center; gap: .65rem; padding: 1.3rem 1.8rem; border: 1px solid rgba(178,231,255,.28); border-radius: .55rem; background: rgba(0,33,53,.72); }
-:root[data-topic=video] .video-screen-center>.od-icon { --od-icon-size: 2rem; color: var(--person-series-0); }
+:root[data-topic=video] .video-screen-center { display: grid; justify-items: center; gap: .65rem; padding: 1.3rem 1.8rem; border: 1px solid color-mix(in srgb,var(--accent) 28%,transparent); border-radius: .55rem; background: rgba(0,33,53,.72); }
+:root[data-topic=video] .video-screen-center>.od-icon { --od-icon-size: 2rem; color: var(--accent); }
 :root[data-topic=video] .video-screen-center strong { font-size: 1.1rem; }
 :root[data-topic=video] .video-screen-center small { font-size: .75rem; color: var(--muted); }
 :root[data-topic=video] .video-wall-footnote { margin: 0; font-size: .65rem; color: var(--muted); text-align: center; }
@@ -564,7 +607,7 @@
 :root[data-topic=production] .bar-row:nth-child(3) .bar-fill { background: linear-gradient(90deg,#ba9444,var(--person-series-2)); }
 :root[data-topic=production] .production-hero { display: grid; gap: .4rem; padding: .2rem .25rem .8rem; border-bottom: 1px solid var(--person-chart-line); }
 :root[data-topic=production] .production-hero>span { font-size: .85rem; color: var(--muted); }
-:root[data-topic=production] .production-hero strong { color: var(--person-series-0); font: 2.8rem/1.15 var(--number); }
+:root[data-topic=production] .production-hero strong { color: var(--accent); font: 2.8rem/1.15 var(--number); }
 :root[data-topic=production] .production-hero strong small { font: .9rem var(--font); color: var(--text); }
 :root[data-topic=production] [data-panel=shipWork] .metrics,
 :root[data-topic=production] [data-panel=fuel] .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); padding: .4rem .25rem; }
@@ -619,7 +662,7 @@
 :root[data-topic=safety] .safety-permit-row>span:first-child { display: flex; align-items: baseline; gap: .8rem; }
 :root[data-topic=safety] .safety-permit-row strong { font: .85rem var(--number); }
 :root[data-topic=safety] .safety-permit-row small { font-size: .75rem; color: var(--muted); }
-:root[data-topic=safety] .safety-state { font-size: .7rem; color: var(--person-series-1); padding: .2rem .4rem; border-radius: .25rem; background: rgba(0,58,82,.25); white-space: nowrap; }
+:root[data-topic=safety] .safety-state { font-size: .7rem; color: var(--person-series-1); padding: .2rem .4rem; border-radius: .25rem; background: color-mix(in srgb,var(--surface) 25%,transparent); white-space: nowrap; }
 :root[data-topic=safety] .safety-state[data-state=待开始] { color: var(--person-series-2); }
 :root[data-topic=safety] .safety-state[data-state=已结束] { color: var(--muted); }
 :root[data-topic=safety] .safety-columns { display: block; width: 100%; flex: 1; min-height: 0; }
@@ -657,7 +700,7 @@
 :root[data-topic=safety] [data-panel=risks] .linked-row { padding: .4rem .2rem; border-bottom: 1px solid var(--person-chart-line); border-radius: .25rem; background: transparent; }
 :root[data-topic=safety] [data-panel=risks] .linked-row strong { font-size: .85rem; font-weight: 500; }
 :root[data-topic=safety] [data-panel=risks] .linked-row small { font-size: .65rem; }
-:root[data-topic=safety] [data-panel=risks] .linked-row:hover { background: rgba(121,214,255,.12); }
+:root[data-topic=safety] [data-panel=risks] .linked-row:hover { background: color-mix(in srgb,var(--accent) 12%,transparent); }
 :root[data-topic=safety] .selection-panel { bottom: 7rem; border-radius: .65rem; }
 :root[data-topic=safety] .safety-columns g:focus-visible,
 :root[data-topic=safety] .production-ring circle:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
@@ -670,3 +713,102 @@
 :root[data-topic=safety] [data-panel=risks] .linked-row .od-field { gap: .15rem; }
 :root[data-topic=safety] [data-panel=risks] .linked-row strong { line-height: 1.3; }
 :root[data-topic=safety] [data-panel=risks] .linked-row small { line-height: 1.4; }
+
+:root .chart .line-a { stroke: var(--person-series-0); }
+:root .chart .line-b { stroke: var(--person-series-1); }
+
+/* Shared glass surfaces for dialogs, popovers and map controls. */
+:root {
+  --glass-edge: color-mix(in srgb,var(--accent) 40%,transparent);
+  --glass-control: color-mix(in srgb,var(--surface) 42%,transparent);
+  --glass-highlight: color-mix(in srgb,var(--accent) 18%,transparent);
+}
+:root dialog,
+:root .theme-menu,
+:root .prototype-panel,
+:root:not([data-topic=map]) #selection {
+  border: 1px solid var(--glass-edge);
+  border-radius: .8rem;
+  background: linear-gradient(120deg,color-mix(in srgb,var(--surface) 82%,transparent),color-mix(in srgb,var(--surface) 68%,transparent));
+  box-shadow: inset 0 1px 0 rgba(220,248,255,.12),0 1.2rem 4rem rgba(0,30,55,.3);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+:root dialog::backdrop { background: color-mix(in srgb,var(--surface) 30%,transparent); backdrop-filter: blur(3px); }
+:root dialog .dialog-head { background: var(--glass-highlight); border-bottom-color: var(--glass-edge); }
+:root dialog .dialog-head h2 { font-weight: 600; letter-spacing: .06em; }
+:root dialog .dialog-body { scrollbar-color: var(--glass-edge) transparent; }
+:root dialog #detail-context { font-size: .8rem; }
+:root dialog .search-field input,
+:root dialog select,
+:root :is(dialog,#selection) .text-btn {
+  border: 1px solid var(--glass-edge);
+  border-radius: .5rem;
+  background: var(--glass-control);
+  color: var(--text);
+  min-height: 2.5rem;
+}
+:root dialog .search-field input::placeholder { color: var(--muted); opacity: .75; }
+:root dialog select option { background: var(--surface); color: var(--text); }
+:root dialog .detail-table th { background: var(--glass-highlight); color: var(--text); }
+:root dialog .detail-table th,
+:root dialog .detail-table td { border-bottom-color: var(--person-chart-line); }
+:root dialog .detail-table tbody tr:nth-child(even) { background: color-mix(in srgb,var(--accent) 4%,transparent); }
+:root dialog .detail-table td:last-child { color: var(--accent); }
+:root dialog .detail-count { color: var(--muted); }
+:root dialog .dialog-note { border-top: 1px solid var(--person-chart-line); padding-top: .85rem; line-height: 1.7; }
+:root dialog .video-screen { border-color: var(--glass-edge); border-radius: .55rem; overflow: hidden; }
+:root :is(dialog,.prototype-panel,#selection) .close-btn {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  border: 1px solid var(--glass-edge);
+  border-radius: .5rem;
+  background: var(--glass-highlight);
+  color: var(--text);
+}
+:root .theme-menu { padding: .4rem; }
+:root .theme-menu button { min-height: 2.5rem; border-radius: .5rem; color: var(--text); }
+:root .theme-menu button[aria-checked=true] { background: var(--glass-highlight); box-shadow: inset 0 0 0 1px var(--glass-edge); }
+:root .theme-menu .swatch { border: 1px solid rgba(235,252,255,.5); box-shadow: 0 0 .5rem color-mix(in srgb,var(--swatch) 25%,transparent); }
+:root .prototype-panel-head,
+:root #selection .selection-head { padding-bottom: .7rem; border-bottom: 1px solid var(--glass-edge); }
+:root .prototype-panel-head h2 { font-weight: 600; }
+:root .prototype-empty { padding: .5rem 0; font-size: .85rem; color: var(--muted); }
+:root #selection .selection-head strong { color: var(--text); font-weight: 600; }
+:root #selection dl { line-height: 1.6; }
+:root #selection dt { color: var(--muted); }
+:root #selection dd { color: var(--text); overflow-wrap: anywhere; }
+:root #selection .selection-actions .text-btn:disabled { opacity: .55; background: transparent; }
+:root .workspace .map-tools {
+  gap: .3rem;
+  padding: .3rem;
+  border: 1px solid var(--glass-edge);
+  border-radius: .65rem;
+  background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom));
+  box-shadow: inset 0 1px 0 rgba(220,248,255,.12),0 .25rem 1rem rgba(0,37,65,.12);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+}
+:root .workspace .map-tools .icon-btn {
+  border: 1px solid color-mix(in srgb,var(--accent) 24%,transparent);
+  border-radius: .4rem;
+  background: color-mix(in srgb,var(--accent) 8%,transparent);
+  color: var(--text);
+}
+@media (hover:hover) {
+  :root :is(dialog,.prototype-panel,#selection) .close-btn:hover,
+  :root :is(dialog,#selection) .text-btn:not(:disabled):hover,
+  :root .theme-menu button:hover,
+  :root .workspace .map-tools .icon-btn:hover { background: var(--glass-highlight); border-color: var(--accent); }
+  :root dialog .detail-table tbody tr:hover { background: color-mix(in srgb,var(--accent) 9%,transparent); }
+}
+@media (max-width:767px) {
+  :root :is(dialog,.prototype-panel,#selection) .close-btn { width: 44px; height: 44px; }
+  :root dialog .search-field input,
+  :root dialog select,
+  :root :is(dialog,#selection) .text-btn,
+  :root .theme-menu button { min-height: 44px; }
+}

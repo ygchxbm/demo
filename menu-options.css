@@ -47,13 +47,9 @@
 .wall-main strong{font-size:1rem;font-weight:500}
 .wall-main small{font-size:.7rem}
 .wall-main .od-icon{--od-icon-size:1.1rem}
-.wall-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem}
-.wall-rail button{background:transparent;border:1px solid var(--border);padding:.5rem;text-align:left;color:var(--muted);--od-gap:.2rem}
-.wall-rail button[aria-pressed=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--text)}
-.wall-rail strong{font:.75rem var(--number)}
-.wall-rail span{font-size:.7rem;overflow-wrap:anywhere}
+
 .video-workspace>.text-btn{justify-self:start;font-size:.7rem}
-@media(hover:hover){.view-switch button:hover,.linked-row:hover,.wall-rail button:hover{background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--text);border-color:var(--accent)}
+@media(hover:hover){.view-switch button:hover,.linked-row:hover{background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--text);border-color:var(--accent)}
 }
 @media(max-width:1599px){:root .app{height:auto;grid-template-rows:4.5rem auto auto auto}
 :root .wing{grid-template-rows:repeat(var(--panel-count,2),minmax(13rem,auto))}
@@ -63,8 +59,8 @@
 @media(max-width:1199px){:root .app{grid-template-rows:auto auto auto auto}
 :root .workspace{grid-template-columns:repeat(2,minmax(0,1fr))}
 :root .center{grid-column:1/-1}
-.view-switch button,.linked-row,.wall-rail button{min-height:44px}
-.view-switch button,.linked-row strong,.wall-rail span{font-size:.85rem}
+.view-switch button,.linked-row{min-height:44px}
+.view-switch button,.linked-row strong{font-size:.85rem}
 .linked-row small,.wall-header small{font-size:.75rem}
 .object-search label,.object-search input{font-size:1rem}
 .view-copy{font-size:1rem}
@@ -80,7 +76,7 @@
 :root .selection-panel{bottom:13rem}
 .wall-header{flex-wrap:wrap}
 .wall-header .od-fill{flex-basis:100%}
-.wall-rail{grid-template-columns:1fr}
+
 .wall-main strong{font-size:.9rem}
 .video-workspace{padding:.5rem}
 .video-workspace>.text-btn{font-size:.85rem}

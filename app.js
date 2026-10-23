@@ -192,6 +192,10 @@ const cameraPositions=['20% 30%','48% 58%','75% 70%'];
 let current='people', selected=null, enabled=new Set(topics.people.layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
 let trendChoice='吞吐量',objectQuery='';
+const peopleLayoutKey='hainan-port-people-layout';
+const peopleLayouts=new Set(['wide','columns','complete']);
+let peopleLayout='default',previewScale=1;
+try{const saved=localStorage.getItem(peopleLayoutKey);if(peopleLayouts.has(saved))peopleLayout=saved;}catch{}
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
 function linkedRows(rows){return `<div class="linked-rows od-stack">${rows.map(([title,detail,attr,value])=>`<button ${attr}="${value}" class="linked-row od-row"><span class="od-field od-fill"><strong>${esc(title)}</strong><small>${esc(detail)}</small></span>${icon('arrow')}</button>`).join('')}</div>`;}
@@ -303,7 +307,7 @@ function renderSceneWorkspace(){
  }else{space.innerHTML='';space.setAttribute('aria-hidden','true');}
 }
 function renderPage(){
- const view=activeView();renderNavigation();renderPanels();renderSummary();renderSceneWorkspace();updateMarkers();
+ const view=activeView();renderNavigation();renderPanels();renderSummary();renderSceneWorkspace();syncPeopleLayout();updateMarkers();
  $('#topic-label').textContent=topics[current].name;
  $('#topic-en').textContent=topics[current].en;
  $('#map-title').textContent=view.layout==='video'?'港区视频监控':view.layout==='map'?'港区地图全览':topics[current].name+' · 空间分布';
@@ -314,14 +318,15 @@ function locateObject(id){
  enabled.add(p.kind);updateMarkers();selectPoint(id);
  // Center the selected point in the exposed center column, keeping the current zoom.
  const target=$('#map-stage').getBoundingClientRect(),surface=$('#panorama-layer').getBoundingClientRect();
- panX=target.left+target.width/2-surface.left-surface.width/2-(p.x/100-.5)*baseWidth*zoom;
- panY=target.top+target.height*.4-surface.top-surface.height/2-(p.y/100-.5)*baseWidth/2*zoom;paintTransform();
+ panX=(target.left+target.width/2-surface.left-surface.width/2)/previewScale-(p.x/100-.5)*baseWidth*zoom;
+ panY=(target.top+target.height*.4-surface.top-surface.height/2)/previewScale-(p.y/100-.5)*baseWidth/2*zoom;paintTransform();
  document.querySelector(`[data-point="${id}"]`)?.focus({preventScroll:true});
 }
 
 renderLayerControls();
 $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
 function renderPanels(){
+ restorePeoplePanels();
  document.documentElement.dataset.topic=current;
  // Move persistent controls out before replacing the sidebar; their event bindings survive.
  if($('#selection').closest('#right-panels'))$('#map-stage').append($('#selection'));
@@ -340,7 +345,7 @@ function changeTopic(key,announce=true){
  current=key;closeSelection();enabled=new Set(activeView().layers);renderPage();
  if(announce)$('#live-status').textContent='已切换至'+topics[key].name+'，地图视角已保留';
 }
-const initial=location.hash.slice(1);if(!topics[initial])history.replaceState(null,'','#'+defaultTopic());changeTopic(topics[initial]?initial:defaultTopic(),false);
+const initial=location.hash.slice(1);if(!topics[initial])history.replaceState(null,'','#'+defaultTopic());
 function setHash(key){if(location.hash==='#'+key)changeTopic(key);else location.hash=key;}
 window.addEventListener('hashchange',()=>changeTopic(location.hash.slice(1)));
 // V2.3 finalized: one full-port interactive panorama, contained at its natural ratio.
@@ -359,7 +364,7 @@ function paintTransform(){
 function fitMap(){
  const w=panoramaLayer.clientWidth,h=panoramaLayer.clientHeight;
  if(!w||!h)return;
- baseWidth=['people','energy','ships','vehicles','production','safety'].includes(current)?Math.max(w,h*2):Math.min(w,h*2);
+ baseWidth=current==='people'&&peopleLayout==='complete'?Math.min(w,h*2):['people','energy','ships','vehicles','production','safety'].includes(current)?Math.max(w,h*2):Math.min(w,h*2);
  mapWorld.style.width=baseWidth+'px';paintTransform();
 }
 function doZoom(delta){zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
@@ -375,17 +380,72 @@ $('#reset-map').addEventListener('click',()=>resetMapView());
 function bindMapInput(surface){
  surface.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey||e.target.closest('button,input,select,#selection'))return;e.preventDefault();doZoom(e.deltaY<0?.1:-.1);},{passive:false});
  surface.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button,#selection'))return;drag={surface,id:e.pointerId,x:e.clientX,y:e.clientY,px:panX,py:panY};surface.setPointerCapture(e.pointerId);});
- surface.addEventListener('pointermove',e=>{if(!drag||drag.surface!==surface||drag.id!==e.pointerId)return;panX=drag.px+e.clientX-drag.x;panY=drag.py+e.clientY-drag.y;paintTransform();});
+ surface.addEventListener('pointermove',e=>{if(!drag||drag.surface!==surface||drag.id!==e.pointerId)return;panX=drag.px+(e.clientX-drag.x)/previewScale;panY=drag.py+(e.clientY-drag.y)/previewScale;paintTransform();});
  const endDrag=e=>{if(drag&&drag.surface===surface&&drag.id===e.pointerId){if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId);drag=null;}};
  surface.addEventListener('pointerup',endDrag);surface.addEventListener('pointercancel',endDrag);
  surface.addEventListener('keydown',e=>{if(e.target!==surface)return;const moves={ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]};if(moves[e.key]){e.preventDefault();panX+=moves[e.key][0];panY+=moves[e.key][1];paintTransform();}if(e.key==='+'||e.key==='='){e.preventDefault();doZoom(.25);}if(e.key==='-'){e.preventDefault();doZoom(-.25);}if(e.key==='0'){e.preventDefault();resetMapView();}});
 }
 bindMapInput(stage);bindMapInput(panoramaLayer);
+const peopleExtraWings={};
+function restorePeoplePanels(){
+ for(const key of ['peopleAffiliation','peopleEntry']){
+  const wing=peopleExtraWings[key];
+  if(wing?.isConnected){while(wing.firstChild)$('#left-panels').append(wing.firstChild);wing.remove();}
+ }
+}
+function syncPreviewPopovers(){
+ const preview=current==='people'&&peopleLayouts.has(peopleLayout);
+ for(const [panelId,buttonId,wrap] of [['prototype-settings-panel','prototype-settings-button','.prototype-wrap'],['theme-menu','theme-button','.theme-wrap']]){
+  const panel=$('#'+panelId);
+  if(preview){
+   if(panel.parentElement!==document.body)document.body.append(panel);
+   panel.classList.add('preview-popover');
+   const rect=$('#'+buttonId).getBoundingClientRect(),width=Math.min(panelId==='theme-menu'?240:380,window.innerWidth-32);
+   const top=Math.max(16,Math.min(rect.bottom+10,window.innerHeight-280));
+   panel.style.width=width+'px';panel.style.left=Math.max(16,Math.min(rect.right-width,window.innerWidth-width-16))+'px';panel.style.top=top+'px';panel.style.maxHeight=Math.max(120,window.innerHeight-top-16)+'px';
+  }else{
+   if(panel.parentElement!==$(wrap))$(wrap).append(panel);
+   panel.classList.remove('preview-popover');
+   for(const property of ['width','left','top','max-height'])panel.style.removeProperty(property);
+  }
+ }
+}
+function syncPeopleLayout(){
+ const active=current==='people'&&peopleLayouts.has(peopleLayout);
+ if(active)document.documentElement.dataset.peopleLayout=peopleLayout;
+ else delete document.documentElement.dataset.peopleLayout;
+ previewScale=active?Math.min(window.innerWidth/3840,window.innerHeight/1080):1;
+ document.documentElement.style.setProperty('--people-preview-scale',previewScale);
+ if(active&&peopleLayout==='columns'){
+  for(const [key,label] of [['peopleAffiliation','人员归属分析'],['peopleEntry','今日入场分析']]){
+   const panel=document.querySelector(`[data-panel="${key}"]`);
+   const wing=peopleExtraWings[key]||(peopleExtraWings[key]=Object.assign(document.createElement('aside'),{className:'wing people-extra-wing'}));
+   wing.setAttribute('aria-label',label);
+   if(panel.parentElement!==wing)wing.append(panel);
+   if(!wing.isConnected){if(key==='peopleAffiliation')$('#left-panels').after(wing);else $('.center').after(wing);}
+  }
+ }else restorePeoplePanels();
+ document.querySelectorAll('[data-people-layout-choice]').forEach(button=>{
+  button.disabled=current!=='people';
+  button.setAttribute('aria-pressed',String(active&&button.dataset.peopleLayoutChoice===peopleLayout));
+ });
+ $('#people-layout-note').textContent=current!=='people'?'这三个32:9方案仅用于人员页，请先切换到人员动态。':active?'32:9预览中；再次点击已选方案恢复原布局。':'仅人员页可用；再次点击已选方案恢复原布局。';
+ syncPreviewPopovers();fitMap();
+}
+document.querySelectorAll('[data-people-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
+ if(current!=='people')return;
+ const choice=button.dataset.peopleLayoutChoice;
+ peopleLayout=peopleLayout===choice?'default':choice;
+ try{if(peopleLayout==='default')localStorage.removeItem(peopleLayoutKey);else localStorage.setItem(peopleLayoutKey,peopleLayout);}catch{}
+ syncPeopleLayout();button.focus({preventScroll:true});
+ $('#live-status').textContent=peopleLayout==='default'?'已恢复人员页原布局':'已切换为'+button.querySelector('strong').textContent+'，32:9画布';
+}));
+window.addEventListener('resize',()=>{if(current==='people'&&peopleLayouts.has(peopleLayout))syncPeopleLayout();});
 const settingsPanel=$('#prototype-settings-panel'),settingsButton=$('#prototype-settings-button');
 function closePrototypeSettings(returnFocus=false){settingsPanel.hidden=true;settingsButton.setAttribute('aria-expanded','false');if(returnFocus)settingsButton.focus();}
 settingsButton.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsButton.setAttribute('aria-expanded',String(open));$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(open)$('#prototype-settings-close').focus();});
 $('#prototype-settings-close').addEventListener('click',()=>closePrototypeSettings(true));
-document.addEventListener('click',e=>{if(!e.target.closest('.prototype-wrap'))closePrototypeSettings();});
+document.addEventListener('click',e=>{if(!e.target.closest('.prototype-wrap,#prototype-settings-panel'))closePrototypeSettings();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidden&&!document.querySelector('dialog[open]')){e.preventDefault();e.stopImmediatePropagation();closePrototypeSettings(true);}},{capture:true});
 $('#selection-close').addEventListener('click',()=>{closeSelection();lastPointFocus?.focus();});
 $('#selection-action').addEventListener('click',()=>{const p=points.find(x=>x.id===selected);if(!p)return;if(p.kind==='摄像头')openCamera(p.channel);else openDetail(p.kind==='船舶'?'berths':p.kind==='门禁'?'approvals':p.alert?'risks':'production',p);});
@@ -415,7 +475,7 @@ function applyTheme(value){if(!themeNames[value])value='ocean';document.document
 try{applyTheme(localStorage.getItem('hainan-port-panorama-v21-theme')||'ocean');}catch{applyTheme('ocean');}
 $('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show)$('#theme-menu button').focus();});
 document.querySelectorAll('[data-theme-choice]').forEach(el=>el.addEventListener('click',()=>{applyTheme(el.dataset.themeChoice);$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');$('#theme-button').focus();toast('已切换为'+themeNames[el.dataset.themeChoice]);}));
-document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap')){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');}});
+document.addEventListener('click',e=>{if(!e.target.closest('.theme-wrap,#theme-menu')){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(!detail.open&&!$('#video-dialog').open)closeSelection();}});
 $('#fullscreen-button').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('当前环境不支持全屏，请在独立浏览器窗口打开');}});
 function clock(){const n=new Date();$('#time').textContent=n.toLocaleTimeString('zh-CN',{hour12:false});$('#date').textContent=n.toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'});}
@@ -423,5 +483,6 @@ clock();setInterval(clock,1000);
 const tooltip=$('#chart-tooltip');
 function tipFor(el,x,y){tooltip.textContent=el.dataset.tip;tooltip.hidden=false;tooltip.style.left=Math.min(x+12,window.innerWidth-240)+'px';tooltip.style.top=Math.max(8,Math.min(y+12,window.innerHeight-100))+'px';}
 document.addEventListener('pointerover',e=>{const t=e.target.closest('[data-tip]');if(t)tipFor(t,e.clientX,e.clientY);});document.addEventListener('pointerout',e=>{if(e.target.closest('[data-tip]'))tooltip.hidden=true;});document.addEventListener('focusin',e=>{if(e.target.dataset.tip){const r=e.target.getBoundingClientRect();tipFor(e.target,r.left,r.bottom);}});document.addEventListener('focusout',()=>tooltip.hidden=true);
+changeTopic(topics[initial]?initial:defaultTopic(),false);
 $('#port-image').addEventListener('error',()=>{$('#map-note').textContent='港区底图加载失败，请保留背景图.png与入口文件的相对位置';});
 })();

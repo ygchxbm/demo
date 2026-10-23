@@ -69,10 +69,12 @@
 <link rel="stylesheet" href="menu-buttons.css">
 <link rel="stylesheet" href="v23.css">
 <link rel="stylesheet" href="homepage.css">
+<link rel="stylesheet" href="people-layouts.css">
 <script src="app.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">跳转至运行态势</a>
+<div id="dashboard-frame" class="dashboard-frame">
 <div class="app">
 <div class="panorama-layer" id="panorama-layer" role="region" tabindex="0" aria-label="港区全景地图，可拖动、滚轮缩放或使用方向键与加减键，按0恢复全景">
       <div class="map-world" id="map-world">
@@ -103,7 +105,12 @@
       <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
         <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
-        <p class="prototype-empty">暂无待选方案</p>
+        <p class="prototype-layout-note" id="people-layout-note">仅人员页可用；再次点击已选方案恢复原布局。</p>
+        <div class="prototype-layout-options" role="group" aria-label="人员页32:9布局方案">
+          <button type="button" data-people-layout-choice="wide" aria-pressed="false"><strong>方案2 · 全景铺图</strong><span>收紧两侧，扩大中央地图</span></button>
+          <button type="button" data-people-layout-choice="columns" aria-pressed="false"><strong>方案3 · 多列布局</strong><span>业务模块独立成列</span></button>
+          <button type="button" data-people-layout-choice="complete" aria-pressed="false"><strong>方案4 · 完整地图</strong><span>完整港区底图与紧凑侧栏</span></button>
+        </div>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>
@@ -146,6 +153,7 @@
   <aside id="right-panels" class="wing" aria-label="业务分析右侧面板"></aside>
 </main>
 <footer class="footer"><div class="footer-left"><span class="status-dot"></span><span>海南码头 · 港区运行态势</span><span> / </span><span>数据日期 2026-10-22</span></div><span class="notice">所有指标、点位及监控均为演示内容</span></footer>
+</div>
 </div>
 <dialog id="detail-dialog" aria-labelledby="detail-title">
   <div class="dialog-head"><h2 id="detail-title">业务详情</h2><button class="close-btn" data-close="detail-dialog" aria-label="关闭业务详情"><span data-icon="close"></span></button></div>

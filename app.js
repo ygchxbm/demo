@@ -201,7 +201,7 @@ function sbDonut(rows,center,{unit='人',tight=false}={}){
   return `<circle cx="100" cy="100" r="${radius}" fill="none" stroke="var(--sb-series-${slot})" stroke-width="13" stroke-dasharray="${dash}" stroke-dashoffset="${shift}" transform="rotate(-90 100 100)" tabindex="0" data-tip="${info}"><title>${info}</title></circle>`;
  }).join('');
  const viewBox=tight?'18 18 164 164':'0 0 200 200';
- return `<div class="sb-donut"><div class="sb-donut-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${esc(center+'，合计 '+total+' '+unit)}"><circle cx="100" cy="100" r="72" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>${geometry}</svg><div class="sb-donut-center od-stat"><strong>${fmt(total)}</strong><span>${esc(center)}</span></div></div><div class="sb-legend">${rows.map(([name,value,color],i)=>{const slot=color??i;return `<div class="sb-legend-row"><span class="sb-dot" style="--item-color:var(--sb-series-${slot})">${esc(name)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`;}).join('')}</div></div>`;
+ return `<div class="sb-donut"><div class="sb-donut-graphic"><svg viewBox="${viewBox}" role="img" aria-label="${esc(center+'，合计 '+total+' '+unit)}"><circle cx="100" cy="100" r="72" fill="none" stroke="var(--sb-track)" stroke-width="13"/>${geometry}</svg><div class="sb-donut-center od-stat"><strong>${fmt(total)}</strong><span>${esc(center)}</span></div></div><div class="sb-legend">${rows.map(([name,value,color],i)=>{const slot=color??i;return `<div class="sb-legend-row"><span class="sb-dot" style="--item-color:var(--sb-series-${slot})">${esc(name)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong><span class="od-nowrap">${(value/total*100).toFixed(1)}%</span></div>`;}).join('')}</div></div>`;
 }
 function sbColumns(rows,{unit='人',step=100,aria,title}={}){
  const max=Math.ceil(Math.max(...rows.map(r=>r[1]))/step)*step||1,left=46,right=628,base=236,top=24,plot=base-top;
@@ -388,7 +388,7 @@ document.addEventListener('click',e=>{
  if(b.dataset.wallChannel!==undefined){wallChannel=Number(b.dataset.wallChannel);renderSceneWorkspace();document.querySelector(`.wall-rail [data-wall-channel="${wallChannel}"]`)?.focus({preventScroll:true});}
  if(b.hasAttribute('data-wall-toggle')){wallPlaying=!wallPlaying;renderSceneWorkspace();document.querySelector('[data-wall-toggle]')?.focus({preventScroll:true});}
 });
-const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透'};
+const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透',lagoon:'夜澜青',amber:'暖金港湾'};
 function applyTheme(value){if(!themeNames[value])value='ocean';document.documentElement.dataset.theme=value;document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.themeChoice===value)));$('#theme-button').setAttribute('aria-label','切换配色，当前'+themeNames[value]);try{localStorage.setItem('hainan-port-panorama-v21-theme',value);}catch{}}
 try{applyTheme(localStorage.getItem('hainan-port-panorama-v21-theme')||'ocean');}catch{applyTheme('ocean');}
 $('#theme-button').addEventListener('click',()=>{const show=$('#theme-menu').hidden;$('#theme-menu').hidden=!show;$('#theme-button').setAttribute('aria-expanded',String(show));if(show)$('#theme-menu button').focus();});

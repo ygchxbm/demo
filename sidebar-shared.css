@@ -358,6 +358,46 @@
   :root[data-sidebar=airy] .summary-item:hover{background:transparent}
   :root[data-sidebar=airy] .panel-link:hover,
   :root[data-sidebar=airy] .linked-row:hover{background:transparent;color:var(--sb-strong)}
+  :root[data-sidebar=airy][data-nav=light] #navigation button:hover{
+    background:transparent;
+    border-color:transparent;
+    color:var(--sb-strong);
+    box-shadow:none;
+  }
+}
+
+/* 轻量顶栏：透明文字，当前项用主题色下划发光。原版不挂 data-nav=light。 */
+:root[data-sidebar=airy][data-nav=light] #navigation{gap:1.15rem}
+:root[data-sidebar=airy][data-nav=light] #navigation button{
+  min-width:0;
+  padding:.2rem .2rem .42rem;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  color:color-mix(in srgb,var(--sb-ink) 68%,transparent);
+  font-weight:400;
+  text-shadow:0 1px 3px rgba(0,16,36,.45);
+}
+:root[data-sidebar=airy][data-nav=light] #navigation button[aria-current=page]{
+  background:transparent;
+  border:0;
+  color:var(--sb-strong);
+  box-shadow:none;
+  text-shadow:0 0 .4rem color-mix(in srgb,var(--accent) 70%,transparent);
+}
+:root[data-sidebar=airy][data-nav=light] #navigation button[aria-current=page]:after{
+  content:'';
+  display:block;
+  position:absolute;
+  bottom:.02rem;
+  left:12%;
+  width:76%;
+  height:2px;
+  opacity:1;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  box-shadow:0 0 .45rem var(--accent),0 0 .12rem var(--accent);
 }
 
 @media(min-width:1200px){

@@ -102,7 +102,13 @@
       <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
         <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
-        <p class="prototype-empty">暂无待选方案</p>
+        <div class="prototype-option">
+          <p class="prototype-option-label" id="nav-style-label">顶栏导航</p>
+          <div class="prototype-choice" role="radiogroup" aria-labelledby="nav-style-label">
+            <button type="button" role="radio" data-nav-style="solid" aria-checked="true">原版</button>
+            <button type="button" role="radio" data-nav-style="light" aria-checked="false">轻量版</button>
+          </div>
+        </div>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>

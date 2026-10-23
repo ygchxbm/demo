@@ -391,7 +391,7 @@ document.addEventListener('click',e=>{
 const themeNames={ocean:'海蓝通透',jade:'青绿通透',slate:'蓝灰通透',lagoon:'夜澜青',amber:'暖金港湾'};
 function applyTheme(value){if(!themeNames[value])value='ocean';document.documentElement.dataset.theme=value;document.querySelectorAll('[data-theme-choice]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.themeChoice===value)));$('#theme-button').setAttribute('aria-label','切换配色，当前'+themeNames[value]);try{localStorage.setItem('hainan-port-panorama-v21-theme',value);}catch{}}
 try{applyTheme(localStorage.getItem('hainan-port-panorama-v21-theme')||'ocean');}catch{applyTheme('ocean');}
-const navStyleNames={solid:'原版',light:'轻量版'};
+const navStyleNames={solid:'原版',light:'轻量版',glow:'光条版'};
 function applyNavStyle(value){if(!navStyleNames[value])value='solid';document.documentElement.dataset.nav=value;document.querySelectorAll('[data-nav-style]').forEach(el=>el.setAttribute('aria-checked',String(el.dataset.navStyle===value)));try{localStorage.setItem('hainan-port-panorama-v21-nav',value);}catch{}}
 try{applyNavStyle(localStorage.getItem('hainan-port-panorama-v21-nav')||'solid');}catch{applyNavStyle('solid');}
 document.querySelectorAll('[data-nav-style]').forEach(el=>el.addEventListener('click',()=>{applyNavStyle(el.dataset.navStyle);toast('顶栏导航已切换为'+navStyleNames[el.dataset.navStyle]);}));

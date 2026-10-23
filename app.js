@@ -34,6 +34,8 @@ const todayKwh=energyKwh.at(-1),prevKwh=energyKwh.at(-2),kwhDelta=todayKwh-prevK
 const peakKwh=Math.max(...energyKwh),peakDay=days[energyKwh.indexOf(peakKwh)];
 const kwhPct=(Math.abs(kwhDelta)/prevKwh*100).toFixed(1);
 const kwhChange=`较前一日${kwhDelta>=0?'增加':'减少'} ${Math.abs(kwhDelta)} kWh / ${kwhPct}%`;
+const peakGap=peakKwh-todayKwh;
+const peakGapNote=peakGap===0?'与七日峰值持平':`较峰值${peakGap>0?'少':'多'} ${Math.abs(peakGap)} kWh · ${peakDay}`;
 const gridKwh=32100,solarSelf=10760,solarExport=2100,solarGen=solarSelf+solarExport;
 const shoreBerths=[['01 号泊位',3280],['02 号泊位',2860],['03 号泊位',2500]];
 const shoreTotal=shoreBerths.reduce((sum,[,n])=>sum+n,0);
@@ -70,12 +72,11 @@ const panels={
  fuel:{title:'加油作业',topic:'production',kind:'船舶',rows:[['柴油储存',680,'t'],['加油吨数',126,'t'],['加油船次',10,'船次']],render:()=>metrics([['柴油储存',680,'t'],['加油吨数',126,'t'],['加油船次',10,'船次']])+lineChart([84,96,92,108,116,112,126],null,days,['加油吨数'])+caption('近七日加油量','单位：t')},
  ash:{title:'输灰作业',topic:'production',kind:'场地',rows:[['输送反打船次',8,'船次'],['输送船次',6,'船次'],['反打船次',2,'船次']],render:()=>metrics([['输送反打',8,'船次'],['输送',6,'船次'],['反打',2,'船次']])+bars([['输送',6],['反打',2]],8)+caption('业务名称沿用原表')},
  prodTrend:{title:'生产趋势',topic:'production',kind:'场地',headers:['业务','今日','昨日'],rows:[['柴油（t）',126,112],['灰浆（t）',320,296],['件杂货（t）',2414,2260],['吞吐量（t）',2860,2668]],render:()=>strip(Object.keys(productionSeries),'data-production-series',trendChoice)+lineChart(productionSeries[trendChoice],null,days,[trendChoice])+caption('近七日'+trendChoice,'单位：t')},
- electricity:{title:'今日用电',topic:'energy',kind:'场地',rows:[['今日总用电',todayKwh,'kWh'],['前一日用电',prevKwh,'kWh'],['较前一日',kwhDelta,'kWh'],['近七日峰值',peakKwh,'kWh'],['峰值日期',peakDay,''],['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh']],render:()=>sbDual({label:'今日总用电',value:todayKwh,unit:'kWh',note:kwhChange},{label:'近七日峰值',value:peakKwh,unit:'kWh',note:'出现在 '+peakDay},true)},
- powerMix:{title:'用电构成',topic:'energy',kind:'场地',rows:[['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['总用电量',gridKwh+solarSelf,'kWh']],render:()=>sbDonut([['购电',gridKwh],['光伏自用',solarSelf]],'总计用电',{unit:'kWh',tight:true})},
- shore:{title:'岸电',topic:'energy',kind:'船舶',rows:[['岸电总用量',shoreTotal,'kWh'],...shoreBerths.map(([name,value])=>[name,value,'kWh']),['统计口径','未并入总用电','说明']],render:()=>sbKpi({label:'岸电总用量',value:shoreTotal,unit:'kWh',note:'未并入上方用电构成'})+sbChips(shoreBerths,'kWh')+caption('泊位名称为示意','不与购电相加')},
- solar:{title:'今日光伏平衡',topic:'energy',kind:'场地',rows:[['总发电量',solarGen,'kWh'],['光伏自用电',solarSelf,'kWh'],['外送电量',solarExport,'kWh'],...solarHours.map((hour,i)=>[hour+'发电',solarCurve[i],'kWh'])],render:()=>sbDonut([['光伏自用',solarSelf,1],['外送电量',solarExport,2]],'总发电量',{unit:'kWh'})},
- resources:{title:'油气水',topic:'energy',kind:'场地',rows:fuels.map(([name,value,unit])=>[name+'消耗',value,unit]),render:()=>sbChips(fuels)+caption('今日消耗','单位各不相同')},
- energyTrend:{title:'近七日趋势',topic:'energy',kind:'场地',rows:[...days.map((d,i)=>[d+' 用电',energyKwh[i],'kWh']),...days.map((d,i)=>[d+' 碳减排',carbonDaily[i],'tCO₂']),['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂'],['排放因子','未设定','演示']],render:()=>sbSparks([['总用电',energyKwh,'kWh'],['碳减排',carbonDaily,'tCO₂']],{delta:(change,_name,_values,unit)=>{const digits=Number.isInteger(change)?0:2,amount=Math.round(Math.abs(change)*10**digits)/10**digits;return `较前日${change>=0?'增加':'减少'} ${amount} ${unit}`;}})},
+ electricity:{title:'今日用电',topic:'energy',kind:'场地',rows:[['今日总用电',todayKwh,'kWh'],['前一日用电',prevKwh,'kWh'],['较前一日',kwhDelta,'kWh'],['近七日峰值',peakKwh,'kWh'],['峰值日期',peakDay,''],['较峰值',todayKwh-peakKwh,'kWh'],['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['岸电',shoreTotal,'kWh']],render:()=>sbDual({label:'今日总用电',value:todayKwh,unit:'kWh',note:kwhChange},{label:'近七日峰值',value:peakKwh,unit:'kWh',note:peakGapNote},true)+sbChips([['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal]],'kWh')},
+ powerMix:{title:'用电构成',topic:'energy',kind:'场地',rows:[['购电量',gridKwh,'kWh'],['光伏自用电',solarSelf,'kWh'],['总用电量',gridKwh+solarSelf,'kWh'],['岸电',shoreTotal,'kWh'],['岸电口径','未计入环内','单独统计']],render:()=>sbDonut([['购电',gridKwh],['光伏自用',solarSelf]],'总计用电',{unit:'kWh',tight:true})+caption('岸电未计入环内',fmt(shoreTotal)+' kWh 单独统计')},
+ todayItems:{title:'今日分项',topic:'energy',kind:'场地',rows:[...[['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal],['外送',solarExport]].map(([name,value])=>[name,value,'kWh']),['光伏发电',solarGen,'kWh'],...shoreBerths.map(([name,value])=>[name+'岸电',value,'kWh']),['柱图口径','四项不相加','购电与光伏自用合计为总用电']],render:()=>sbColumns([['购电',gridKwh],['光伏自用',solarSelf],['岸电',shoreTotal],['外送',solarExport]],{unit:'kWh',step:10000,aria:'今日分项电量：购电'+gridKwh+'、光伏自用'+solarSelf+'、岸电'+shoreTotal+'、外送'+solarExport+'，单位 kWh，柱间不相加',title:max=>`今日分项电量，单位 kWh，各柱共用零起点但不互加，刻度上限 ${max}`})+sbChips(shoreBerths,'kWh')+caption('购电 + 光伏自用 = 总用电','岸电按泊位拆开，外送单独统计')},
+ solarBalance:{title:'今日光伏平衡',topic:'energy',kind:'场地',rows:[['总发电量',solarGen,'kWh'],['光伏自用电',solarSelf,'kWh'],['外送电量',solarExport,'kWh'],...solarHours.map((hour,i)=>[hour+'发电',solarCurve[i],'kWh']),...fuels.map(([name,value,unit])=>[name+'消耗',value,unit])],render:()=>sbDonut([['光伏自用',solarSelf,1],['外送电量',solarExport,2]],'总发电量',{unit:'kWh'})+sbFuels(fuels)},
+ energyTrend:{title:'近七日趋势',topic:'energy',kind:'场地',rows:[...days.map((d,i)=>[d+' 用电',energyKwh[i],'kWh']),...days.map((d,i)=>[d+' 碳减排',carbonDaily[i],'tCO₂']),['本月碳减排',186.4,'tCO₂'],['本年碳减排',2148.6,'tCO₂'],['排放因子','未设定','演示'],['岸电',shoreTotal,'kWh'],['光伏发电',solarGen,'kWh'],['岸电与光伏发电','仅今日','无七日序列']],render:()=>sbSparks([['总用电',energyKwh,'kWh'],['碳减排',carbonDaily,'tCO₂']],{chartHeight:84,delta:(change,_name,_values,unit)=>{const digits=Number.isInteger(change)?0:2,amount=Math.round(Math.abs(change)*10**digits)/10**digits;return `较前日${change>=0?'增加':'减少'} ${amount} ${unit}`;}})+sbToday([['岸电',shoreTotal,'kWh'],['光伏发电',solarGen,'kWh']])},
  equipment:{title:'关键重要设备',topic:'safety',kind:'场地',headers:['设备','总数 / 可用 / 停用 / 在用','完好率'],rows:[['消防水泵','8 / 8 / 0 / 2','100%'],['空压机','12 / 11 / 1 / 6','91.7%'],['生活水泵','6 / 6 / 0 / 3','100%']],render:()=>table(['设备','总数 / 在用','完好率'],[['消防水泵','8 / 2','100%'],['空压机','12 / 6','91.7%'],['生活水泵','6 / 3','100%']])+caption('点击详情查看可用、停用数量')},
  availability:{title:'设备可靠性',topic:'safety',kind:'场地',rows:[['设备总数',26,'台'],['年可用率',98.6,'%'],['当前完好率',96.2,'%'],['可用设备',25,'台'],['停用设备',1,'台'],['在用设备',11,'台']],render:()=>donut(96.2,'设备完好率',[['总数','26 台'],['年可用率','98.6%'],['在用','11 台']])+caption('可用 25 台 · 停用 1 台')},
  permits:{title:'作业许可记录',topic:'safety',kind:'场地',headers:['票号','作业类型','状态'],rows:[['PT-1022-024','吊装','执行中'],['PT-1022-023','动火','执行中'],['PT-1022-022','有限空间','待开始'],['PT-1022-021','高处','已结束']],render:()=>table(['作业票','类型','状态'],[['…024','吊装','执行中'],['…023','动火','执行中'],['…022','有限空间','待开始'],['…021','高处','已结束']])},
@@ -84,7 +85,7 @@ const panels={
 };
 const topics={
  people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
- energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','powerMix','shore','energyTrend','solar','resources'],layers:['场地','船舶']},
+ energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','powerMix','todayItems','energyTrend','solarBalance'],layers:['场地','船舶']},
  ships:{name:'船舶动态',en:'VESSEL DYNAMICS',panels:['ships','voyages','berths','shipPeak'],layers:['船舶','摄像头']},
  vehicles:{name:'车辆动态',en:'VEHICLE DYNAMICS',panels:['vehicles','vehicleFlow','approvals','vehicleObjects'],layers:['拖车','平板拖车','叉车','门禁']},
  map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'},
@@ -150,20 +151,26 @@ function sbColumns(rows,{unit='人',step=100,aria,title}={}){
 }
 function sbSparkline(values,name,opt){
  const unit=opt.unit??'人',labels=opt.labels??days;
- const min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,1),w=280,n=values.length;
- const coords=values.map((value,i)=>[((i+.5)/n)*w,6+(max-value)/span*18]);
+ const min=Math.min(...values),max=Math.max(...values),span=Math.max(max-min,1),w=280,n=values.length,h=opt.chartHeight??32,plot=h-14;
+ const coords=values.map((value,i)=>[((i+.5)/n)*w,6+(max-value)/span*plot]);
  const path=coords.map(([x,y],i)=>(i?'L':'M')+x.toFixed(1)+','+y.toFixed(1)).join(' ');
  const aria=(opt.aria||((label,series)=>label+'：'+series.join('、')+unit))(name,values);
  const title=(opt.title||((label,lo,hi)=>label+'趋势，纵轴单位为'+unit+'，范围 '+lo+'–'+hi))(name,min,max);
  const tip=opt.tip||((label,seriesName,value)=>label+'\n'+seriesName+'：'+value+' '+unit);
- return `<svg class="sb-spark-chart" viewBox="0 0 ${w} 32" role="img" aria-label="${esc(aria)}"><title>${esc(title)}</title><path d="${path}" class="sb-spark-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(tip(labels[i],name,values[i]))}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="sb-spark-dot"/></g>`).join('')}</svg>`;
+ return `<svg class="sb-spark-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(aria)}"><title>${esc(title)}</title><path d="${path}" class="sb-spark-line"/>${coords.map(([x,y],i)=>`<g tabindex="0" data-tip="${esc(tip(labels[i],name,values[i]))}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" class="sb-spark-dot"/></g>`).join('')}</svg>`;
 }
 function sbSparks(items,opt={}){
  const fallback=opt.unit??'人',labels=opt.labels??days;
  const delta=opt.delta||((change,_name,_values,unit)=>`${change>=0?'+':''}${change} ${unit}`);
  const sectionLabel=opt.sectionLabel||(name=>name+'近七日趋势');
  const rows=items.map(([name,values,rowUnit],i)=>{const unit=rowUnit||fallback,change=values.at(-1)-values.at(-2);return `<section class="sb-spark" style="--trend-color:var(--sb-series-${i})" aria-label="${esc(sectionLabel(name))}"><div class="sb-spark-head"><strong class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</strong><b class="od-nowrap">${fmt(values.at(-1))}<small> ${esc(unit)}</small></b><small class="sb-spark-delta">${esc(delta(change,name,values,unit))}</small></div>${sbSparkline(values,name,{...opt,unit})}</section>`;}).join('');
- return `<div class="sb-sparks">${rows}<div class="sb-axis">${labels.map(day=>`<span>${esc(day)}</span>`).join('')}</div></div>`;
+ return `<div class="sb-sparks${opt.chartHeight?' sb-sparks-tall':''}">${rows}<div class="sb-axis">${labels.map(day=>`<span>${esc(day)}</span>`).join('')}</div></div>`;
+}
+function sbToday(rows){
+ return `<div class="sb-today"><p class="sb-note">仅今日 · 无七日序列</p><div class="sb-today-grid">${rows.map(([label,value,unit],i)=>`<div class="od-stat"><span class="sb-dot" style="--item-color:var(--sb-series-${i+2})">${esc(label)}</span><strong class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></strong></div>`).join('')}</div></div>`;
+}
+function sbFuels(rows){
+ return `<div class="sb-fuels"><p class="sb-note">今日油气水 · 单位各不相同</p>${rows.map(([name,value,unit],i)=>`<div class="sb-fuel"><span class="sb-dot" style="--item-color:var(--sb-series-${i})">${esc(name)}</span><b class="od-nowrap">${fmt(value)}<small> ${esc(unit)}</small></b></div>`).join('')}</div>`;
 }
 const weeklyRoles=Object.entries(personSeries).map(([name,values])=>[name,values.reduce((sum,value)=>sum+value,0)]);
 const personTrendKeys=Object.keys(personSeries);
@@ -189,7 +196,7 @@ function objectResults(){const q=objectQuery.trim().toLowerCase(),items=points.f
 function topicSummary(){
  const view=activeView();
  if(current==='people')return [['当前在场',onSiteTotal,'人','','people','people'],['今日峰值',onSitePeak,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',affiliation[0][1],'人','','people','peopleAffiliation'],['海油外',affiliation[1][1],'人','','people','peopleAffiliation']];
- if(current==='energy')return [['今日用电',todayKwh,'kWh','','bolt','electricity'],['七日峰值',peakKwh,'kWh','','bolt','energyTrend'],['光伏发电',solarGen,'kWh','','bolt','solar'],['购电',gridKwh,'kWh','','bolt','powerMix'],['今日碳减排',carbonDaily.at(-1),'tCO₂','','bolt','energyTrend']];
+ if(current==='energy')return [['今日用电',todayKwh,'kWh','','bolt','electricity'],['购电',gridKwh,'kWh','','bolt','powerMix'],['光伏发电',solarGen,'kWh','','bolt','solarBalance'],['岸电',shoreTotal,'kWh','','bolt','todayItems'],['今日碳减排',carbonDaily.at(-1),'tCO₂','','bolt','energyTrend']];
  if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['图层类型',9,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
  if(view.layout==='video')return [['模拟通道',3,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
  const keys={vehicles:['vehicles','vehicleFlow','approvals'],ships:['ships','voyages','berths'],safety:['safety','permits'],production:['production','shipWork','cargo']}[current];

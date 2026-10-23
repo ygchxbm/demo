@@ -9,6 +9,7 @@
 .prototype-panel button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #prototype-settings-button[aria-expanded=true]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
 .panorama-layer{position:absolute;inset:0;z-index:0;overflow:hidden;touch-action:none;cursor:grab;isolation:isolate}
+.map-viewport{position:absolute;inset:0}
 .panorama-layer:active{cursor:grabbing}
 .panorama-layer:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}
 .app>.navigation,

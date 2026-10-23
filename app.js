@@ -192,10 +192,12 @@ const cameraPositions=['20% 30%','48% 58%','75% 70%'];
 let current='people', selected=null, enabled=new Set(topics.people.layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
 let trendChoice='吞吐量',objectQuery='';
-const peopleLayoutKey='hainan-port-people-layout';
-const peopleLayouts=new Set(['wide','columns','complete']);
-let peopleLayout='default',previewScale=1;
-try{const saved=localStorage.getItem(peopleLayoutKey);if(peopleLayouts.has(saved))peopleLayout=saved;}catch{}
+const dashboardLayoutKey='hainan-port-dashboard-layout';
+const dashboardLayouts=new Set(['wide','columns','complete']);
+let dashboardLayout='wide',previewScale=1;
+try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||dashboardLayouts.has(saved))dashboardLayout=saved;}catch{}
+// The whole project uses scheme 2; personnel retains its comparison layouts.
+function activeDashboardLayout(){return current==='people'||dashboardLayout==='default'?dashboardLayout:'wide';}
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
 function linkedRows(rows){return `<div class="linked-rows od-stack">${rows.map(([title,detail,attr,value])=>`<button ${attr}="${value}" class="linked-row od-row"><span class="od-field od-fill"><strong>${esc(title)}</strong><small>${esc(detail)}</small></span>${icon('arrow')}</button>`).join('')}</div>`;}
@@ -307,7 +309,7 @@ function renderSceneWorkspace(){
  }else{space.innerHTML='';space.setAttribute('aria-hidden','true');}
 }
 function renderPage(){
- const view=activeView();renderNavigation();renderPanels();renderSummary();renderSceneWorkspace();syncPeopleLayout();updateMarkers();
+ const view=activeView();renderNavigation();renderPanels();renderSummary();renderSceneWorkspace();syncDashboardLayout();updateMarkers();
  $('#topic-label').textContent=topics[current].name;
  $('#topic-en').textContent=topics[current].en;
  $('#map-title').textContent=view.layout==='video'?'港区视频监控':view.layout==='map'?'港区地图全览':topics[current].name+' · 空间分布';
@@ -317,7 +319,7 @@ function locateObject(id){
  if(activeView().layout==='video'){history.replaceState(null,'','#map');changeTopic('map');}
  enabled.add(p.kind);updateMarkers();selectPoint(id);
  // Center the selected point in the exposed center column, keeping the current zoom.
- const target=$('#map-stage').getBoundingClientRect(),surface=$('#panorama-layer').getBoundingClientRect();
+ const target=$('#map-stage').getBoundingClientRect(),surface=mapSurface().getBoundingClientRect();
  panX=(target.left+target.width/2-surface.left-surface.width/2)/previewScale-(p.x/100-.5)*baseWidth*zoom;
  panY=(target.top+target.height*.4-surface.top-surface.height/2)/previewScale-(p.y/100-.5)*baseWidth/2*zoom;paintTransform();
  document.querySelector(`[data-point="${id}"]`)?.focus({preventScroll:true});
@@ -351,9 +353,11 @@ window.addEventListener('hashchange',()=>changeTopic(location.hash.slice(1)));
 // V2.3 finalized: one full-port interactive panorama, contained at its natural ratio.
 const stage=$('#map-stage');
 const panoramaLayer=$('#panorama-layer');
+const mapViewport=$('#map-viewport');
 const mapWorld=$('#map-world');
+function mapSurface(){return current==='map'&&activeDashboardLayout()==='wide'?mapViewport:panoramaLayer;}
 function paintTransform(){
- const w=panoramaLayer.clientWidth,h=panoramaLayer.clientHeight;
+ const w=mapSurface().clientWidth,h=mapSurface().clientHeight;
  const mx=Math.max(0,(baseWidth*zoom-w)/2)+w*.15;
  const my=Math.max(0,(baseWidth/2*zoom-h)/2)+h*.15;
  panX=Math.max(-mx,Math.min(mx,panX));panY=Math.max(-my,Math.min(my,panY));
@@ -362,9 +366,9 @@ function paintTransform(){
  $('#zoom-in').disabled=zoom>=3;$('#zoom-out').disabled=zoom<=1;
 }
 function fitMap(){
- const w=panoramaLayer.clientWidth,h=panoramaLayer.clientHeight;
+ const w=mapSurface().clientWidth,h=mapSurface().clientHeight;
  if(!w||!h)return;
- baseWidth=current==='people'&&peopleLayout==='complete'?Math.min(w,h*2):['people','energy','ships','vehicles','production','safety'].includes(current)?Math.max(w,h*2):Math.min(w,h*2);
+ baseWidth=activeDashboardLayout()==='complete'?Math.min(w,h*2):['people','energy','ships','vehicles','production','safety'].includes(current)?Math.max(w,h*2):Math.min(w,h*2);
  mapWorld.style.width=baseWidth+'px';paintTransform();
 }
 function doZoom(delta){zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
@@ -373,7 +377,7 @@ function resetMapView(announce=true){
  if(announce)toast('已恢复港区全景');
 }
 const mapResizeObserver=new ResizeObserver(fitMap);
-mapResizeObserver.observe(stage);mapResizeObserver.observe(panoramaLayer);fitMap();
+mapResizeObserver.observe(stage);mapResizeObserver.observe(panoramaLayer);mapResizeObserver.observe(mapViewport);fitMap();
 $('#zoom-in').addEventListener('click',()=>doZoom(.25));
 $('#zoom-out').addEventListener('click',()=>doZoom(-.25));
 $('#reset-map').addEventListener('click',()=>resetMapView());
@@ -394,7 +398,7 @@ function restorePeoplePanels(){
  }
 }
 function syncPreviewPopovers(){
- const preview=current==='people'&&peopleLayouts.has(peopleLayout);
+ const preview=dashboardLayouts.has(activeDashboardLayout());
  for(const [panelId,buttonId,wrap] of [['prototype-settings-panel','prototype-settings-button','.prototype-wrap'],['theme-menu','theme-button','.theme-wrap']]){
   const panel=$('#'+panelId);
   if(preview){
@@ -410,13 +414,13 @@ function syncPreviewPopovers(){
   }
  }
 }
-function syncPeopleLayout(){
- const active=current==='people'&&peopleLayouts.has(peopleLayout);
- if(active)document.documentElement.dataset.peopleLayout=peopleLayout;
- else delete document.documentElement.dataset.peopleLayout;
+function syncDashboardLayout(){
+ const active=dashboardLayouts.has(activeDashboardLayout());
+ if(active)document.documentElement.dataset.dashboardLayout=activeDashboardLayout();
+ else delete document.documentElement.dataset.dashboardLayout;
  previewScale=active?Math.min(window.innerWidth/3840,window.innerHeight/1080):1;
- document.documentElement.style.setProperty('--people-preview-scale',previewScale);
- if(active&&peopleLayout==='columns'){
+ document.documentElement.style.setProperty('--dashboard-preview-scale',previewScale);
+ if(active&&activeDashboardLayout()==='columns'){
   for(const [key,label] of [['peopleAffiliation','人员归属分析'],['peopleEntry','今日入场分析']]){
    const panel=document.querySelector(`[data-panel="${key}"]`);
    const wing=peopleExtraWings[key]||(peopleExtraWings[key]=Object.assign(document.createElement('aside'),{className:'wing people-extra-wing'}));
@@ -425,22 +429,27 @@ function syncPeopleLayout(){
    if(!wing.isConnected){if(key==='peopleAffiliation')$('#left-panels').after(wing);else $('.center').after(wing);}
   }
  }else restorePeoplePanels();
- document.querySelectorAll('[data-people-layout-choice]').forEach(button=>{
-  button.disabled=current!=='people';
-  button.setAttribute('aria-pressed',String(active&&button.dataset.peopleLayoutChoice===peopleLayout));
+ document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>{
+  button.disabled=current!=='people'&&button.dataset.dashboardLayoutChoice!=='wide';
+  button.setAttribute('aria-pressed',String(active&&button.dataset.dashboardLayoutChoice===activeDashboardLayout()));
  });
- $('#people-layout-note').textContent=current!=='people'?'这三个32:9方案仅用于人员页，请先切换到人员动态。':active?'32:9预览中；再次点击已选方案恢复原布局。':'仅人员页可用；再次点击已选方案恢复原布局。';
+ $('#dashboard-layout-note').textContent=current==='people'?'方案2应用于全部菜单；再次点击已选方案恢复原布局。':active?'当前使用全局方案2；方案3、4仅在人员页提供比较预览。':'当前为原布局；点击方案2恢复全局32:9展示。';
+ if(active){
+  for(const id of ['left-panels','right-panels']){
+   const wing=$('#'+id);wing.style.setProperty('--layout-panel-count',wing.querySelectorAll(':scope > .panel').length);
+  }
+ }
  syncPreviewPopovers();fitMap();
 }
-document.querySelectorAll('[data-people-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
- if(current!=='people')return;
- const choice=button.dataset.peopleLayoutChoice;
- peopleLayout=peopleLayout===choice?'default':choice;
- try{if(peopleLayout==='default')localStorage.removeItem(peopleLayoutKey);else localStorage.setItem(peopleLayoutKey,peopleLayout);}catch{}
- syncPeopleLayout();button.focus({preventScroll:true});
- $('#live-status').textContent=peopleLayout==='default'?'已恢复人员页原布局':'已切换为'+button.querySelector('strong').textContent+'，32:9画布';
+document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
+ const choice=button.dataset.dashboardLayoutChoice;
+ if(current!=='people'&&choice!=='wide')return;
+ dashboardLayout=activeDashboardLayout()===choice?'default':choice;
+ try{localStorage.setItem(dashboardLayoutKey,dashboardLayout);localStorage.removeItem('hainan-port-people-layout');}catch{}
+ syncDashboardLayout();button.focus({preventScroll:true});
+ $('#live-status').textContent=dashboardLayout==='default'?'已恢复原布局':'已切换为'+button.querySelector('strong').textContent+'，32:9画布';
 }));
-window.addEventListener('resize',()=>{if(current==='people'&&peopleLayouts.has(peopleLayout))syncPeopleLayout();});
+window.addEventListener('resize',()=>{if(dashboardLayouts.has(activeDashboardLayout()))syncDashboardLayout();});
 const settingsPanel=$('#prototype-settings-panel'),settingsButton=$('#prototype-settings-button');
 function closePrototypeSettings(returnFocus=false){settingsPanel.hidden=true;settingsButton.setAttribute('aria-expanded','false');if(returnFocus)settingsButton.focus();}
 settingsButton.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsButton.setAttribute('aria-expanded',String(open));$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(open)$('#prototype-settings-close').focus();});

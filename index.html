@@ -69,7 +69,7 @@
 <link rel="stylesheet" href="menu-buttons.css">
 <link rel="stylesheet" href="v23.css">
 <link rel="stylesheet" href="homepage.css">
-<link rel="stylesheet" href="people-layouts.css">
+<link rel="stylesheet" href="dashboard-layouts.css">
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -77,11 +77,13 @@
 <div id="dashboard-frame" class="dashboard-frame">
 <div class="app">
 <div class="panorama-layer" id="panorama-layer" role="region" tabindex="0" aria-label="港区全景地图，可拖动、滚轮缩放或使用方向键与加减键，按0恢复全景">
+    <div class="map-viewport" id="map-viewport">
       <div class="map-world" id="map-world">
         <img class="port-image od-media" id="port-image" src="背景图.png" width="1774" height="887" alt="用户提供的海南码头港区全景底图，包含码头、作业区、道路和水域" draggable="false">
         <div class="map-tint" aria-hidden="true"></div>
         <div id="markers"></div>
       </div>
+    </div>
 </div>
 <header class="masthead">
   <div class="brand">
@@ -105,11 +107,11 @@
       <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
         <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
-        <p class="prototype-layout-note" id="people-layout-note">仅人员页可用；再次点击已选方案恢复原布局。</p>
-        <div class="prototype-layout-options" role="group" aria-label="人员页32:9布局方案">
-          <button type="button" data-people-layout-choice="wide" aria-pressed="false"><strong>方案2 · 全景铺图</strong><span>收紧两侧，扩大中央地图</span></button>
-          <button type="button" data-people-layout-choice="columns" aria-pressed="false"><strong>方案3 · 多列布局</strong><span>业务模块独立成列</span></button>
-          <button type="button" data-people-layout-choice="complete" aria-pressed="false"><strong>方案4 · 完整地图</strong><span>完整港区底图与紧凑侧栏</span></button>
+        <p class="prototype-layout-note" id="dashboard-layout-note">方案2应用于全部菜单；再次点击已选方案恢复原布局。</p>
+        <div class="prototype-layout-options" role="group" aria-label="32:9布局方案">
+          <button type="button" data-dashboard-layout-choice="wide" aria-pressed="false"><strong>方案2 · 全景铺图</strong><span>收紧两侧，扩大中央地图</span></button>
+          <button type="button" data-dashboard-layout-choice="columns" aria-pressed="false"><strong>方案3 · 多列布局</strong><span>业务模块独立成列</span></button>
+          <button type="button" data-dashboard-layout-choice="complete" aria-pressed="false"><strong>方案4 · 完整地图</strong><span>完整港区底图与紧凑侧栏</span></button>
         </div>
       </section>
     </div>

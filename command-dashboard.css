@@ -441,6 +441,10 @@
 
 /* Automatic demo controls stay in the unscaled settings popover. */
 .auto-demo-settings { border: 0; border-top: 1px solid var(--glass-edge); padding: 12px 0 0; margin: 16px 0 0; min-width: 0; }
+.operations-wrap { position: relative; flex: none; }
+:root[data-command-center] #operations-button { min-height: 38px; padding: 0 12px; font-size: 15px; border-radius: 6px; }
+#operations-button[aria-expanded=true] { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 15%,transparent); }
+#operations-panel .auto-demo-settings { border: 0; padding: 0; margin: 0; }
 .auto-demo-settings legend { padding: 0 8px 0 0; font-size: 13px; color: var(--text); }
 .auto-demo-toggle, .auto-demo-speed { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
 .auto-demo-toggle { margin: 10px 0; cursor: pointer; }

@@ -108,9 +108,9 @@
       </div>
     </div>
     <div class="prototype-wrap">
-      <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
+      <button id="prototype-settings-button" class="icon-btn" aria-label="样式设计" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="样式设计"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
-        <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
+        <div class="prototype-panel-head"><h2 id="prototype-settings-title">样式设计</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭样式设计"><span data-icon="close"></span></button></div>
         <div class="prototype-setting-row">
           <p class="prototype-layout-note" id="dashboard-layout-note">展示比例</p>
           <div class="prototype-layout-options" role="group" aria-labelledby="dashboard-layout-note">
@@ -139,6 +139,14 @@
             <button type="button" data-content-edition-choice="simple" aria-pressed="false"><strong>简约版</strong></button>
           </div>
         </div>
+
+        <p id="page-style-note" class="prototype-style-note">四组设置独立生效，简约版保留主要指标，其余数据可在详情查看。</p>
+      </section>
+    </div>
+    <div class="operations-wrap">
+      <button id="operations-button" class="text-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="operations-panel">操作</button>
+      <section class="prototype-panel" id="operations-panel" role="dialog" aria-modal="false" aria-labelledby="operations-title" hidden>
+        <div class="prototype-panel-head"><h2 id="operations-title">操作</h2><button id="operations-close" class="close-btn" aria-label="关闭操作"><span data-icon="close"></span></button></div>
         <fieldset class="auto-demo-settings">
           <legend>自动演示</legend>
           <label class="auto-demo-toggle"><span>页面往返浏览</span><input id="page-tour-enabled" type="checkbox" role="switch" aria-describedby="page-tour-status"></label>
@@ -149,9 +157,8 @@
           <label class="auto-demo-speed" for="map-tour-speed"><span>巡游速度</span><output id="map-tour-speed-value" for="map-tour-speed">1.0 倍</output></label>
           <input id="map-tour-speed" type="range" min="1" max="3" step="0.1" value="1" aria-label="地图镜头巡游速度">
           <p id="map-tour-status" class="auto-demo-status">已关闭 · A → B → C → B → A</p>
-          <p class="auto-demo-status">手动操作后暂停，重新开启继续；打开设置或详情时临时暂停。</p>
+          <p class="auto-demo-status">手动操作后暂停，重新开启继续；打开样式设计、操作或详情时临时暂停。</p>
         </fieldset>
-        <p id="page-style-note" class="prototype-style-note">四组设置独立生效，简约版保留主要指标，其余数据可在详情查看。</p>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>

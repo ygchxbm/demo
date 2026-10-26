@@ -204,10 +204,13 @@ const mapTourStops=[{x:.36,y:.28},{x:.78,y:.27},{x:.36,y:.63}];
 let demoFrame=0,demoLastTime=null;
 
 try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||dashboardLayouts.has(saved))dashboardLayout=saved;}catch{}
-// V3 保留比例、页面风格、数据展示三个独立设置。
+// 展示比例、页面风格、图表表达和内容版本分别保存。
 function activeDashboardLayout(){return dashboardLayout;}
 const pageStyleKey='hainan-port-people-page-style';
 const dataDisplayKey='hainan-port-people-data-display';
+const contentEditionKey='hainan-port-content-edition';
+let contentEdition='original';
+try{if(localStorage.getItem(contentEditionKey)==='simple')contentEdition='simple';}catch{}
 let pageStyle='glass',dataDisplay='flat';
 try{
  const savedStyle=localStorage.getItem(pageStyleKey),savedDisplay=localStorage.getItem(dataDisplayKey);
@@ -221,6 +224,8 @@ try{
  }
 }catch{}
 function syncPageAppearance(){
+ document.documentElement.dataset.contentEdition=contentEdition;
+ document.querySelectorAll('[data-content-edition-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.contentEditionChoice===contentEdition)));
  const supported=true;
  if(supported&&pageStyle==='airy')document.documentElement.dataset.pageStyle='airy';
  else delete document.documentElement.dataset.pageStyle;
@@ -228,7 +233,7 @@ function syncPageAppearance(){
  else delete document.documentElement.dataset.chartMode;
  document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pageStyleChoice===pageStyle)));
  document.querySelectorAll('[data-display-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.displayChoice===dataDisplay)));
- $('#page-style-note').textContent='三组设置独立生效。32:9 整屏适配 7680 × 2169；16:9 高度占满，通过底部横向滚动查看完整内容。';
+ $('#page-style-note').textContent='四组设置独立生效。简约版保留主要指标，其余数据可在详情查看。32:9 整屏适配；16:9 高度占满，横向滚动查看完整内容。';
 }
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
@@ -294,7 +299,7 @@ Object.assign(panels,{
   channelList:{title:'监控通道',topic:'video',kind:'摄像头',headers:['通道','名称','接入状态'],rows:cameras.map((n,i)=>['CAM 0'+(i+1),n,'模拟']),render:()=>linkedRows(cameras.map((n,i)=>[n,'CAM 0'+(i+1)+' · 静态底图模拟','data-wall-channel',String(i)]))},
   videoGuide:{title:'画面与位置',topic:'video',kind:'摄像头',rows:[['画面来源','港区底图','模拟'],['真实视频流','尚未接入','状态']],render:()=>`<p class="view-copy">选择画面可放大查看，支持暂停模拟、切换通道和定位摄像头。</p>`+linkedRows(points.filter(p=>p.kind==='摄像头').map(p=>[p.name,'查看摄像头示意位置','data-locate',p.id]))},
  });
-const commandDashboard=window.createPortDashboard({panels,days,personSeries,productionTasks,productionSeries,tickets,safetyEquipment,points,cameras,cameraPositions,icon,esc,fmt,vehicleTrafficTotal,vehicleApprovalTotals,vehicleHistory,shipVoyageValues,layerKinds});
+const commandDashboard=window.createPortDashboard({getContentEdition:()=>contentEdition,panels,days,personSeries,productionTasks,productionSeries,tickets,safetyEquipment,points,cameras,cameraPositions,icon,esc,fmt,vehicleTrafficTotal,vehicleApprovalTotals,vehicleHistory,shipVoyageValues,layerKinds});
 function defaultTopic(){return 'people';}
 function activeView(){return topics[current];}
 function mapMatchingObjects(){const q=objectQuery.trim().toLowerCase();return points.filter(p=>enabled.has(p.kind)&&(!q||(p.name+p.kind+p.status).toLowerCase().includes(q)));}
@@ -469,6 +474,12 @@ function syncDashboardLayout(){
  if(mapTour.enabled)mapTour.segment=null;
  syncAutoDemoControls();
 }
+document.querySelectorAll('[data-content-edition-choice]').forEach(button=>button.addEventListener('click',()=>{
+ contentEdition=button.dataset.contentEditionChoice;
+ try{localStorage.setItem(contentEditionKey,contentEdition);}catch{}
+ syncPageAppearance();commandDashboard.renderPanels();fitMap();
+ $('#live-status').textContent='已切换为'+button.textContent.trim();
+}));
 document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
  pageStyle=button.dataset.pageStyleChoice;
  try{localStorage.setItem(pageStyleKey,pageStyle);}catch{}

@@ -443,3 +443,78 @@
 .auto-demo-status { margin: 6px 0 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
 #map-tour-toggle { min-width: 78px; white-space: nowrap; }
 #map-tour-toggle[aria-pressed=true] { color: var(--accent); border-color: var(--accent); }
+
+/* 简约版只调整侧栏内容与内部空间，地图和两侧总宽度沿用原版。 */
+:root[data-command-center][data-content-edition=simple] #left-panels {
+  grid-template-columns: minmax(0, 53fr) minmax(0, 47fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+.cc-simple-left-primary, .cc-simple-left-secondary { display: grid; gap: var(--cc-gap); min-height: 0; min-width: 0; }
+.cc-simple-left-primary { grid-template-rows: minmax(0, 50fr) minmax(0, 50fr); }
+.cc-simple-left-secondary { grid-template-rows: minmax(0, 34fr) minmax(0, 36fr) minmax(0, 30fr); }
+:root[data-command-center][data-content-edition=simple] .cc-card { padding: 18px 20px 14px; }
+:root[data-command-center][data-content-edition=simple] .cc-card-head { margin-bottom: 16px; padding-bottom: 12px; }
+:root[data-command-center][data-content-edition=simple] .cc-card-head h2 { font-size: 24px; }
+:root[data-command-center][data-content-edition=simple] .cc-card-body { gap: 18px; }
+:root[data-command-center][data-content-edition=simple] .cc-stats span { font-size: 18px; line-height: 1.4; }
+:root[data-command-center][data-content-edition=simple] .cc-stats strong { font-size: 38px; }
+:root[data-command-center][data-content-edition=simple] .cc-stats strong small { font-size: 17px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-hero strong { font-size: 60px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-hero strong small { font-size: 24px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-tiles { gap: 12px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-tiles > div {
+  padding: 12px 14px; border: 1px solid var(--cc-edge); border-radius: 7px; background: var(--glass-control); gap: 8px;
+}
+:root[data-command-center][data-content-edition=simple] .cc-subtitle h3 { font-size: 20px; }
+:root[data-command-center][data-content-edition=simple] .cc-subtitle > span { font-size: 15px; }
+:root[data-command-center][data-content-edition=simple] .cc-chart text { font-size: 17px; }
+:root[data-command-center][data-content-edition=simple] .cc-vehicles .cc-card-body { justify-content: space-between; }
+.cc-simple-completion { display: flex; align-items: center; gap: 20px; flex: none; }
+.cc-simple-completion > .cc-dimensional-only { width: 150px; flex: none; }
+.cc-simple-completion .cc-completion-ring { width: 100%; }
+.cc-simple-completion .cc-subtitle { margin-bottom: 10px; }
+.cc-simple-fraction { display: block; font: 44px var(--number); color: var(--text); white-space: nowrap; }
+.cc-simple-fraction small { font-size: 24px; color: var(--muted); }
+.cc-simple-completion p { margin: 10px 0 0; color: var(--muted); font-size: 19px; }
+.cc-simple-completion p b { color: var(--text); }
+.cc-simple-ring { position: relative; display: grid; place-items: center; width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--accent) var(--cc-percent), var(--cc-edge) 0); }
+.cc-simple-ring::before { content: ''; position: absolute; inset: 15px; border-radius: 50%; background: var(--surface); }
+.cc-simple-ring strong { position: relative; font: 32px var(--number); color: var(--text); }
+.cc-simple-ring small { font: 17px var(--font); }
+.cc-simple-business { display: grid; flex: 1; min-height: 0; }
+.cc-simple-business button { display: grid; grid-template-columns: minmax(0, 1fr) auto 18px; gap: 10px; align-items: center; padding: 12px 0; border: 0; border-top: 1px solid var(--cc-edge); background: none; color: var(--muted); text-align: left; font-size: 18px; }
+.cc-simple-business strong { font: 28px var(--number); color: var(--text); white-space: nowrap; }
+.cc-simple-business small { font: 15px var(--font); margin-left: 5px; color: var(--muted); }
+.cc-simple-business .od-icon { --od-icon-size: 16px; }
+:root[data-command-center][data-content-edition=simple] .cc-device-rows button { grid-template-columns: 26px 90px 66px minmax(0, 1fr); font-size: 18px; gap: 12px; }
+:root[data-command-center][data-content-edition=simple] .cc-device-rows b { font-size: 23px; }
+:root[data-command-center][data-content-edition=simple] .cc-device-rows { gap: 8px; }
+:root[data-command-center][data-content-edition=simple] .cc-resource-column { grid-template-rows: minmax(0, 54fr) minmax(0, 22fr) minmax(0, 24fr); }
+:root[data-command-center][data-content-edition=simple] .cc-safety-column { grid-template-rows: minmax(0, 42fr) minmax(0, 18fr) minmax(0, 16fr) minmax(0, 24fr); }
+:root[data-command-center][data-content-edition=simple] .cc-simple-yard-stats { grid-template-columns: 1fr 1.15fr 1.15fr; align-items: end; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-yard-stats strong { font-size: 28px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-yard-stats > div:first-child strong { font-size: 43px; color: var(--accent); }
+:root[data-command-center][data-content-edition=simple] .cc-simple-yard-stats strong small { font-size: 14px; }
+.cc-simple-yard-meter { width: 100%; height: 18px; margin-top: auto; accent-color: var(--accent); }
+.cc-simple-yard-meter::-webkit-meter-bar { background: var(--cc-edge); border: 0; border-radius: 12px; }
+.cc-simple-yard-meter::-webkit-meter-optimum-value { background: var(--accent); border-radius: 12px; }
+.cc-simple-oil { display: grid; grid-template-columns: 1fr 150px; align-items: center; gap: 12px; height: 100%; }
+.cc-simple-label { display: block; font-size: 18px; color: var(--muted); margin-bottom: 10px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-oil .cc-simple-hero strong { font-size: 48px; }
+:root[data-command-center][data-content-edition=simple] .cc-safety .cc-bars { flex: 1; gap: 4px; align-content: space-evenly; }
+:root[data-command-center][data-content-edition=simple] .cc-safety .cc-bars > div { grid-template-columns: 100px minmax(0, 1fr) 46px; font-size: 18px; }
+:root[data-command-center][data-content-edition=simple] .cc-safety .cc-bars b { font-size: 21px; }
+:root[data-command-center][data-content-edition=simple] .cc-hazards .cc-card-body { justify-content: center; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-hazard-stats > div:nth-child(2) strong { color: var(--gold); }
+:root[data-command-center][data-content-edition=simple] .cc-recognition .cc-card-body { justify-content: center; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-recognition-stats span { font-size: 16px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-recognition-stats strong { font-size: 28px; }
+:root[data-command-center][data-content-edition=simple] .cc-alert-list { gap: 8px; }
+:root[data-command-center][data-content-edition=simple] .cc-alert-list button { font-size: 18px; padding: 4px 0; }
+:root[data-command-center][data-content-edition=simple] .cc-alert-list :is(small, b) { font-size: 16px; }
+
+:root[data-command-center][data-content-edition=simple] .cc-safety .cc-card-body { gap: 12px; }
+:root[data-command-center][data-content-edition=simple] .cc-safety .cc-simple-hero strong { font-size: 44px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-oil .cc-simple-ring { width: 100px; height: 100px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-recognition-stats > div { gap: 3px; }
+:root[data-command-center][data-content-edition=simple] .cc-simple-oil .cc-simple-label { margin-bottom: 4px; }

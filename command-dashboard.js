@@ -25,7 +25,7 @@ window.createPortDashboard = function (api) {
     panels[key] = { title, rows, headers, note, topic, kind: '场地' };
   }
   register('ccPeople', '人员动态', allRows(['people', 'peopleAffiliation', 'peopleEntry']), undefined, '当前在场与累计入场分别统计；下方数值与主屏共用 V2 演示数据。');
-  register('ccProduction', '生产状态', [...allRows(['production', 'shipWork', 'fuel', 'cargo', 'ash']), ...Object.entries(productionSeries).flatMap(([name, values]) => [[name + ' · ' + days.at(-1), values.at(-1), 't'], [name + ' · ' + days.at(-2), values.at(-2), 't']])], undefined, '作业完成率由已完成 / 任务总数计算；各业务数量的单位与周期独立。', 'production');
+  register('ccProduction', '生产状态', allRows(['production', 'shipWork', 'fuel', 'cargo', 'ash']), undefined, '作业完成率由已完成 / 任务总数计算；各业务数量的单位与周期独立。', 'production');
   register('ccEnergy', '能耗监测', energyRows.map(row => [...row]), undefined, '沿用 V2 今日演示数据；未提供的同比、环比不补造。碳减排月、年值可在下表查看。', 'energy');
   panels.ccEnergy.rows.push(...panels.carbon.rows.slice(1));
   register('ccYard', '堆场管理情况', [['总量', yard.total, 'm³'], ['已租量', yard.rented, 'm³'], ['出租率', Number((yard.rented / yard.total * 100).toFixed(1)), '%'], ...yard.categories.flatMap(([name, rate, amount]) => [[name + '参考比例', rate, '%'], [name + '参考量', amount, 'm³']])], undefined, '用户提供的 Axure 原型补充数据。原型使用 m³ 容量口径；各分类比例为独立参考指标，不作合计。');
@@ -35,6 +35,14 @@ window.createPortDashboard = function (api) {
   register('ccDevices', '作业设备状态', deviceRows, ['设备类型', '地图示意数量', '作业中示意数量'], '仅统计当前地图的示意点位，不代表全部设备台账或真实利用率。', 'production');
   register('ccSafety', '安全控制', [...panels.safety.rows, ...panels.availability.rows, ...safetyEquipment.flatMap(item => [['设备总数 · ' + item.name, item.total, '台'], ['可用 · ' + item.name, item.available, '台'], ['停用 · ' + item.name, item.stopped, '台'], ['在用 · ' + item.name, item.inUse, '台'], ['完好率 · ' + item.name, item.integrity, '%']])], undefined, '沿用 V2 作业票与设备数据；在用属于可用的子集，不重复累加。', 'safety');
   register('ccAlerts', '告警关注事项', panels.risks.rows, panels.risks.headers, '未接入实时告警，以下仅为 V2 已有的三条关注事项，不补造事件时间。', 'safety');
+
+  // 简约主屏收起的数据仍可在对应详情中查看；历史数据沿用同一序列。
+  const historyRows = (name, values, unit) => values.map((value, index) => [name + ' · ' + days[index], value, unit]);
+  panels.ccPeople.rows.push(...Object.entries(personSeries).flatMap(([name, values]) => historyRows(name + '入场', values, '人')));
+  panels.ccProduction.rows.push(...Object.entries(productionSeries).flatMap(([name, values]) => historyRows(name, values, 't')));
+  panels.ccEnergy.rows.push(...panels.energyTrend.rows.map(([day, value, unit]) => ['总用电量 · ' + day, value, unit]));
+  register('ccVehicles', '车辆动态', [...allRows(['vehicles']), ['进出合计', api.vehicleTrafficTotal(), '车次'], ...historyRows('在场车辆', api.vehicleHistory, '辆'), ...api.vehicleApprovalTotals.map(([name, value]) => ['出门审批 · ' + name, value, '单'])], undefined, '当前车辆与进出车次分别统计；审批与近七日数据沿用现有演示数据。', 'vehicles');
+  register('ccShips', '船舶动态', [...allRows(['ships']), ...historyRows('每日航次', api.shipVoyageValues, '航次'), ...points.filter(point => point.kind === '船舶').map(point => [point.name, point.status, '地图示意'])], undefined, '保留全部船舶指标及近七日航次；地图点位为示意样本。', 'ships');
 
   function stats(rows, extra = '') {
     return `<div class="cc-stats ${extra}" style="--cc-stat-count:${rows.length}">${rows.map(([label, value, unit = '']) => `<div><span>${esc(label)}</span><strong>${esc(fmt(value))}<small>${esc(unit)}</small></strong></div>`).join('')}</div>`;
@@ -174,10 +182,56 @@ window.createPortDashboard = function (api) {
       });
     }
   });
+  function simpleHero(row) {
+    return stats([row], 'cc-simple-hero');
+  }
+  function simpleRing(percent, label) {
+    return `<div class="cc-simple-ring" style="--cc-percent:${percent}%" role="img" aria-label="${esc(label)} ${percent}%"><strong>${percent}<small>%</small></strong></div>`;
+  }
+  function simplePersonnel() {
+    const values = days.map((_, index) => sum(Object.values(personSeries).map(series => series[index])));
+    return card('ccPeople', '人员动态', 'people', simpleHero(panels.people.rows[0]) + stats([panels.people.rows[1], panels.peopleEntry.rows[0]], 'cc-simple-tiles') + subtitle('近七日人员入场趋势', '人') + chart([{ name: '每日入场人数', values }], { legend: false, unit: '人' }), 'cc-personnel');
+  }
+  function simpleVehicles() {
+    return card('ccVehicles', '车辆动态', 'truck', simpleHero(panels.vehicles.rows[0]) + stats(panels.vehicles.rows.slice(1, 3), 'cc-simple-tiles'), 'cc-vehicles');
+  }
+  function simpleProduction() {
+    const percent = Number((productionTasks.completed / productionTasks.total * 100).toFixed(1));
+    const rows = [['船舶作业 · 年吞吐量', ...panels.shipWork.rows[0].slice(1)], ['加油作业 · 柴油储存', ...panels.fuel.rows[0].slice(1)], ['卸装作业 · 卸装件数', ...panels.cargo.rows[0].slice(1)], ['输灰作业 · 输送反打', ...panels.ash.rows[0].slice(1)]];
+    const keys = ['shipWork', 'fuel', 'cargo', 'ash'];
+    return card('ccProduction', '生产状态', 'chart', `<div class="cc-simple-completion"><div class="cc-flat-only">${simpleRing(percent, '作业完成率')}</div><div class="cc-dimensional-only">${completionRing(productionTasks.completed, productionTasks.total, '作业完成率', '已完成', '未完成', '单')}</div><div>${subtitle('作业完成率')}<strong class="cc-simple-fraction">${productionTasks.completed}<small> / ${productionTasks.total} 单</small></strong><p>已接单 <b>${productionTasks.accepted}</b> 单</p></div></div><div class="cc-simple-business">${rows.map(([name, value, unit], index) => `<button data-detail="${keys[index]}"><span>${esc(name)}</span><strong>${fmt(value)}<small>${esc(unit)}</small></strong>${icon('arrow')}</button>`).join('')}</div>`, 'cc-production');
+  }
+  function simpleShips() {
+    return card('ccShips', '船舶动态', 'ship', stats([panels.ships.rows[2], panels.ships.rows[1]], 'cc-simple-tiles') + subtitle('近七日航次趋势', '航次') + chart([{ name: '每日航次', values: api.shipVoyageValues }], { type: 'bar', legend: false, unit: '航次', palette: 1 }), 'cc-ships');
+  }
+  function simpleEnergy() {
+    return card('ccEnergy', '能耗监测', 'bolt', simpleHero(energyRows[0]) + stats([panels.shore.rows[0], panels.electricity.rows[2]], 'cc-simple-tiles') + subtitle('近七日用电量', 'kWh') + chart([{ name: '总用电量', values: panels.energyTrend.rows.map(row => row[1]) }], { type: 'bar', legend: false, unit: 'kWh', palette: 2 }), 'cc-energy');
+  }
+  function simpleYard() {
+    const rate = panels.ccYard.rows[2][1];
+    return card('ccYard', '堆场管理情况', 'area', stats([panels.ccYard.rows[2], panels.ccYard.rows[1], panels.ccYard.rows[0]], 'cc-simple-yard-stats') + `<meter class="cc-simple-yard-meter" min="0" max="${yard.total}" value="${yard.rented}" aria-label="堆场出租率 ${rate}%"></meter>`, 'cc-yard');
+  }
+  function simpleStorage() {
+    return card('ccStorage', '油品仓储态势', 'area', `<div class="cc-simple-oil">${simpleHero(storage[0])}<div><span class="cc-simple-label">${esc(storage[1][0])}</span><div class="cc-flat-only">${simpleRing(storage[1][1], storage[1][0])}</div><div class="cc-dimensional-only">${gauge(storage[1][1], storage[1][0])}</div></div></div>`, 'cc-storage');
+  }
+  function simpleSafety() {
+    return card('ccSafety', '安全控制', 'shield', simpleHero(panels.safety.rows[0]) + subtitle('高风险作业票统计', '张') + bars(tickets, '张'), 'cc-safety');
+  }
+  function simpleHazards() {
+    return card('ccHazards', '隐患治理统计', 'shield', stats([hazards[0], hazards[5], hazards[2]], 'cc-simple-hazard-stats'), 'cc-hazards');
+  }
+  function simpleRecognition() {
+    return card('ccRecognition', '智能识别设备', 'camera', stats(recognition.slice(0, 3), 'cc-simple-recognition-stats'), 'cc-recognition');
+  }
   function renderPanels() {
     chartLabelObserver.disconnect();
-    $('#left-panels').innerHTML = `<div class="cc-left-top">${personnel()}${vehicles()}</div><div class="cc-left-bottom">${production()}<div class="cc-left-secondary">${ships()}${devices()}</div></div>`;
-    $('#right-panels').innerHTML = `<div class="cc-resource-column">${energy()}${yardCard()}${storageCard()}</div><div class="cc-safety-column">${safety()}${hazardCard()}${recognitionCard()}${alerts()}</div>`;
+    if (api.getContentEdition() === 'simple') {
+      $('#left-panels').innerHTML = `<div class="cc-simple-left-primary">${simplePersonnel()}${simpleProduction()}</div><div class="cc-simple-left-secondary">${simpleVehicles()}${simpleShips()}${devices()}</div>`;
+      $('#right-panels').innerHTML = `<div class="cc-resource-column">${simpleEnergy()}${simpleYard()}${simpleStorage()}</div><div class="cc-safety-column">${simpleSafety()}${simpleHazards()}${simpleRecognition()}${alerts()}</div>`;
+    } else {
+      $('#left-panels').innerHTML = `<div class="cc-left-top">${personnel()}${vehicles()}</div><div class="cc-left-bottom">${production()}<div class="cc-left-secondary">${ships()}${devices()}</div></div>`;
+      $('#right-panels').innerHTML = `<div class="cc-resource-column">${energy()}${yardCard()}${storageCard()}</div><div class="cc-safety-column">${safety()}${hazardCard()}${recognitionCard()}${alerts()}</div>`;
+    }
     document.querySelectorAll('.cc-chart').forEach(svg => chartLabelObserver.observe(svg));
   }
   function renderSummary() {

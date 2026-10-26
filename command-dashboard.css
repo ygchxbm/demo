@@ -343,13 +343,9 @@
 :root[data-command-center][data-chart-mode=dimensional] .cc-production-trends .cc-subtitle h3 { color: var(--cc-trend-color); border-color: var(--cc-trend-color); }
 .cc-gauge-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-width: 0; }
 .cc-gauge svg { display: block; width: 100%; height: 100%; max-height: 104px; overflow: visible; }
-.cc-gauge-shadow, .cc-gauge-track, .cc-gauge-value, .cc-gauge-edge { fill: none; }
-.cc-gauge-shadow { stroke: rgba(var(--theme-shadow-rgb), .7); stroke-width: 15; transform: translateY(4px); }
-.cc-gauge-track { stroke: color-mix(in srgb, var(--cc-color) 18%, transparent); stroke-width: 12; }
-.cc-gauge-value { stroke: var(--cc-color); stroke-width: 12; stroke-linecap: butt; filter: drop-shadow(0 -1px 1px color-mix(in srgb, var(--cc-color) 55%, transparent)); }
-.cc-gauge-edge { stroke: color-mix(in srgb, var(--cc-color) 60%, transparent); stroke-width: 1; }
-.cc-gauge text { fill: var(--text); font: 600 24px var(--number); }
-.cc-gauge tspan { font: 12px var(--font); }
+.cc-gauge-face { stroke: color-mix(in srgb, var(--cc-color) 40%, white); stroke-width: .45; }
+.cc-gauge text { fill: var(--text); font: 500 21px var(--number); }
+.cc-gauge tspan { font: 10px var(--font); }
 .cc-gauge .cc-gauge-label { fill: var(--muted); font: 11px var(--font); }
 :root[data-command-center][data-chart-mode=dimensional] .cc-oil-visual { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 2fr); align-items: center; gap: 6px; flex: 1; min-height: 0; }
 .cc-oil-visual .cc-stats span { font-size: 12px; }
@@ -375,3 +371,31 @@
 :root[data-command-center][data-chart-mode=dimensional] .cc-oil-visual { flex: none; height: 76px; }
 .cc-oil-visual .cc-gauge svg { height: 72px; }
 .cc-oil-visual .cc-stats { margin: 0; }
+
+/* 两处完成/占用环复用现有总数，只在立体模式显示。 */
+.cc-completion-ring { min-width: 0; --cc-ring-color: var(--cc-series-0); }
+.cc-completion-ring svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cc-ring-percent { fill: var(--text); font: 500 19px var(--number); }
+.cc-ring-percent tspan { font: 9px var(--font); }
+.cc-ring-label { fill: var(--muted); font: 9px var(--font); }
+.cc-ring-caption { fill: var(--muted); font: 10px var(--font); }
+.cc-ring-segment:focus-visible { outline: none; filter: drop-shadow(0 0 3px var(--cc-ring-color)); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-ring-visual { display: grid; grid-template-columns: 110px minmax(0, 1fr); height: 116px; align-items: center; gap: 8px; }
+.cc-production-ring-stats { min-width: 0; }
+.cc-production-grid .cc-production-ring-stats .cc-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cc-production-grid .cc-production-ring-stats .cc-stats strong { font-size: 20px; }
+.cc-production-grid .cc-production-ring-stats .cc-bars { margin-top: 7px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-yard-visual { grid-template-columns: 94px minmax(0, 1fr); gap: 10px; align-items: center; align-content: center; }
+.cc-yard-visual .cc-completion-ring { height: 94px; }
+.cc-yard-ring-categories { display: grid; gap: 6px; min-width: 0; }
+.cc-yard-ring-categories .cc-proportion { grid-template-columns: 42px minmax(0, 1fr) 42px; }
+
+/* 实体环与实体柱：顶面、侧壁、内壁与落地阴影分别绘制。 */
+.cc-ring-segment { stroke: color-mix(in srgb, var(--cc-series-0) 45%, white); stroke-width: .45; }
+.cc-column-shadow, .cc-column-edge, .cc-column-value { display: none; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-column { filter: none; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-bar-depth { filter: none; fill: color-mix(in srgb, var(--cc-color) 48%, var(--surface)); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-bar-top { fill: color-mix(in srgb, var(--cc-color) 60%, white); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-column-shadow { display: block; fill: rgba(var(--theme-shadow-rgb), .5); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-column-edge { display: block; fill: none; stroke: color-mix(in srgb, var(--cc-color) 40%, white); stroke-width: .65; opacity: .6; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-column-value { display: block; fill: var(--text); font: 600 12px var(--number); }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="people">
+<html lang="zh-CN" data-theme="ocean" data-version="V3" data-command-center="true" data-topic="people">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,6 +73,8 @@
 <link rel="stylesheet" href="themes.css">
 <link rel="stylesheet" href="people-airy.css">
 <link rel="stylesheet" href="people-dimensional.css">
+<link rel="stylesheet" href="command-dashboard.css">
+<script src="command-dashboard.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -188,7 +190,7 @@
   <div class="dialog-head"><h2 id="video-title">监控画面</h2><button class="close-btn" data-close="video-dialog" aria-label="关闭模拟监控"><span data-icon="close"></span></button></div>
   <div class="dialog-body">
     <div class="video-screen" id="video-screen"><div class="video-caption" id="video-name"></div><div class="video-center"><span data-icon="camera"></span><strong id="video-state">模拟监控已开启</strong><small id="video-description"></small><small id="video-time"></small></div></div>
-    <div class="video-controls"><div class="period-filter"><label for="camera-channel">监控通道</label><select id="camera-channel"><option value="0">01 泊位监控</option><option value="1">作业区监控</option><option value="2">出入口监控</option></select></div><div class="od-cluster"><button class="text-btn" id="video-toggle">暂停模拟</button><button class="text-btn" id="video-locate">定位到地图</button></div></div>
+    <div class="video-controls"><div class="period-filter"><label for="camera-channel">监控通道</label><select id="camera-channel"><option value="0">01 泊位监控</option><option value="1">作业区监控</option><option value="2">出入口监控</option><option value="3">港区全景监控</option></select></div><div class="od-cluster"><button class="text-btn" id="video-toggle">暂停模拟</button><button class="text-btn" id="video-locate">定位到地图</button></div></div>
     <p class="dialog-note">当前为静态底图模拟画面；暂停与继续仅演示操作状态，未接入真实视频流。</p>
   </div>
 </dialog>

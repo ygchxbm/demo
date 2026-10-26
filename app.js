@@ -4,6 +4,7 @@ const $ = s => document.querySelector(s);
 const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => typeof n === 'number' ? n.toLocaleString('zh-CN') : n;
 const glyphs = {
+ people:'<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3z"/>',
  ship:'<path d="M4 13l8-4 8 4-2 6H6zM8 11V5h8v6M12 5V2M2 21q3-3 6 0 4-3 8 0 3-3 6 0"/>',
  truck:'<path d="M2 6h12v11H2zM14 10h4l4 4v3h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
  crane:'<path d="M6 21V3h13M3 21h6M6 6l13-3M17 3v9m-2 0a2 2 0 1 0 4 0M6 10l6-6"/>',
@@ -187,8 +188,9 @@ const points=[
  point('f1','叉车',34,44,'示意叉车 F01','作业中'),point('f2','叉车',44,59,'示意叉车 F02','空闲'),point('t1','拖车',39,64,'示意拖车 T01','运输中'),point('t2','拖车',67,56,'示意拖车 T02','运输中'),point('p1','平板拖车',49,72,'示意平板车 P01','作业中'),point('c1','汽车吊',31,32,'示意汽车吊 C01','作业中'),point('c2','轮胎吊',51,57,'示意轮胎吊 C02','作业中'),
  point('v1','摄像头',27,30,'01 泊位监控','模拟通道',{channel:0}),point('v2','摄像头',47,66,'作业区监控','模拟通道',{channel:1}),point('v3','摄像头',69,71,'出入口监控','模拟通道',{channel:2}),point('g1','门禁',58,74,'示意门岗 G01','正常'),point('g2','门禁',79,64,'示意门岗 G02','正常'),point('a1','场地',40,39,'示意场地 A区','正常'),point('a2','场地',58,57,'示意场地 B区','吊装作业',{alert:true}),point('a3','场地',34,61,'示意设备区','检修中',{alert:true})
 ];
-const cameras=['01 泊位监控','作业区监控','出入口监控'];
-const cameraPositions=['20% 30%','48% 58%','75% 70%'];
+const cameras=['01 泊位监控','作业区监控','出入口监控','港区全景监控'];
+const cameraPositions=['20% 30%','48% 58%','75% 70%','45% 30%'];
+points.push(point('v4','摄像头',78,28,'港区全景监控','模拟通道',{channel:3}));
 let current='people', selected=null, enabled=new Set(topics.people.layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
 let trendChoice='吞吐量',objectQuery='';
@@ -196,7 +198,7 @@ const dashboardLayoutKey='hainan-port-dashboard-layout';
 const dashboardLayouts=new Set(['wide']);
 let dashboardLayout='wide',previewScale=1;
 try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||dashboardLayouts.has(saved))dashboardLayout=saved;}catch{}
-// Display ratio is shared by every topic; 32:9 uses scheme 2.
+// V3 保留比例、页面风格、数据展示三个独立设置。
 function activeDashboardLayout(){return dashboardLayout;}
 const pageStyleKey='hainan-port-people-page-style';
 const dataDisplayKey='hainan-port-people-data-display';
@@ -213,14 +215,14 @@ try{
  }
 }catch{}
 function syncPageAppearance(){
- const supported=current==='people';
+ const supported=true;
  if(supported&&pageStyle==='airy')document.documentElement.dataset.pageStyle='airy';
  else delete document.documentElement.dataset.pageStyle;
  if(supported&&dataDisplay==='dimensional')document.documentElement.dataset.chartMode='dimensional';
  else delete document.documentElement.dataset.chartMode;
  document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pageStyleChoice===pageStyle)));
  document.querySelectorAll('[data-display-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.displayChoice===dataDisplay)));
- $('#page-style-note').textContent=supported?'两组设置可独立组合，支持人员动态的 16:9 与 32:9。':'设置已记住；切回人员动态时生效。';
+ $('#page-style-note').textContent='三组设置独立生效。32:9 整屏适配 7680 × 2169；16:9 高度占满，通过底部横向滚动查看完整内容。';
 }
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
@@ -286,6 +288,7 @@ Object.assign(panels,{
   channelList:{title:'监控通道',topic:'video',kind:'摄像头',headers:['通道','名称','接入状态'],rows:cameras.map((n,i)=>['CAM 0'+(i+1),n,'模拟']),render:()=>linkedRows(cameras.map((n,i)=>[n,'CAM 0'+(i+1)+' · 静态底图模拟','data-wall-channel',String(i)]))},
   videoGuide:{title:'画面与位置',topic:'video',kind:'摄像头',rows:[['画面来源','港区底图','模拟'],['真实视频流','尚未接入','状态']],render:()=>`<p class="view-copy">选择画面可放大查看，支持暂停模拟、切换通道和定位摄像头。</p>`+linkedRows(points.filter(p=>p.kind==='摄像头').map(p=>[p.name,'查看摄像头示意位置','data-locate',p.id]))},
  });
+const commandDashboard=window.createPortDashboard({panels,days,personSeries,productionTasks,productionSeries,tickets,safetyEquipment,points,cameras,cameraPositions,icon,esc,fmt,vehicleTrafficTotal,vehicleApprovalTotals,vehicleHistory,shipVoyageValues,layerKinds});
 function defaultTopic(){return 'people';}
 function activeView(){return topics[current];}
 function mapMatchingObjects(){const q=objectQuery.trim().toLowerCase();return points.filter(p=>enabled.has(p.kind)&&(!q||(p.name+p.kind+p.status).toLowerCase().includes(q)));}
@@ -349,11 +352,9 @@ function renderSceneWorkspace(){
  }else{space.innerHTML='';space.setAttribute('aria-hidden','true');}
 }
 function renderPage(){
- const view=activeView();renderNavigation();renderPanels();renderSummary();renderSceneWorkspace();syncDashboardLayout();updateMarkers();
- $('#topic-label').textContent=topics[current].name;
- $('#topic-en').textContent=topics[current].en;
- $('#map-title').textContent=view.layout==='video'?'港区视频监控':view.layout==='map'?'港区地图全览':topics[current].name+' · 空间分布';
+ commandDashboard.render();syncDashboardLayout();updateMarkers();
 }
+
 function locateObject(id){
  const p=points.find(x=>x.id===id);if(!p)return;
  if(activeView().layout==='video'){history.replaceState(null,'','#map');changeTopic('map');}
@@ -367,25 +368,15 @@ function locateObject(id){
 
 renderLayerControls();
 $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${p.id}" data-kind="${p.kind}" data-alert="${Boolean(p.alert)}" style="--x:${p.x};--y:${p.y}" aria-label="${p.name}，${p.status}，示意位置">${icon(layerKinds[p.kind])}<span class="marker-label">${p.name.replace('示意','').replace(/ /g,'')}</span></button>`).join('');
-function renderPanels(){
- restorePeoplePanels();
- document.documentElement.dataset.topic=current;
- // Move persistent controls out before replacing the sidebar; their event bindings survive.
- if($('#selection').closest('#right-panels'))$('#map-stage').append($('#selection'));
- if($('#layer-controls').closest('#right-panels'))$('.scene-ui').append($('#layer-controls'));
- renderLayerControls();
- if(current==='map'){renderMapPanels();return;}
- if(current==='video'){renderVideoPanels();return;}
- const keys=activeView().panels,half=Math.ceil(keys.length/2);
- ['left-panels','right-panels'].forEach((id,index)=>{const wing=$('#'+id),items=keys.slice(index*half,index*half+half);wing.style.setProperty('--panel-count',items.length);wing.innerHTML=items.map(key=>{const p=panels[key];return `<section class="panel" data-panel="${key}"><div class="panel-head"><h2>${p.title}</h2><button class="panel-link" data-detail="${key}" aria-label="查看${p.title}详情">详情 ${icon('arrow')}</button></div><div class="panel-body">${p.render()}</div></section>`}).join('');});
-}
+function renderPanels(){commandDashboard.renderPanels();}
+
 function updateMarkers(){document.querySelectorAll('[data-point]').forEach(el=>{el.hidden=!enabled.has(el.dataset.kind);el.classList.toggle('selected',el.dataset.point===selected);el.setAttribute('aria-pressed',String(el.dataset.point===selected));});document.querySelectorAll('[data-layer]').forEach(el=>el.setAttribute('aria-pressed',String(enabled.has(el.dataset.layer))));$('#visible-count').textContent=points.filter(p=>enabled.has(p.kind)).length;if($('#object-results'))$('#object-results').innerHTML=objectResults();if(activeView().layout==='map'){renderSummary();updateMapSidebar();}}
 function closeSelection(){selected=null;$('#selection').hidden=true;document.querySelectorAll('.linked').forEach(el=>el.classList.remove('linked'));updateMarkers();}
 function selectPoint(id){const p=points.find(x=>x.id===id);if(!p)return;selected=id;lastPointFocus=document.querySelector(`[data-point="${id}"]`);$('#selection-title').textContent=p.name;$('#selection-info').innerHTML=`<dt>对象类型</dt><dd>${p.kind}</dd><dt>当前状态</dt><dd>${p.status}</dd><dt>所在位置</dt><dd>${p.berth||'港区示意位置'}</dd><dt>关联业务</dt><dd>${p.task||({摄像头:'视频监控',门禁:'人员车辆进出',场地:'生产与安全'}[p.kind]||'生产作业')}</dd>`;$('#selection-action').textContent=p.kind==='摄像头'?'打开模拟监控':'查看关联详情';$('#selection').hidden=false;$('.selection-actions').hidden=false;$('#selection-video').dataset.relatedCamera=p.kind==='摄像头'?String(p.channel):'';$('#selection-video').textContent=p.kind==='摄像头'?'打开模拟监控':'关联监控：暂无资料';$('#selection-video').disabled=p.kind!=='摄像头';document.querySelectorAll('.linked').forEach(el=>el.classList.remove('linked'));if(current!=='map')document.querySelectorAll('[data-panel]').forEach(el=>{const pk=panels[el.dataset.panel];if(pk.kind===p.kind||(p.kind==='场地'&&pk.topic==='safety')||(['叉车','拖车','平板拖车','汽车吊','轮胎吊'].includes(p.kind)&&pk.topic==='production'))el.classList.add('linked');});updateMarkers();}
 function changeTopic(key,announce=true){
  if(!topics[key])key=defaultTopic();
- current=key;closeSelection();enabled=new Set(activeView().layers);renderPage();
- if(announce)$('#live-status').textContent='已切换至'+topics[key].name+'，地图视角已保留';
+ current='people';closeSelection();enabled=new Set(Object.keys(layerKinds));renderPage();
+ if(announce)$('#live-status').textContent='综合运行大屏已显示全部业务，地图视角已保留';
 }
 const initial=location.hash.slice(1);if(!topics[initial])history.replaceState(null,'','#'+defaultTopic());
 function setHash(key){if(location.hash==='#'+key)changeTopic(key);else location.hash=key;}
@@ -395,7 +386,7 @@ const stage=$('#map-stage');
 const panoramaLayer=$('#panorama-layer');
 const mapViewport=$('#map-viewport');
 const mapWorld=$('#map-world');
-function mapSurface(){return current==='map'&&activeDashboardLayout()==='wide'?mapViewport:panoramaLayer;}
+function mapSurface(){return panoramaLayer;}
 function paintTransform(){
  const w=mapSurface().clientWidth,h=mapSurface().clientHeight;
  const mx=Math.max(0,(baseWidth*zoom-w)/2)+w*.15;
@@ -408,7 +399,7 @@ function paintTransform(){
 function fitMap(){
  const w=mapSurface().clientWidth,h=mapSurface().clientHeight;
  if(!w||!h)return;
- baseWidth=activeDashboardLayout()==='complete'?Math.min(w,h*2):['people','energy','ships','vehicles','production','safety'].includes(current)?Math.max(w,h*2):Math.min(w,h*2);
+ baseWidth=Math.max(w,h*2);
  mapWorld.style.width=baseWidth+'px';paintTransform();
 }
 function doZoom(delta){zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
@@ -422,7 +413,7 @@ $('#zoom-in').addEventListener('click',()=>doZoom(.25));
 $('#zoom-out').addEventListener('click',()=>doZoom(-.25));
 $('#reset-map').addEventListener('click',()=>resetMapView());
 function bindMapInput(surface){
- surface.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey||e.target.closest('button,input,select,#selection'))return;e.preventDefault();doZoom(e.deltaY<0?.1:-.1);},{passive:false});
+ surface.addEventListener('wheel',e=>{if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.target.closest('button,input,select,#selection'))return;e.preventDefault();doZoom(e.deltaY<0?.1:-.1);},{passive:false});
  surface.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button,#selection'))return;drag={surface,id:e.pointerId,x:e.clientX,y:e.clientY,px:panX,py:panY};surface.setPointerCapture(e.pointerId);});
  surface.addEventListener('pointermove',e=>{if(!drag||drag.surface!==surface||drag.id!==e.pointerId)return;panX=drag.px+(e.clientX-drag.x)/previewScale;panY=drag.py+(e.clientY-drag.y)/previewScale;paintTransform();});
  const endDrag=e=>{if(drag&&drag.surface===surface&&drag.id===e.pointerId){if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId);drag=null;}};
@@ -438,7 +429,7 @@ function restorePeoplePanels(){
  }
 }
 function syncPreviewPopovers(){
- const preview=dashboardLayouts.has(activeDashboardLayout());
+ const preview=true;
  for(const [panelId,buttonId,wrap] of [['prototype-settings-panel','prototype-settings-button','.prototype-wrap'],['theme-menu','theme-button','.theme-wrap']]){
   const panel=$('#'+panelId);
   if(preview){
@@ -455,29 +446,17 @@ function syncPreviewPopovers(){
  }
 }
 function syncDashboardLayout(){
- const active=dashboardLayouts.has(activeDashboardLayout());
- if(active)document.documentElement.dataset.dashboardLayout=activeDashboardLayout();
- else delete document.documentElement.dataset.dashboardLayout;
- previewScale=active?Math.min(window.innerWidth/3840,window.innerHeight/1080):1;
+ const wide=dashboardLayout==='wide',width=3840,height=1084.5;
+ document.documentElement.dataset.dashboardLayout=wide?'wide':'standard';
+ document.documentElement.dataset.displayRatio=wide?'wide':'standard';
+ previewScale=wide?Math.min(window.innerWidth/width,window.innerHeight/height):Math.max(.1,(window.innerHeight-14)/height);
  document.documentElement.style.setProperty('--dashboard-preview-scale',previewScale);
- if(active&&activeDashboardLayout()==='columns'){
-  for(const [key,label] of [['peopleAffiliation','人员归属分析'],['peopleEntry','今日入场分析']]){
-   const panel=document.querySelector(`[data-panel="${key}"]`);
-   const wing=peopleExtraWings[key]||(peopleExtraWings[key]=Object.assign(document.createElement('aside'),{className:'wing people-extra-wing'}));
-   wing.setAttribute('aria-label',label);
-   if(panel.parentElement!==wing)wing.append(panel);
-   if(!wing.isConnected){if(key==='peopleAffiliation')$('#left-panels').after(wing);else $('.center').after(wing);}
-  }
- }else restorePeoplePanels();
- document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>{
-  button.setAttribute('aria-pressed',String(button.dataset.dashboardLayoutChoice===activeDashboardLayout()));
- });
+ document.documentElement.style.setProperty('--cc-scaled-width',width*previewScale+'px');
+ document.documentElement.style.setProperty('--cc-scaled-height',height*previewScale+'px');
+ document.documentElement.style.setProperty('--cc-header-width',window.innerWidth/previewScale+'px');
+ document.documentElement.style.setProperty('--cc-scroll-offset',window.scrollX/previewScale+'px');
+ document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.dashboardLayoutChoice===dashboardLayout)));
  $('#dashboard-layout-note').textContent='展示比例';
- if(active){
-  for(const id of ['left-panels','right-panels']){
-   const wing=$('#'+id);wing.style.setProperty('--layout-panel-count',wing.querySelectorAll(':scope > .panel').length);
-  }
- }
  syncPageAppearance();syncPreviewPopovers();fitMap();
 }
 document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
@@ -496,10 +475,22 @@ document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>butt
  const choice=button.dataset.dashboardLayoutChoice;
  dashboardLayout=choice;
  try{localStorage.setItem(dashboardLayoutKey,dashboardLayout);localStorage.removeItem('hainan-port-people-layout');}catch{}
- syncDashboardLayout();button.focus({preventScroll:true});
+ window.scrollTo(0,0);syncDashboardLayout();button.focus({preventScroll:true});
  $('#live-status').textContent='已切换为'+button.querySelector('strong').textContent+(dashboardLayout==='wide'?'全景布局':'标准布局');
 }));
-window.addEventListener('resize',()=>{if(dashboardLayouts.has(activeDashboardLayout()))syncDashboardLayout();});
+window.addEventListener('resize',syncDashboardLayout);
+window.addEventListener('scroll',()=>{document.documentElement.style.setProperty('--cc-scroll-offset',window.scrollX/previewScale+'px');syncPreviewPopovers();},{passive:true});
+// 16:9 下将纵向滚轮转换为横向浏览；地图、弹窗与表单保留各自行为。
+document.addEventListener('wheel',e=>{
+ if(dashboardLayout!=='default'||e.defaultPrevented||e.ctrlKey||e.metaKey)return;
+ if(e.target.closest('dialog,[role="dialog"],#theme-menu,#selection,#map-stage,input,textarea,select'))return;
+ if(!e.deltaY||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;
+ const scroll=document.scrollingElement;
+ if(!scroll||scroll.scrollWidth<=scroll.clientWidth)return;
+ const multiplier=e.deltaMode===1?16:e.deltaMode===2?window.innerWidth:1;
+ e.preventDefault();
+ window.scrollBy({left:e.deltaY*multiplier,behavior:'instant'});
+},{passive:false});
 const settingsPanel=$('#prototype-settings-panel'),settingsButton=$('#prototype-settings-button');
 function closePrototypeSettings(returnFocus=false){settingsPanel.hidden=true;settingsButton.setAttribute('aria-expanded','false');if(returnFocus)settingsButton.focus();}
 settingsButton.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsButton.setAttribute('aria-expanded',String(open));$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(open)$('#prototype-settings-close').focus();});
@@ -510,7 +501,7 @@ $('#selection-close').addEventListener('click',()=>{closeSelection();lastPointFo
 $('#selection-action').addEventListener('click',()=>{const p=points.find(x=>x.id===selected);if(!p)return;if(p.kind==='摄像头')openCamera(p.channel);else openDetail(p.kind==='船舶'?'berths':p.kind==='门禁'?'approvals':p.alert?'risks':'production',p);});
 const detail=$('#detail-dialog');
 function showDialog(d){previousFocus=document.activeElement;d.showModal();}
-function openDetail(key,pointInfo){currentPanel=key;const p=panels[key];$('#detail-title').textContent=p.title+(pointInfo?' · '+pointInfo.name:'');$('#detail-period').value='all';$('#detail-context').textContent=pointInfo?'所选对象为示意点位，下方展示关联业务演示数据。':'演示数据 · 统计日期 2026-10-22';$('#detail-search').value='';renderDetail();showDialog(detail);}
+function openDetail(key,pointInfo){currentPanel=key;const p=panels[key];$('#detail-title').textContent=p.title+(pointInfo?' · '+pointInfo.name:'');$('#detail-period').value='all';$('#detail-context').textContent=pointInfo?'所选对象为示意点位，下方展示关联业务演示数据。':(p.note||'演示数据 · 统计日期 2026-10-22');$('#detail-search').value='';renderDetail();showDialog(detail);}
 function renderDetail(){const p=panels[currentPanel],q=$('#detail-search').value.trim(),filter=$('#detail-period').value;let rows=p.rows.filter(r=>!q||r.some(x=>String(x).includes(q)));if(filter==='numeric')rows=rows.filter(r=>typeof r[1]==='number');const headers=p.headers||['指标','数值','单位'];$('#detail-content').innerHTML=(currentPanel==='prodTrend'?`<div class="detail-grid">${['柴油','灰浆','件杂货','吞吐量'].map((n,i)=>`<div><h3 style="font-size:.9rem">${n}趋势（t）</h3>${lineChart([[84,96,92,108,116,112,126],[220,240,230,280,265,296,320],[1820,1960,1900,2120,2080,2260,2414],[2100,2360,2280,2520,2410,2668,2860]][i],null,days,[n])}</div>`).join('')}</div>`:'')+(rows.length?`<table class="detail-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(fmt(x))}</td>`).join('')}</tr>`).join('')}</tbody></table>`:'<div class="empty-state">没有符合条件的记录，请清空关键词或切换筛选条件。</div>');$('#detail-count').textContent=`共 ${rows.length} 项`;
 }
 $('#detail-search').addEventListener('input',renderDetail);$('#detail-period').addEventListener('change',renderDetail);

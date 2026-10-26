@@ -242,6 +242,14 @@
 .cc-alert-list b { color: var(--gold); font-weight: 400; font-size: 12px; }
 :root[data-command-center] .center { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: 94px minmax(0, 1fr) 204px !important; grid-column: auto !important; grid-row: auto !important; min-height: 0 !important; height: 100% !important; gap: var(--cc-gap); pointer-events: auto !important; }
 :root[data-command-center] #summary { display: grid !important; grid-template-columns: repeat(6, minmax(0, 1fr)) !important; grid-area: auto !important; width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; gap: 8px; background: none !important; border: 0 !important; box-shadow: none !important; }
+/* 只柔化中间列背后的照片，地图、监控和操作控件保持清晰。 */
+:root[data-command-center] .center { position: relative; isolation: isolate; }
+:root[data-command-center] .center::before {
+  content: ''; position: absolute; inset: -6px; z-index: -1;
+  border-radius: 12px; pointer-events: none;
+  background: rgba(var(--theme-shadow-rgb), .32);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+}
 .cc-summary-item { display: flex; align-items: center; min-width: 0; gap: 10px; padding: 10px 12px; border: 1px solid var(--cc-edge); border-radius: .8rem; background: var(--cc-card-fill); color: var(--text); text-align: left; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: var(--cc-glass-shadow); }
 .cc-summary-item > .od-icon { --od-icon-size: 30px; flex: none; color: var(--accent); }
 .cc-summary-item > span { display: grid; gap: 5px; min-width: 0; font-size: 14px; color: var(--muted); }

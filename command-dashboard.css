@@ -311,15 +311,46 @@
   --cc-series-2: color-mix(in srgb, var(--accent) 35%, var(--gold));
   --cc-series-3: color-mix(in srgb, var(--accent) 45%, #b9a2ff);
 }
-:root[data-command-center][data-chart-mode=dimensional][data-theme=jade] {
-  --cc-series-1: color-mix(in srgb, var(--accent) 40%, #73bcff);
-  --cc-series-3: color-mix(in srgb, var(--accent) 30%, #c4eb83);
+/* 海蓝主题的数据色独立于背景，不再通过主题蓝混合生成。 */
+:root[data-command-center][data-theme=ocean] {
+  --cc-series-0: #67c7f2;
+  --cc-series-1: #69ceb3;
+  --cc-series-2: #f1d28a;
+  --cc-series-3: #b5a4ee;
+  --cc-bar-0: var(--cc-series-0);
+  --cc-bar-1: var(--cc-series-3);
+  --cc-bar-2: var(--cc-series-2);
+  --cc-bar-3: var(--cc-series-1);
+  --cc-edge: var(--glass-edge);
+  --cc-glass-shadow: inset 0 1px 0 rgba(240,248,255,.06),0 4px 18px rgba(0,28,45,.13);
 }
-:root[data-command-center][data-chart-mode=dimensional][data-theme=amber] {
-  --cc-series-1: color-mix(in srgb, var(--accent) 35%, #f0a078);
-  --cc-series-2: color-mix(in srgb, var(--accent) 35%, #fff0cb);
-  --cc-series-3: color-mix(in srgb, var(--accent) 35%, #d59e88);
+/* 其他主题采用独立数据色，平面和立体展示共用同一色彩语义。 */
+:root[data-command-center]:is([data-theme=jade], [data-theme=lagoon], [data-theme=amber]) {
+  --cc-series-0: var(--data-series-0);
+  --cc-series-1: var(--data-series-1);
+  --cc-series-2: var(--data-series-2);
+  --cc-series-3: var(--data-series-3);
+  --cc-bar-0: var(--cc-series-0);
+  --cc-bar-1: var(--cc-series-3);
+  --cc-bar-2: var(--cc-series-2);
+  --cc-bar-3: var(--cc-series-1);
+  --cc-edge: var(--glass-edge);
+  --cc-glass-shadow: inset 0 1px 0 rgba(240,248,255,.06),0 4px 18px rgba(var(--theme-shadow-rgb),.18);
 }
+:root[data-command-center][data-theme] :is(.cc-summary-item strong, .cc-personnel .cc-stats strong, .cc-vehicles .cc-stats strong),
+:root[data-command-center][data-theme] .cc-production-grid > section:nth-child(2) strong {
+  color: var(--gold);
+}
+:root[data-command-center][data-theme] .cc-summary-item:nth-child(2) strong { color: var(--text); }
+:root[data-command-center][data-theme] .cc-summary-item:nth-child(4) strong { color: var(--cc-series-3); }
+:root[data-command-center][data-theme] .cc-summary-item:nth-child(4) > .od-icon { color: var(--cc-series-3); }
+:root[data-command-center][data-theme] :is(.cc-summary-item:nth-child(1), .cc-summary-item:nth-child(5)) > .od-icon { color: var(--cc-series-1); }
+:root[data-command-center][data-theme] .cc-recognition-devices b { color: var(--text); }
+:root[data-command-center][data-theme] .cc-chart .cc-gridline { stroke: rgba(200,216,228,.2); }
+:root[data-command-center][data-theme] .cc-production-trends > section:nth-child(1) { --cc-series-0: var(--gold); }
+:root[data-command-center][data-theme] .cc-production-trends > section:nth-child(2) { --cc-series-1: var(--data-series-3, #b5a4ee); }
+:root[data-command-center][data-theme] .cc-production-trends > section:nth-child(3) { --cc-series-2: var(--data-series-1, #69ceb3); }
+:root[data-command-center][data-theme] .cc-production-trends > section:nth-child(4) { --cc-series-3: var(--data-series-0, #67c7f2); }
 .cc-dimensional-only, .cc-area-fill, .cc-column-solid { display: none; }
 :root[data-command-center][data-chart-mode=dimensional] .cc-flat-only,
 :root[data-command-center][data-chart-mode=dimensional] .cc-column-flat { display: none; }

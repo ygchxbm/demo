@@ -39,52 +39,83 @@
   --status-simulation: #72d5ff;
 }
 
+/* 海蓝通透：环境保留海蓝，内容使用中性白与独立的冷暖配色。 */
+:root[data-theme=ocean] {
+  --surface: #123d52;
+  --accent: #67c7f2;
+  --accent2: #69ceb3;
+  --gold: #f1d28a;
+  --theme-text: #f3f5f7;
+  --theme-muted: #bdccd5;
+  --theme-wing-top: rgba(18,61,82,.83);
+  --theme-wing-bottom: rgba(12,46,65,.76);
+  --glass-edge: rgba(183,213,229,.25);
+}
+
 :root[data-theme=jade] {
   --bg: #0d4e49;
-  --surface: #083833;
+  --surface: #173e39;
   --panel: rgba(8,72,66,.42);
-  --accent: #7dffe0;
-  --gold: #f3d48a;
-  --theme-text: #f3fffb;
-  --theme-muted: #d7f6ee;
-  --theme-wing-top: rgba(16,112,100,.65);
-  --theme-wing-bottom: rgba(6,78,72,.52);
+  --accent: #76d5b5;
+  --gold: #ebd49a;
+  --theme-text: #f3f5f1;
+  --theme-muted: #c3d1ca;
+  --theme-wing-top: rgba(23,62,57,.85);
+  --theme-wing-bottom: rgba(15,45,43,.78);
   --theme-map-filter: brightness(1.01) saturate(.98) contrast(1.03);
   --theme-scene-rgb: 4,82,66;
   --theme-shadow-rgb: 0,28,24;
   --label-bg: rgba(4,42,38,.9);
+  --accent2: #87bff0;
+  --glass-edge: rgba(185,217,203,.25);
+  --data-series-0: #76d5b5;
+  --data-series-1: #87bff0;
+  --data-series-2: #ebd49a;
+  --data-series-3: #c4ace9;
 }
 
 :root[data-theme=lagoon] {
   --bg: #021820;
-  --surface: #032833;
+  --surface: #142b3d;
   --panel: rgba(3,40,54,.5);
-  --accent: #5cefff;
-  --gold: #d7e7ff;
-  --theme-text: #eefcff;
-  --theme-muted: #b7e7f2;
-  --theme-wing-top: rgba(3,42,59,.8);
-  --theme-wing-bottom: rgba(2,24,38,.72);
+  --accent: #78cbe5;
+  --gold: #e8c78d;
+  --theme-text: #f0f3f8;
+  --theme-muted: #bcc8d6;
+  --theme-wing-top: rgba(20,43,61,.87);
+  --theme-wing-bottom: rgba(11,26,41,.83);
   --theme-map-filter: brightness(.78) saturate(.8) contrast(1.08);
   --theme-scene-rgb: 1,18,32;
   --theme-shadow-rgb: 0,8,16;
   --label-bg: rgba(2,20,30,.94);
+  --accent2: #74cfba;
+  --glass-edge: rgba(171,198,225,.24);
+  --data-series-0: #78cbe5;
+  --data-series-1: #74cfba;
+  --data-series-2: #e8c78d;
+  --data-series-3: #b7a2ed;
 }
 
 :root[data-theme=amber] {
   --bg: #2a160c;
-  --surface: #3a2214;
+  --surface: #40352c;
   --panel: rgba(62,36,16,.48);
-  --accent: #ffc15a;
-  --gold: #ffe1a3;
-  --theme-text: #fff6ea;
-  --theme-muted: #f0d7b8;
-  --theme-wing-top: rgba(113,76,34,.72);
-  --theme-wing-bottom: rgba(65,39,20,.62);
+  --accent: #e4bb78;
+  --gold: #b5d8ed;
+  --theme-text: #f7f3ec;
+  --theme-muted: #d3c9bb;
+  --theme-wing-top: rgba(64,53,44,.86);
+  --theme-wing-bottom: rgba(43,36,32,.80);
   --theme-map-filter: brightness(.96) saturate(.9) sepia(.28) contrast(1.04);
   --theme-scene-rgb: 76,40,12;
   --theme-shadow-rgb: 28,10,2;
   --label-bg: rgba(36,18,8,.92);
+  --accent2: #85c8b0;
+  --glass-edge: rgba(225,207,177,.25);
+  --data-series-0: #e4bb78;
+  --data-series-1: #85c8b0;
+  --data-series-2: #b5d8ed;
+  --data-series-3: #c3afe0;
 }
 
 /* Tint the photograph and its backdrop only, never the data or status icons. */

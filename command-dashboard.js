@@ -68,7 +68,8 @@ window.createPortDashboard = function (api) {
         return definition + item.values.map((value, position) => {
           const px = x(position) + (index - (series.length - 1) / 2) * (width + 3) - width / 2;
           const py = y(value), height = bottom - py;
-          const barColor = position === item.values.length - 1 ? color(index + palette + 1) : stroke;
+          const defaultBarColor = position === item.values.length - 1 ? color(index + palette + 1) : stroke;
+          const barColor = `var(--cc-bar-${(position + palette) % 4}, ${defaultBarColor})`;
           const barFill = fillId + '-' + position;
           return `<defs><linearGradient id="${barFill}" x1="0" y1="0" x2="1" y2=".2"><stop stop-color="color-mix(in srgb, ${barColor} 70%, white)"/><stop offset=".45" stop-color="${barColor}"/><stop offset="1" stop-color="color-mix(in srgb, ${barColor} 72%, var(--surface))"/></linearGradient></defs><g class="cc-column" style="--cc-color:${barColor}" tabindex="0" data-tip="${esc(labels[position] + ' · ' + item.name + '：' + fmt(value) + ' ' + unit)}"><title>${esc(item.name)} ${fmt(value)} ${esc(unit)}</title><ellipse class="cc-column-shadow" cx="${px + width / 2 + 4}" cy="${bottom + 3}" rx="${width * .85}" ry="3.5"/><rect x="${px}" y="${py}" width="${width}" height="${height}" rx="2" fill="${stroke}" class="cc-column-flat"/><rect x="${px}" y="${py}" width="${width}" height="${height}" rx="0" fill="url(#${barFill})" class="cc-column-solid"/><path class="cc-bar-depth" d="M${px + width} ${py}l9 -7v${height}l-9 7z" fill="${barColor}"/><path class="cc-bar-depth cc-bar-top" d="M${px} ${py}l9 -7h${width}l-9 7z" fill="${barColor}"/><path class="cc-column-edge" d="M${px} ${py}H${px + width}V${bottom}"/><text class="cc-column-value" x="${px + width / 2 + 4}" y="${py - 12}" text-anchor="middle">${fmt(value)}</text></g>`;
         }).join('');

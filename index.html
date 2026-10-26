@@ -132,6 +132,18 @@
             <button type="button" data-display-choice="dimensional" aria-pressed="false"><strong>立体数据</strong></button>
           </div>
         </div>
+        <fieldset class="auto-demo-settings">
+          <legend>自动演示</legend>
+          <label class="auto-demo-toggle"><span>页面往返浏览</span><input id="page-tour-enabled" type="checkbox" role="switch" aria-describedby="page-tour-status"></label>
+          <label class="auto-demo-speed" for="page-tour-duration"><span>单程时长</span><output id="page-tour-duration-value" for="page-tour-duration">60 秒</output></label>
+          <input id="page-tour-duration" type="range" min="15" max="90" step="5" value="60" aria-label="页面往返浏览单程时长">
+          <p id="page-tour-status" class="auto-demo-status">仅在 16:9 下可用 · 两端停留 1 秒</p>
+          <label class="auto-demo-toggle"><span>地图镜头巡游</span><input id="map-tour-enabled" type="checkbox" role="switch" aria-describedby="map-tour-status"></label>
+          <label class="auto-demo-speed" for="map-tour-speed"><span>巡游速度</span><output id="map-tour-speed-value" for="map-tour-speed">1.0 倍</output></label>
+          <input id="map-tour-speed" type="range" min="1" max="3" step="0.1" value="1" aria-label="地图镜头巡游速度">
+          <p id="map-tour-status" class="auto-demo-status">已关闭 · A → B → C → B → A</p>
+          <p class="auto-demo-status">手动操作后暂停，重新开启继续；打开设置或详情时临时暂停。</p>
+        </fieldset>
         <p id="page-style-note" class="prototype-style-note">两组设置可独立组合，支持人员动态的 16:9 与 32:9。</p>
       </section>
     </div>
@@ -155,6 +167,7 @@
       <div class="map-tools" role="group" aria-label="地图操作">
         <button id="zoom-out" class="icon-btn" aria-label="缩小地图" title="缩小"><span data-icon="minus"></span></button>
         <button id="zoom-in" class="icon-btn" aria-label="放大地图" title="放大"><span data-icon="plus"></span></button>
+        <button id="map-tour-toggle" class="text-btn" aria-label="开始地图巡游" aria-pressed="false">开始巡游</button>
         <button id="reset-map" class="icon-btn" aria-label="恢复港区全景" title="恢复全景"><span data-icon="reset"></span></button>
       </div>
     </div>

@@ -197,6 +197,12 @@ let trendChoice='吞吐量',objectQuery='';
 const dashboardLayoutKey='hainan-port-dashboard-layout';
 const dashboardLayouts=new Set(['wide']);
 let dashboardLayout='wide',previewScale=1;
+// Automatic demos start disabled on every page load; paused tours retain their position.
+const pageTour={enabled:false,paused:false,direction:1,hold:0,duration:60,position:0};
+const mapTour={enabled:false,paused:false,speed:1,index:0,direction:1,hold:0,segment:null};
+const mapTourStops=[{x:.36,y:.28},{x:.78,y:.27},{x:.36,y:.63}];
+let demoFrame=0,demoLastTime=null;
+
 try{const saved=localStorage.getItem(dashboardLayoutKey);if(saved==='default'||dashboardLayouts.has(saved))dashboardLayout=saved;}catch{}
 // V3 保留比例、页面风格、数据展示三个独立设置。
 function activeDashboardLayout(){return dashboardLayout;}
@@ -356,6 +362,7 @@ function renderPage(){
 }
 
 function locateObject(id){
+ pauseMapTour();
  const p=points.find(x=>x.id===id);if(!p)return;
  if(activeView().layout==='video'){history.replaceState(null,'','#map');changeTopic('map');}
  enabled.add(p.kind);updateMarkers();selectPoint(id);
@@ -372,7 +379,7 @@ function renderPanels(){commandDashboard.renderPanels();}
 
 function updateMarkers(){document.querySelectorAll('[data-point]').forEach(el=>{el.hidden=!enabled.has(el.dataset.kind);el.classList.toggle('selected',el.dataset.point===selected);el.setAttribute('aria-pressed',String(el.dataset.point===selected));});document.querySelectorAll('[data-layer]').forEach(el=>el.setAttribute('aria-pressed',String(enabled.has(el.dataset.layer))));$('#visible-count').textContent=points.filter(p=>enabled.has(p.kind)).length;if($('#object-results'))$('#object-results').innerHTML=objectResults();if(activeView().layout==='map'){renderSummary();updateMapSidebar();}}
 function closeSelection(){selected=null;$('#selection').hidden=true;document.querySelectorAll('.linked').forEach(el=>el.classList.remove('linked'));updateMarkers();}
-function selectPoint(id){const p=points.find(x=>x.id===id);if(!p)return;selected=id;lastPointFocus=document.querySelector(`[data-point="${id}"]`);$('#selection-title').textContent=p.name;$('#selection-info').innerHTML=`<dt>对象类型</dt><dd>${p.kind}</dd><dt>当前状态</dt><dd>${p.status}</dd><dt>所在位置</dt><dd>${p.berth||'港区示意位置'}</dd><dt>关联业务</dt><dd>${p.task||({摄像头:'视频监控',门禁:'人员车辆进出',场地:'生产与安全'}[p.kind]||'生产作业')}</dd>`;$('#selection-action').textContent=p.kind==='摄像头'?'打开模拟监控':'查看关联详情';$('#selection').hidden=false;$('.selection-actions').hidden=false;$('#selection-video').dataset.relatedCamera=p.kind==='摄像头'?String(p.channel):'';$('#selection-video').textContent=p.kind==='摄像头'?'打开模拟监控':'关联监控：暂无资料';$('#selection-video').disabled=p.kind!=='摄像头';document.querySelectorAll('.linked').forEach(el=>el.classList.remove('linked'));if(current!=='map')document.querySelectorAll('[data-panel]').forEach(el=>{const pk=panels[el.dataset.panel];if(pk.kind===p.kind||(p.kind==='场地'&&pk.topic==='safety')||(['叉车','拖车','平板拖车','汽车吊','轮胎吊'].includes(p.kind)&&pk.topic==='production'))el.classList.add('linked');});updateMarkers();}
+function selectPoint(id){pauseMapTour();const p=points.find(x=>x.id===id);if(!p)return;selected=id;lastPointFocus=document.querySelector(`[data-point="${id}"]`);$('#selection-title').textContent=p.name;$('#selection-info').innerHTML=`<dt>对象类型</dt><dd>${p.kind}</dd><dt>当前状态</dt><dd>${p.status}</dd><dt>所在位置</dt><dd>${p.berth||'港区示意位置'}</dd><dt>关联业务</dt><dd>${p.task||({摄像头:'视频监控',门禁:'人员车辆进出',场地:'生产与安全'}[p.kind]||'生产作业')}</dd>`;$('#selection-action').textContent=p.kind==='摄像头'?'打开模拟监控':'查看关联详情';$('#selection').hidden=false;$('.selection-actions').hidden=false;$('#selection-video').dataset.relatedCamera=p.kind==='摄像头'?String(p.channel):'';$('#selection-video').textContent=p.kind==='摄像头'?'打开模拟监控':'关联监控：暂无资料';$('#selection-video').disabled=p.kind!=='摄像头';document.querySelectorAll('.linked').forEach(el=>el.classList.remove('linked'));if(current!=='map')document.querySelectorAll('[data-panel]').forEach(el=>{const pk=panels[el.dataset.panel];if(pk.kind===p.kind||(p.kind==='场地'&&pk.topic==='safety')||(['叉车','拖车','平板拖车','汽车吊','轮胎吊'].includes(p.kind)&&pk.topic==='production'))el.classList.add('linked');});updateMarkers();}
 function changeTopic(key,announce=true){
  if(!topics[key])key=defaultTopic();
  current='people';closeSelection();enabled=new Set(Object.keys(layerKinds));renderPage();
@@ -402,8 +409,9 @@ function fitMap(){
  baseWidth=Math.max(w,h*2);
  mapWorld.style.width=baseWidth+'px';paintTransform();
 }
-function doZoom(delta){zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
+function doZoom(delta){pauseMapTour();zoom=Math.max(1,Math.min(3,Math.round((zoom+delta)*10)/10));if(zoom===1){panX=0;panY=0;}paintTransform();}
 function resetMapView(announce=true){
+ stopMapTour();
  zoom=1;panX=panY=0;closeSelection();fitMap();
  if(announce)toast('已恢复港区全景');
 }
@@ -414,11 +422,11 @@ $('#zoom-out').addEventListener('click',()=>doZoom(-.25));
 $('#reset-map').addEventListener('click',()=>resetMapView());
 function bindMapInput(surface){
  surface.addEventListener('wheel',e=>{if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.target.closest('button,input,select,#selection'))return;e.preventDefault();doZoom(e.deltaY<0?.1:-.1);},{passive:false});
- surface.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button,#selection'))return;drag={surface,id:e.pointerId,x:e.clientX,y:e.clientY,px:panX,py:panY};surface.setPointerCapture(e.pointerId);});
+ surface.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button,#selection'))return;pauseMapTour();drag={surface,id:e.pointerId,x:e.clientX,y:e.clientY,px:panX,py:panY};surface.setPointerCapture(e.pointerId);});
  surface.addEventListener('pointermove',e=>{if(!drag||drag.surface!==surface||drag.id!==e.pointerId)return;panX=drag.px+(e.clientX-drag.x)/previewScale;panY=drag.py+(e.clientY-drag.y)/previewScale;paintTransform();});
  const endDrag=e=>{if(drag&&drag.surface===surface&&drag.id===e.pointerId){if(surface.hasPointerCapture(e.pointerId))surface.releasePointerCapture(e.pointerId);drag=null;}};
  surface.addEventListener('pointerup',endDrag);surface.addEventListener('pointercancel',endDrag);
- surface.addEventListener('keydown',e=>{if(e.target!==surface)return;const moves={ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]};if(moves[e.key]){e.preventDefault();panX+=moves[e.key][0];panY+=moves[e.key][1];paintTransform();}if(e.key==='+'||e.key==='='){e.preventDefault();doZoom(.25);}if(e.key==='-'){e.preventDefault();doZoom(-.25);}if(e.key==='0'){e.preventDefault();resetMapView();}});
+ surface.addEventListener('keydown',e=>{if(e.target!==surface)return;const moves={ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]};if(moves[e.key]){pauseMapTour();e.preventDefault();panX+=moves[e.key][0];panY+=moves[e.key][1];paintTransform();}if(e.key==='+'||e.key==='='){e.preventDefault();doZoom(.25);}if(e.key==='-'){e.preventDefault();doZoom(-.25);}if(e.key==='0'){e.preventDefault();resetMapView();}});
 }
 bindMapInput(stage);bindMapInput(panoramaLayer);
 const peopleExtraWings={};
@@ -458,6 +466,8 @@ function syncDashboardLayout(){
  document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.dashboardLayoutChoice===dashboardLayout)));
  $('#dashboard-layout-note').textContent='展示比例';
  syncPageAppearance();syncPreviewPopovers();fitMap();
+ if(mapTour.enabled)mapTour.segment=null;
+ syncAutoDemoControls();
 }
 document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
  pageStyle=button.dataset.pageStyleChoice;
@@ -475,7 +485,7 @@ document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>butt
  const choice=button.dataset.dashboardLayoutChoice;
  dashboardLayout=choice;
  try{localStorage.setItem(dashboardLayoutKey,dashboardLayout);localStorage.removeItem('hainan-port-people-layout');}catch{}
- window.scrollTo(0,0);syncDashboardLayout();button.focus({preventScroll:true});
+ stopPageTour();window.scrollTo(0,0);syncDashboardLayout();button.focus({preventScroll:true});
  $('#live-status').textContent='已切换为'+button.querySelector('strong').textContent+(dashboardLayout==='wide'?'全景布局':'标准布局');
 }));
 window.addEventListener('resize',syncDashboardLayout);
@@ -491,6 +501,96 @@ document.addEventListener('wheel',e=>{
  e.preventDefault();
  window.scrollBy({left:e.deltaY*multiplier,behavior:'instant'});
 },{passive:false});
+// Page motion and map motion share a clock, but have independent controls and progress.
+function demoTemporarilyPaused(){return document.hidden||!$('#prototype-settings-panel').hidden||Boolean(document.querySelector('dialog[open]'));}
+function pageTourAvailable(){const el=document.scrollingElement;return dashboardLayout==='default'&&el&&el.scrollWidth>el.clientWidth;}
+function syncAutoDemoControls(){
+ const available=pageTourAvailable(),temporary=demoTemporarilyPaused();
+ $('#page-tour-enabled').disabled=!available;
+ $('#page-tour-enabled').checked=pageTour.enabled&&!pageTour.paused;
+ $('#map-tour-enabled').checked=mapTour.enabled&&!mapTour.paused;
+ $('#page-tour-status').textContent=!available?'仅在 16:9 且页面可横向滚动时可用':pageTour.paused?'已暂停 · 重新开启继续':!pageTour.enabled?'已关闭 · 两端停留 1 秒':temporary?'已开启 · 关闭面板后继续':'浏览中 · 两端停留 1 秒';
+ $('#map-tour-status').textContent=(mapTour.paused?'已暂停 · 重新开启继续':!mapTour.enabled?'已关闭':temporary?'已开启 · 关闭面板后继续':'巡游中')+' · A → B → C → B → A';
+ const running=mapTour.enabled&&!mapTour.paused;
+ $('#map-tour-toggle').textContent=running?'暂停巡游':mapTour.paused?'继续巡游':'开始巡游';
+ $('#map-tour-toggle').setAttribute('aria-label',running?'暂停地图巡游':mapTour.paused?'继续地图巡游':'开始地图巡游');
+ $('#map-tour-toggle').setAttribute('aria-pressed',String(running));
+}
+function pausePageTour(){if(pageTour.enabled){pageTour.paused=true;syncAutoDemoControls();}}
+function stopPageTour(){pageTour.enabled=false;pageTour.paused=false;pageTour.hold=0;syncAutoDemoControls();}
+function pauseMapTour(){if(mapTour.enabled){mapTour.paused=true;mapTour.segment=null;syncAutoDemoControls();}}
+function stopMapTour(){mapTour.enabled=false;mapTour.paused=false;mapTour.segment=null;mapTour.hold=0;syncAutoDemoControls();}
+function startPageTour(){
+ if(!pageTourAvailable())return;
+ if(!pageTour.paused){window.scrollTo({left:0,behavior:'instant'});pageTour.direction=1;pageTour.hold=0;}
+ pageTour.position=window.scrollX;pageTour.enabled=true;pageTour.paused=false;syncAutoDemoControls();scheduleDemo();
+}
+function startMapTour(){
+ if(!mapTour.paused){mapTour.index=0;mapTour.direction=1;mapTour.hold=0;closeSelection();}
+ mapTour.segment=null;mapTour.enabled=true;mapTour.paused=false;syncAutoDemoControls();scheduleDemo();
+}
+function scheduleDemo(){if(!demoFrame){demoLastTime=null;demoFrame=requestAnimationFrame(animateDemo);}}
+function animateDemo(now){
+ const dt=demoLastTime===null?0:Math.min((now-demoLastTime)/1000,.1);demoLastTime=now;
+ if(!demoTemporarilyPaused()){
+  if(pageTour.enabled&&!pageTour.paused&&pageTourAvailable()){
+   if(pageTour.hold>0)pageTour.hold=Math.max(0,pageTour.hold-dt);
+   else{
+    const el=document.scrollingElement,max=el.scrollWidth-el.clientWidth;
+    pageTour.position=Math.max(0,Math.min(max,pageTour.position+pageTour.direction*max*dt/pageTour.duration));
+    window.scrollTo({left:pageTour.position,behavior:'instant'});
+    if(pageTour.position===max||pageTour.position===0){pageTour.direction*=-1;pageTour.hold=1;}
+   }
+  }
+  if(mapTour.enabled&&!mapTour.paused&&baseWidth>0){
+   if(mapTour.hold>0)mapTour.hold=Math.max(0,mapTour.hold-dt);
+   else{
+    if(!mapTour.segment){
+     const point=mapTourStops[mapTour.index],targetZoom=2;
+     // Keep the image covering the viewport, including near the three focal regions.
+     const mx=Math.max(0,(baseWidth*targetZoom-mapSurface().clientWidth)/2);
+     const my=Math.max(0,(baseWidth/2*targetZoom-mapSurface().clientHeight)/2);
+     const x=Math.max(-mx,Math.min(mx,(.5-point.x)*baseWidth*targetZoom));
+     const y=Math.max(-my,Math.min(my,(.5-point.y)*baseWidth/2*targetZoom));
+     mapTour.segment={x,y,fromX:panX,fromY:panY,fromZoom:zoom,progress:0,duration:Math.max(8,Math.hypot(x-panX,y-panY)/(baseWidth*targetZoom*.025))};
+    }
+    const leg=mapTour.segment;leg.progress=Math.min(1,leg.progress+dt*mapTour.speed/leg.duration);
+    const t=leg.progress*leg.progress*(3-2*leg.progress);
+    panX=leg.fromX+(leg.x-leg.fromX)*t;panY=leg.fromY+(leg.y-leg.fromY)*t;zoom=leg.fromZoom+(2-leg.fromZoom)*t;paintTransform();
+    if(leg.progress===1){
+     mapTour.segment=null;mapTour.hold=2;
+     if(mapTour.index===2)mapTour.direction=-1;else if(mapTour.index===0)mapTour.direction=1;
+     mapTour.index+=mapTour.direction;
+    }
+   }
+  }
+ }
+ if((pageTour.enabled&&!pageTour.paused)||(mapTour.enabled&&!mapTour.paused))demoFrame=requestAnimationFrame(animateDemo);
+ else{demoFrame=0;demoLastTime=null;}
+}
+$('#page-tour-enabled').addEventListener('change',e=>{if(e.target.checked)startPageTour();else stopPageTour();});
+$('#map-tour-enabled').addEventListener('change',e=>{if(e.target.checked)startMapTour();else stopMapTour();});
+$('#map-tour-toggle').addEventListener('click',()=>{if(mapTour.enabled&&!mapTour.paused)pauseMapTour();else startMapTour();});
+$('#page-tour-duration').addEventListener('input',e=>{pageTour.duration=Number(e.target.value);$('#page-tour-duration-value').value=pageTour.duration+' 秒';});
+$('#map-tour-speed').addEventListener('input',e=>{mapTour.speed=Number(e.target.value);$('#map-tour-speed-value').value=mapTour.speed.toFixed(1)+' 倍';});
+// Pause on user input, rather than on scroll events generated by the animation itself.
+document.addEventListener('wheel',e=>{
+ if(e.target.closest('#map-stage'))return;
+ if(!e.target.closest('dialog,#prototype-settings-panel,#theme-menu,input,textarea,select'))pausePageTour();
+},{capture:true,passive:true});
+document.addEventListener('pointerdown',e=>{
+ if(e.target===document.documentElement||e.target===document.body)pausePageTour();
+},{capture:true});
+document.addEventListener('keydown',e=>{
+ if(e.target.closest('input,textarea,select,dialog,#prototype-settings-panel'))return;
+ if(e.target.closest('#map-stage'))return;
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))pausePageTour();
+},{capture:true});
+const demoOverlayObserver=new MutationObserver(syncAutoDemoControls);
+demoOverlayObserver.observe($('#prototype-settings-panel'),{attributes:true,attributeFilter:['hidden']});
+document.querySelectorAll('dialog').forEach(d=>demoOverlayObserver.observe(d,{attributes:true,attributeFilter:['open']}));
+document.addEventListener('visibilitychange',()=>{demoLastTime=null;syncAutoDemoControls();});
+
 const settingsPanel=$('#prototype-settings-panel'),settingsButton=$('#prototype-settings-button');
 function closePrototypeSettings(returnFocus=false){settingsPanel.hidden=true;settingsButton.setAttribute('aria-expanded','false');if(returnFocus)settingsButton.focus();}
 settingsButton.addEventListener('click',()=>{const open=settingsPanel.hidden;settingsPanel.hidden=!open;settingsButton.setAttribute('aria-expanded',String(open));$('#theme-menu').hidden=true;$('#theme-button').setAttribute('aria-expanded','false');if(open)$('#prototype-settings-close').focus();});

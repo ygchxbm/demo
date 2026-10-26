@@ -162,9 +162,22 @@ window.createPortDashboard = function (api) {
   function alerts() {
     return card('ccAlerts', '告警关注事项', 'shield', `<div class="cc-alert-list">${panels.risks.rows.map(([name, location, status], index) => `<button ${index < 2 ? `data-locate="${['a3', 'a2'][index]}"` : 'data-detail="risks"'}><i></i><span>${esc(name)}</span><small>${esc(location)}</small><b>${esc(status)}</b></button>`).join('')}</div>`, 'cc-alerts', '3 条关注示例 · 未接入实时告警');
   }
+  // Chart geometry fills its slot; labels keep their natural font proportions.
+  const chartLabelObserver = new ResizeObserver(entries => {
+    for (const { target: svg, contentRect } of entries) {
+      const sx = contentRect.width / 490, sy = contentRect.height / 178;
+      if (!sx || !sy) continue;
+      svg.querySelectorAll('text').forEach(text => {
+        const x = Number(text.getAttribute('x')), y = Number(text.getAttribute('y'));
+        text.setAttribute('transform', `translate(${x} ${y}) scale(${1 / sx} ${1 / sy}) translate(${-x} ${-y})`);
+      });
+    }
+  });
   function renderPanels() {
+    chartLabelObserver.disconnect();
     $('#left-panels').innerHTML = `<div class="cc-left-top">${personnel()}${vehicles()}</div><div class="cc-left-bottom">${production()}<div class="cc-left-secondary">${ships()}${devices()}</div></div>`;
     $('#right-panels').innerHTML = `<div class="cc-resource-column">${energy()}${yardCard()}${storageCard()}</div><div class="cc-safety-column">${safety()}${hazardCard()}${recognitionCard()}${alerts()}</div>`;
+    document.querySelectorAll('.cc-chart').forEach(svg => chartLabelObserver.observe(svg));
   }
   function renderSummary() {
     const rows = [['年吞吐量', ...panels.shipWork.rows[0].slice(1), 'ship', 'shipWork'], ['当日在港', ...panels.ships.rows[2].slice(1), 'ship', 'ships'], ['作业完成率', Number((productionTasks.completed / productionTasks.total * 100).toFixed(1)), '%', 'chart', 'production'], ['年可用率', panels.availability.rows[1][1], '%', 'shield', 'availability'], ['设备完好率', panels.availability.rows[2][1], '%', 'crane', 'availability'], ['今日用电', energyRows[0][1], 'kWh', 'bolt', 'ccEnergy']];

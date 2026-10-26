@@ -399,3 +399,16 @@
 :root[data-command-center][data-chart-mode=dimensional] .cc-column-shadow { display: block; fill: rgba(var(--theme-shadow-rgb), .5); }
 :root[data-command-center][data-chart-mode=dimensional] .cc-column-edge { display: block; fill: none; stroke: color-mix(in srgb, var(--cc-color) 40%, white); stroke-width: .65; opacity: .6; }
 :root[data-command-center][data-chart-mode=dimensional] .cc-column-value { display: block; fill: var(--text); font: 600 12px var(--number); }
+
+/* Automatic demo controls stay in the unscaled settings popover. */
+.auto-demo-settings { border: 0; border-top: 1px solid var(--glass-edge); padding: 12px 0 0; margin: 16px 0 0; min-width: 0; }
+.auto-demo-settings legend { padding: 0 8px 0 0; font-size: 13px; color: var(--text); }
+.auto-demo-toggle, .auto-demo-speed { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
+.auto-demo-toggle { margin: 10px 0; cursor: pointer; }
+.auto-demo-toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.auto-demo-settings input[type=range] { width: 100%; margin: 8px 0 0; accent-color: var(--accent); cursor: pointer; }
+.auto-demo-speed { color: var(--muted); font-size: 12px; }
+.auto-demo-speed output { color: var(--accent); }
+.auto-demo-status { margin: 6px 0 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+#map-tour-toggle { min-width: 78px; white-space: nowrap; }
+#map-tour-toggle[aria-pressed=true] { color: var(--accent); border-color: var(--accent); }

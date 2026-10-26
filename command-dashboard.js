@@ -5,7 +5,7 @@ window.createPortDashboard = function (api) {
     safetyEquipment, points, cameras, cameraPositions, icon, esc, fmt } = api;
   const $ = selector => document.querySelector(selector);
   const rowValue = (key, name) => panels[key].rows.find(row => row[0] === name)?.[1];
-  const color = index => `var(--person-series-${index % 4})`;
+  const color = index => `var(--cc-series-${index % 4})`;
   const sum = values => values.reduce((total, value) => total + value, 0);
   let serial = 0;
 
@@ -50,7 +50,7 @@ window.createPortDashboard = function (api) {
   }
 
   /* 单位相同的序列共用零起点；多业务单位不同，使用独立小图。 */
-  function chart(series, { labels = days, type = 'line', unit = '', legend = true } = {}) {
+  function chart(series, { labels = days, type = 'line', unit = '', legend = true, palette = 0 } = {}) {
     const id = 'cc-chart-' + ++serial;
     const top = 14, bottom = 142, left = 43, right = 476;
     const maxValue = Math.max(1, ...series.flatMap(item => item.values));
@@ -60,19 +60,30 @@ window.createPortDashboard = function (api) {
     const y = value => bottom - value / maximum * (bottom - top);
     const grid = [0, .5, 1].map(fraction => `<line x1="${left}" x2="${right}" y1="${y(maximum * fraction)}" y2="${y(maximum * fraction)}" class="cc-gridline"/><text x="${left - 9}" y="${y(maximum * fraction) + 5}" text-anchor="end">${fmt(maximum * fraction)}</text>`).join('');
     const shapes = series.map((item, index) => {
-      const stroke = color(index);
+      const stroke = color(index + palette);
+      const fillId = id + '-fill-' + index;
+      const definition = `<defs><linearGradient id="${fillId}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${stroke}"/><stop offset="1" stop-color="${stroke}" stop-opacity=".12"/></linearGradient></defs>`;
       if (type === 'bar') {
         const width = Math.min(24, (right - left) / labels.length / (series.length + 1));
-        return item.values.map((value, position) => {
+        return definition + item.values.map((value, position) => {
           const px = x(position) + (index - (series.length - 1) / 2) * (width + 3) - width / 2;
           const py = y(value), height = bottom - py;
-          return `<g tabindex="0" data-tip="${esc(labels[position] + ' · ' + item.name + '：' + fmt(value) + ' ' + unit)}"><title>${esc(item.name)} ${fmt(value)} ${esc(unit)}</title><rect x="${px}" y="${py}" width="${width}" height="${height}" rx="2" fill="${stroke}"/><path class="cc-bar-depth" d="M${px + width} ${py}l5 -4v${height}l-5 4z" fill="${stroke}"/><path class="cc-bar-depth cc-bar-top" d="M${px} ${py}l5 -4h${width}l-5 4z" fill="${stroke}"/></g>`;
+          const barColor = position === item.values.length - 1 ? color(index + palette + 1) : stroke;
+          const barFill = fillId + '-' + position;
+          return `<defs><linearGradient id="${barFill}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${barColor}"/><stop offset="1" stop-color="${barColor}" stop-opacity=".3"/></linearGradient></defs><g class="cc-column" style="--cc-color:${barColor}" tabindex="0" data-tip="${esc(labels[position] + ' · ' + item.name + '：' + fmt(value) + ' ' + unit)}"><title>${esc(item.name)} ${fmt(value)} ${esc(unit)}</title><rect x="${px}" y="${py}" width="${width}" height="${height}" rx="2" fill="${stroke}" class="cc-column-flat"/><rect x="${px}" y="${py}" width="${width}" height="${height}" rx="1" fill="url(#${barFill})" class="cc-column-solid"/><path class="cc-bar-depth" d="M${px + width} ${py}l5 -4v${height}l-5 4z" fill="${barColor}"/><path class="cc-bar-depth cc-bar-top" d="M${px} ${py}l5 -4h${width}l-5 4z" fill="${barColor}"/></g>`;
         }).join('');
       }
       const path = item.values.map((value, position) => `${position ? 'L' : 'M'}${x(position)} ${y(value)}`).join(' ');
-      return `<path class="cc-line-depth" d="${path}" stroke="${stroke}"/><path d="${path}" fill="none" stroke="${stroke}" stroke-width="2.5"/>${item.values.map((value, position) => `<g tabindex="0" data-tip="${esc(labels[position] + ' · ' + item.name + '：' + fmt(value) + ' ' + unit)}"><circle cx="${x(position)}" cy="${y(value)}" r="9" fill="transparent"/><circle cx="${x(position)}" cy="${y(value)}" r="3" fill="${stroke}"/></g>`).join('')}`;
+      return `${definition}<path class="cc-area-fill" d="${path} L${x(item.values.length - 1)} ${bottom} L${x(0)} ${bottom} Z" fill="url(#${fillId})"/><path class="cc-line-depth" d="${path}" stroke="${stroke}"/><path d="${path}" fill="none" stroke="${stroke}" stroke-width="2.5"/>${item.values.map((value, position) => `<g tabindex="0" data-tip="${esc(labels[position] + ' · ' + item.name + '：' + fmt(value) + ' ' + unit)}"><circle cx="${x(position)}" cy="${y(value)}" r="9" fill="transparent"/><circle cx="${x(position)}" cy="${y(value)}" r="3" fill="${stroke}"/></g>`).join('')}`;
     }).join('');
-    return `<div class="cc-chart-wrap">${legend ? `<div class="cc-chart-legend">${series.map((item, index) => `<span style="--cc-color:${color(index)}"><i></i>${esc(item.name)}</span>`).join('')}</div>` : ''}<svg class="cc-chart" preserveAspectRatio="none" viewBox="0 0 490 178" role="img" aria-labelledby="${id}"><title id="${id}">${esc(series.map(item => item.name + '：' + item.values.map((value, index) => labels[index] + ' ' + value + unit).join('，')).join('；'))}</title>${grid}${shapes}${labels.map((label, index) => `<text x="${x(index)}" y="168" text-anchor="middle">${esc(label)}</text>`).join('')}</svg></div>`;
+    return `<div class="cc-chart-wrap">${legend ? `<div class="cc-chart-legend">${series.map((item, index) => `<span style="--cc-color:${color(index + palette)}"><i></i>${esc(item.name)}</span>`).join('')}</div>` : ''}<svg class="cc-chart" preserveAspectRatio="none" viewBox="0 0 490 178" role="img" aria-labelledby="${id}"><title id="${id}">${esc(series.map(item => item.name + '：' + item.values.map((value, index) => labels[index] + ' ' + value + unit).join('，')).join('；'))}</title>${grid}${shapes}${labels.map((label, index) => `<text x="${x(index)}" y="168" text-anchor="middle">${esc(label)}</text>`).join('')}</svg></div>`;
+  }
+  function gauge(value, label, index = 0) {
+    const radius = 49, length = Math.PI * radius;
+    return `<div class="cc-gauge" tabindex="0" data-tip="${esc(label)}：${value}%" style="--cc-color:${color(index)}"><svg viewBox="0 0 140 93" role="img" aria-label="${esc(label)} ${value}%"><path class="cc-gauge-shadow" d="M21 65 A49 49 0 0 1 119 65"/><path class="cc-gauge-track" d="M21 65 A49 49 0 0 1 119 65"/><path class="cc-gauge-value" d="M21 65 A49 49 0 0 1 119 65" stroke-dasharray="${length * value / 100} ${length}"/><path class="cc-gauge-edge" d="M13 65 A57 57 0 0 1 127 65"/><text x="70" y="60" text-anchor="middle">${value}<tspan>%</tspan></text><text class="cc-gauge-label" x="70" y="86" text-anchor="middle">${esc(label)}</text></svg></div>`;
+  }
+  function proportion(value, label, index = 0) {
+    return `<div class="cc-proportion" style="--cc-color:${color(index)}"><span>${esc(label)}</span><meter min="0" max="100" value="${value}" aria-label="${esc(label)} ${value}%"></meter><b>${value}<small>%</small></b></div>`;
   }
   function card(key, title, glyph, content, extra = '', note = '') {
     return `<section class="cc-card ${extra}" data-panel="${key}" aria-label="${esc(title)}"><header class="cc-card-head"><h2>${icon(glyph)}${esc(title)}</h2><button data-detail="${key}" aria-label="查看${esc(title)}详情">详情 ${icon('arrow')}</button></header><div class="cc-card-body">${content}</div>${note ? `<p class="cc-card-note">${esc(note)}</p>` : ''}</section>`;
@@ -87,25 +98,25 @@ window.createPortDashboard = function (api) {
   function production() {
     const complete = Number((productionTasks.completed / productionTasks.total * 100).toFixed(1));
     const groups = [['生产作业', [['完成率', complete, '%'], ['任务数', productionTasks.total, '单'], ['接单数', productionTasks.accepted, '单']]], ['船舶作业', panels.shipWork.rows], ['加油作业', panels.fuel.rows], ['卸装作业', panels.cargo.rows.slice(0, 3)], ['输灰作业', panels.ash.rows]];
-    return card('ccProduction', '生产状态', 'chart', `<div class="cc-production-grid">${groups.map(([name, rows], index) => `<section>${subtitle(name)}${stats(rows, 'cc-stats-compact')}${index === 0 ? bars(productionTasks.categories.map(([label, value]) => [label, value]), '单') : ''}</section>`).join('')}</div><div class="cc-production-trends">${Object.entries(productionSeries).map(([name, values]) => `<section>${subtitle(name + '趋势', 't')}${chart([{ name, values }], { legend: false, unit: 't' })}</section>`).join('')}</div>`, 'cc-production');
+    return card('ccProduction', '生产状态', 'chart', `<div class="cc-production-grid">${groups.map(([name, rows], index) => `<section>${subtitle(name)}${stats(rows, 'cc-stats-compact')}${index === 0 ? bars(productionTasks.categories.map(([label, value]) => [label, value]), '单') : ''}</section>`).join('')}</div><div class="cc-production-trends">${Object.entries(productionSeries).map(([name, values]) => `<section>${subtitle(name + '趋势', 't')}${chart([{ name, values }], { legend: false, unit: 't', palette: Object.keys(productionSeries).indexOf(name) })}</section>`).join('')}</div>`, 'cc-production');
   }
   function ships() {
-    return card('ships', '船舶动态', 'ship', stats(panels.ships.rows) + subtitle('近七日航次', '航次') + chart([{ name: '每日航次', values: api.shipVoyageValues }], { type: 'bar', unit: '航次', legend: false }) + `<div class="cc-map-links">${points.filter(point => point.kind === '船舶').map(point => `<button data-locate="${point.id}" aria-label="定位${esc(point.name)}">${esc(point.name.replace('示意船舶 ', ''))}<span>${esc(point.status)}</span></button>`).join('')}</div>`, 'cc-ships');
+    return card('ships', '船舶动态', 'ship', stats(panels.ships.rows) + subtitle('近七日航次', '航次') + chart([{ name: '每日航次', values: api.shipVoyageValues }], { type: 'bar', unit: '航次', legend: false, palette: 1 }) + `<div class="cc-map-links">${points.filter(point => point.kind === '船舶').map(point => `<button data-locate="${point.id}" aria-label="定位${esc(point.name)}">${esc(point.name.replace('示意船舶 ', ''))}<span>${esc(point.status)}</span></button>`).join('')}</div>`, 'cc-ships');
   }
   function devices() {
-    return card('ccDevices', '作业设备状态', 'crane', `<div class="cc-device-rows">${deviceRows.map(([kind, total, active]) => `<button data-locate="${points.find(point => point.kind === kind).id}">${icon(api.layerKinds[kind])}<span>${esc(kind)}</span><b>${active} / ${total}</b><meter min="0" max="${total}" value="${active}" aria-label="${esc(kind)}示意点位中作业 ${active} 个，共 ${total} 个"></meter></button>`).join('')}</div>`, 'cc-devices', '作业 / 地图示意数量，非全量设备利用率');
+    return card('ccDevices', '作业设备状态', 'crane', `<div class="cc-device-rows">${deviceRows.map(([kind, total, active], index) => `<button style="--cc-color:${color(index)}" data-locate="${points.find(point => point.kind === kind).id}">${icon(api.layerKinds[kind])}<span>${esc(kind)}</span><b>${active} / ${total}</b><meter min="0" max="${total}" value="${active}" aria-label="${esc(kind)}示意点位中作业 ${active} 个，共 ${total} 个"></meter></button>`).join('')}</div>`, 'cc-devices', '作业 / 地图示意数量，非全量设备利用率');
   }
   function energy() {
-    return card('ccEnergy', '能耗监测', 'bolt', dataTable(['能源项目', '今日', '单位'], energyRows.map(([name, value, unit]) => [name.replace('今日', ''), value, unit])) + subtitle('近七日用电量', 'kWh') + chart([{ name: '总用电量', values: panels.energyTrend.rows.map(row => row[1]) }], { type: 'bar', legend: false, unit: 'kWh' }) + `<div class="cc-inline-metrics"><span>本月减排 <b>${fmt(rowValue('carbon', '本月碳减排'))}</b> tCO₂</span><span>本年 <b>${fmt(rowValue('carbon', '本年碳减排'))}</b> tCO₂</span></div>`, 'cc-energy');
+    return card('ccEnergy', '能耗监测', 'bolt', dataTable(['能源项目', '今日', '单位'], energyRows.map(([name, value, unit]) => [name.replace('今日', ''), value, unit])) + subtitle('近七日用电量', 'kWh') + chart([{ name: '总用电量', values: panels.energyTrend.rows.map(row => row[1]) }], { type: 'bar', legend: false, unit: 'kWh', palette: 2 }) + `<div class="cc-inline-metrics"><span>本月减排 <b>${fmt(rowValue('carbon', '本月碳减排'))}</b> tCO₂</span><span>本年 <b>${fmt(rowValue('carbon', '本年碳减排'))}</b> tCO₂</span></div>`, 'cc-energy');
   }
   function yardCard() {
-    return card('ccYard', '堆场管理情况', 'area', stats(panels.ccYard.rows.slice(0, 3), 'cc-stats-compact') + dataTable(['分类', '参考量（m³）', '参考比例'], yard.categories.map(([name, rate, amount]) => [name, amount, rate + '%'])), 'cc-yard', 'Axure 补充演示 · 原型容量口径，各分类独立');
+    return card('ccYard', '堆场管理情况', 'area', stats(panels.ccYard.rows.slice(0, 3), 'cc-stats-compact') + `<div class="cc-dimensional-only cc-yard-visual">${proportion(Number((yard.rented / yard.total * 100).toFixed(1)), '整体出租率')}${yard.categories.map(([name, rate, amount], index) => `<div class="cc-yard-category" tabindex="0" data-tip="${esc(name)}：参考量 ${fmt(amount)} m³，独立参考比例 ${rate}%">${proportion(rate, name, index + 1)}<small>参考量 ${fmt(amount)} m³</small></div>`).join('')}</div>` + dataTable(['分类', '参考量（m³）', '参考比例'], yard.categories.map(([name, rate, amount]) => [name, amount, rate + '%']), 'cc-flat-only'), 'cc-yard', 'Axure 补充演示 · 原型容量口径，各分类独立');
   }
   function storageCard() {
-    return card('ccStorage', '油品仓储态势', 'area', stats(storage.slice(0, 3), 'cc-stats-compact') + stats(storage.slice(3), 'cc-stats-minor'), 'cc-storage', 'Axure 补充演示 · 未提供历史，保留数值与比例');
+    return card('ccStorage', '油品仓储态势', 'area', `<div class="cc-flat-only">${stats(storage.slice(0, 3), 'cc-stats-compact')}</div><div class="cc-dimensional-only cc-oil-visual">${stats(storage.slice(0, 1), 'cc-stats-minor')}<div class="cc-gauge-pair">${gauge(storage[1][1], storage[1][0])}${gauge(storage[2][1], storage[2][0], 1)}</div></div>` + stats(storage.slice(3), 'cc-stats-minor'), 'cc-storage', 'Axure 补充演示 · 未提供历史，保留数值与比例');
   }
   function safety() {
-    return card('ccSafety', '安全控制', 'shield', stats(panels.safety.rows.slice(0, 2)) + subtitle('高风险作业票统计', '张') + bars(tickets, '张') + subtitle('关键重要设备状态', '台') + stats(panels.availability.rows.slice(0, 3), 'cc-stats-compact') + dataTable(panels.equipment.headers, panels.equipment.rows), 'cc-safety');
+    return card('ccSafety', '安全控制', 'shield', stats(panels.safety.rows.slice(0, 2)) + subtitle('高风险作业票统计', '张') + bars(tickets, '张') + subtitle('关键重要设备状态', '台') + `<div class="cc-flat-only">${stats(panels.availability.rows.slice(0, 3), 'cc-stats-compact')}</div><div class="cc-dimensional-only cc-safety-visual">${stats(panels.availability.rows.slice(0, 1), 'cc-stats-minor')}<div class="cc-gauge-pair">${gauge(panels.availability.rows[1][1], '年可用率')}${gauge(panels.availability.rows[2][1], '设备完好率', 1)}</div></div>` + dataTable(panels.equipment.headers, panels.equipment.rows), 'cc-safety');
   }
   function hazardCard() {
     return card('ccHazards', '隐患治理统计', 'shield', stats(hazards.slice(0, 3), 'cc-stats-compact') + stats(hazards.slice(3), 'cc-stats-minor'), 'cc-hazards', 'Axure 补充演示 · 完成率沿用原型独立口径');

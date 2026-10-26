@@ -297,3 +297,81 @@
   :root[data-command-center][data-display-ratio=standard] .title { justify-self: start; }
   :root[data-command-center][data-display-ratio=standard] .title h1 { font-size: 28px !important; }
 }
+
+/* 图表表达独立于毛玻璃材质与信息块布局。 */
+:root[data-command-center] {
+  --cc-series-0: var(--person-series-0);
+  --cc-series-1: var(--person-series-1);
+  --cc-series-2: var(--person-series-2);
+  --cc-series-3: var(--person-series-3);
+}
+:root[data-command-center][data-chart-mode=dimensional] {
+  --cc-series-0: var(--accent);
+  --cc-series-1: color-mix(in srgb, var(--accent) 30%, #62edc8);
+  --cc-series-2: color-mix(in srgb, var(--accent) 35%, var(--gold));
+  --cc-series-3: color-mix(in srgb, var(--accent) 45%, #b9a2ff);
+}
+:root[data-command-center][data-chart-mode=dimensional][data-theme=jade] {
+  --cc-series-1: color-mix(in srgb, var(--accent) 40%, #73bcff);
+  --cc-series-3: color-mix(in srgb, var(--accent) 30%, #c4eb83);
+}
+:root[data-command-center][data-chart-mode=dimensional][data-theme=amber] {
+  --cc-series-1: color-mix(in srgb, var(--accent) 35%, #f0a078);
+  --cc-series-2: color-mix(in srgb, var(--accent) 35%, #fff0cb);
+  --cc-series-3: color-mix(in srgb, var(--accent) 35%, #d59e88);
+}
+.cc-dimensional-only, .cc-area-fill, .cc-column-solid { display: none; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-flat-only,
+:root[data-command-center][data-chart-mode=dimensional] .cc-column-flat { display: none; }
+:root[data-command-center][data-chart-mode=dimensional] :is(.cc-dimensional-only, .cc-column-solid, .cc-area-fill) { display: block; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-area-fill { opacity: .3; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-line-depth { stroke-width: 4; opacity: .2; transform: translate(0, 3px); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-column { filter: drop-shadow(0 3px 3px rgba(var(--theme-shadow-rgb), .3)); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-bar-depth { filter: brightness(.58); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-bar-top { filter: brightness(1.22); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-card meter { height: 10px; box-shadow: 0 2px 2px rgba(var(--theme-shadow-rgb), .28); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-card meter::-webkit-meter-optimum-value {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cc-color, var(--accent)) 60%, white), var(--cc-color, var(--accent)) 40%, color-mix(in srgb, var(--cc-color, var(--accent)) 75%, var(--surface)));
+}
+:root[data-command-center][data-chart-mode=dimensional] .cc-card meter::-moz-meter-bar {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cc-color, var(--accent)) 60%, white), var(--cc-color, var(--accent)) 40%, color-mix(in srgb, var(--cc-color, var(--accent)) 75%, var(--surface)));
+}
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-trends > section:nth-child(1) { --cc-trend-color: var(--cc-series-0); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-trends > section:nth-child(2) { --cc-trend-color: var(--cc-series-1); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-trends > section:nth-child(3) { --cc-trend-color: var(--cc-series-2); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-trends > section:nth-child(4) { --cc-trend-color: var(--cc-series-3); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-production-trends .cc-subtitle h3 { color: var(--cc-trend-color); border-color: var(--cc-trend-color); }
+.cc-gauge-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; min-width: 0; }
+.cc-gauge svg { display: block; width: 100%; height: 100%; max-height: 104px; overflow: visible; }
+.cc-gauge-shadow, .cc-gauge-track, .cc-gauge-value, .cc-gauge-edge { fill: none; }
+.cc-gauge-shadow { stroke: rgba(var(--theme-shadow-rgb), .7); stroke-width: 15; transform: translateY(4px); }
+.cc-gauge-track { stroke: color-mix(in srgb, var(--cc-color) 18%, transparent); stroke-width: 12; }
+.cc-gauge-value { stroke: var(--cc-color); stroke-width: 12; stroke-linecap: butt; filter: drop-shadow(0 -1px 1px color-mix(in srgb, var(--cc-color) 55%, transparent)); }
+.cc-gauge-edge { stroke: color-mix(in srgb, var(--cc-color) 60%, transparent); stroke-width: 1; }
+.cc-gauge text { fill: var(--text); font: 600 24px var(--number); }
+.cc-gauge tspan { font: 12px var(--font); }
+.cc-gauge .cc-gauge-label { fill: var(--muted); font: 11px var(--font); }
+:root[data-command-center][data-chart-mode=dimensional] .cc-oil-visual { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 2fr); align-items: center; gap: 6px; flex: 1; min-height: 0; }
+.cc-oil-visual .cc-stats span { font-size: 12px; }
+.cc-oil-visual .cc-stats strong { font-size: 23px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-safety-visual { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 5px; align-items: center; }
+.cc-safety-visual .cc-gauge svg { height: 76px; }
+.cc-safety-visual .cc-stats span { font-size: 11px; }
+.cc-proportion { display: grid; grid-template-columns: 82px minmax(0, 1fr) 48px; align-items: center; gap: 7px; min-height: 19px; font-size: 12px; }
+.cc-proportion > span { color: var(--muted); }
+.cc-proportion b { color: var(--cc-color); font: 15px var(--number); text-align: right; }
+.cc-proportion small { font: 10px var(--font); margin-left: 2px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-yard-visual { display: grid; gap: 4px; flex: 1; align-content: center; }
+.cc-yard-category > small { display: none; }
+
+:root[data-command-center][data-chart-mode=dimensional] .cc-column:focus-visible { outline: 1px solid var(--accent); }
+/* 在既有安全卡片高度内放下仪表及设备表。 */
+:root[data-command-center][data-chart-mode=dimensional] .cc-safety .cc-card-body { gap: 4px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-safety .cc-bars { gap: 3px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-safety .cc-table :is(th, td) { padding-top: 3px; padding-bottom: 3px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-safety-visual .cc-gauge svg { height: 70px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-recognition .cc-card-body { gap: 2px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-storage .cc-card-body { gap: 6px; }
+:root[data-command-center][data-chart-mode=dimensional] .cc-oil-visual { flex: none; height: 76px; }
+.cc-oil-visual .cc-gauge svg { height: 72px; }
+.cc-oil-visual .cc-stats { margin: 0; }

@@ -4,8 +4,10 @@
   --cc-width: 3840px;
   --cc-height: 1084.5px;
   --cc-gap: 12px;
-  --cc-edge: color-mix(in srgb, var(--accent) 30%, transparent);
-  --cc-card-fill: linear-gradient(135deg, color-mix(in srgb, var(--theme-wing-top) 75%, var(--surface)), color-mix(in srgb, var(--surface) 78%, transparent));
+  /* 与 V2 的 .wing 共用材质参数，不再叠加不透明底色。 */
+  --cc-edge: var(--glass-edge);
+  --cc-card-fill: linear-gradient(120deg, var(--theme-wing-top), var(--theme-wing-bottom));
+  --cc-glass-shadow: inset 0 0 2rem color-mix(in srgb, var(--accent) 8%, transparent), 0 .3rem 2rem rgba(var(--theme-shadow-rgb), .16);
 }
 /* 16:9 仅改变浏览方式：高度撑满，宽屏内容通过横向滚动查看。 */
 :root[data-command-center][data-display-ratio=standard] { overflow-x: auto; overflow-y: hidden; }
@@ -17,8 +19,8 @@
 :root[data-command-center][data-display-ratio=standard] .app { transform: scale(var(--dashboard-preview-scale)); transform-origin: top left; }
 :root[data-command-center][data-display-ratio=standard] .masthead {
   width: var(--cc-header-width); transform: translateX(var(--cc-scroll-offset, 0px));
-  position: relative; z-index: 12; background: color-mix(in srgb, var(--surface) 85%, transparent);
-  backdrop-filter: blur(12px);
+  position: relative; z-index: 12; background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 55%, transparent), transparent);
+  backdrop-filter: blur(8px);
 }
 :root[data-command-center][data-display-ratio=standard]::-webkit-scrollbar { height: 12px; }
 :root[data-command-center][data-display-ratio=standard]::-webkit-scrollbar-track { background: var(--surface); }
@@ -39,6 +41,19 @@
   background: linear-gradient(rgba(var(--theme-scene-rgb), .8), rgba(var(--theme-shadow-rgb), .92)), url('背景图.png') center / cover !important;
 }
 :root[data-command-center] .app::before, :root[data-command-center] .app::after { display: none !important; }
+/* 玻璃背后使用完整港区照片与 V2 的轻遮罩；中央交互地图仍独立呈现。 */
+:root[data-command-center]:not([data-page-style=airy]) .app { background: var(--surface) !important; isolation: isolate; }
+:root[data-command-center]:not([data-page-style=airy]) .app::before,
+:root[data-command-center]:not([data-page-style=airy]) .app::after {
+  content: ''; display: block !important; position: absolute; inset: 0; pointer-events: none;
+}
+:root[data-command-center]:not([data-page-style=airy]) .app::before {
+  z-index: -2; background: url('背景图.png') center / cover;
+  filter: var(--theme-map-filter); opacity: 1;
+}
+:root[data-command-center]:not([data-page-style=airy]) .app::after {
+  z-index: -1; background: var(--theme-map-veil); opacity: 1;
+}
 :root[data-command-center] .navigation { display: none !important; }
 :root[data-command-center] .masthead {
   min-height: 0 !important; height: 78px; padding: 0 16px !important;
@@ -80,9 +95,9 @@
 .cc-safety-column { grid-template-rows: minmax(0, 48fr) minmax(0, 20fr) minmax(0, 16fr) minmax(0, 16fr); }
 .cc-card {
   display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden;
-  padding: 14px 16px 10px; border: 1px solid var(--cc-edge); border-radius: 9px;
-  background: var(--cc-card-fill); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 8%, transparent), 0 4px 20px rgba(var(--theme-shadow-rgb), .18);
+  padding: 14px 16px 10px; border: 1px solid var(--cc-edge); border-radius: .8rem;
+  background: var(--cc-card-fill); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--cc-glass-shadow);
 }
 .cc-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: none; padding-bottom: 10px; border-bottom: 1px solid var(--cc-edge); margin-bottom: 10px; }
 .cc-card-head h2 { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 600; line-height: 1.3; margin: 0; white-space: nowrap; }
@@ -227,7 +242,7 @@
 .cc-alert-list b { color: var(--gold); font-weight: 400; font-size: 12px; }
 :root[data-command-center] .center { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: 94px minmax(0, 1fr) 204px !important; grid-column: auto !important; grid-row: auto !important; min-height: 0 !important; height: 100% !important; gap: var(--cc-gap); pointer-events: auto !important; }
 :root[data-command-center] #summary { display: grid !important; grid-template-columns: repeat(6, minmax(0, 1fr)) !important; grid-area: auto !important; width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; gap: 8px; background: none !important; border: 0 !important; box-shadow: none !important; }
-.cc-summary-item { display: flex; align-items: center; min-width: 0; gap: 10px; padding: 10px 12px; border: 1px solid var(--cc-edge); border-radius: 6px; background: var(--cc-card-fill); color: var(--text); text-align: left; }
+.cc-summary-item { display: flex; align-items: center; min-width: 0; gap: 10px; padding: 10px 12px; border: 1px solid var(--cc-edge); border-radius: .8rem; background: var(--cc-card-fill); color: var(--text); text-align: left; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: var(--cc-glass-shadow); }
 .cc-summary-item > .od-icon { --od-icon-size: 30px; flex: none; color: var(--accent); }
 .cc-summary-item > span { display: grid; gap: 5px; min-width: 0; font-size: 14px; color: var(--muted); }
 .cc-summary-item strong { color: var(--text); font: 29px var(--number); white-space: nowrap; }
@@ -268,7 +283,7 @@
 :root[data-command-center] .footer { display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; padding: 0 4px !important; min-height: 0; margin: 0; font-size: 11px; }
 :root[data-command-center] .footer-left, :root[data-command-center] .footer .notice { font-size: 11px !important; }
 :root[data-command-center] .preview-popover { font-size: 16px; }
-:root[data-command-center] :is(dialog, .prototype-panel, .theme-menu) { background: var(--surface); }
+:root[data-command-center] :is(dialog, .prototype-panel, .theme-menu) { background: linear-gradient(120deg, color-mix(in srgb, var(--surface) 82%, transparent), color-mix(in srgb, var(--surface) 68%, transparent)); }
 :root[data-command-center] #detail-dialog { width: min(90vw, 1100px); }
 :root[data-command-center] #video-dialog { width: min(90vw, 1100px); }
 :root[data-command-center] .dialog-note { font-size: 13px; }

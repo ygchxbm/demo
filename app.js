@@ -170,14 +170,43 @@ const panels={
  risks:{title:'重点关注',topic:'safety',kind:'场地',headers:['事项','位置（示意）','状态'],rows:[['空压机停用','设备区','检修中'],['吊装作业','03 号场地','执行中'],['动火作业','维修区','执行中']],render:()=>linkedRows([['空压机停用','示意设备区 · 检修中','data-locate','a3'],['吊装作业','示意场地 B区 · 执行中','data-locate','a2'],['出门申请','3 单待审批 · 待办事项','data-detail','approvals']])},
  safetyTrend:{title:'作业票趋势',topic:'safety',kind:'场地',rows:days.map((d,i)=>[d,safetyHistory[i],'张']),render:safetyTrendColumns}
 };
-const topics={
+const fourMenuTopics={
  production:{name:'生产作业',en:'PRODUCTION OPERATIONS',left:['throughput','shipService','taskOverview'],right:['highRisk','stockyard','chemicals'],leftRows:'.96fr 1.12fr .92fr',rightRows:'1.2fr .95fr .85fr',layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
  safety:{name:'安全合规',en:'SAFETY & COMPLIANCE',left:['personnel','vehicleManagement'],right:['hazardManagement','equipmentUsage'],leftRows:'1.12fr .88fr',rightRows:'.95fr 1.05fr',layers:['门禁','拖车','平板拖车','叉车','场地','汽车吊','轮胎吊']},
  resources:{name:'资源保障',en:'RESOURCE SUPPORT',left:['energyMonitoring','intelligentDevices'],right:['alertEvents','aiRecognition'],leftRows:'1fr 1fr',rightRows:'1fr 1fr',layers:['场地','船舶','摄像头','门禁']},
  map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'}
 };
+const eightMenuTopics={
+ production:{name:'生产状态',en:'PRODUCTION OPERATIONS',panels:['production','shipWork','cargo','fuel','ash','prodTrend'],layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
+ safety:{name:'安全控制',en:'SAFETY & EQUIPMENT MONITORING',panels:['safety','permits','safetyTrend','availability','equipment','risks'],layers:['场地','摄像头','门禁','汽车吊','轮胎吊']},
+ people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
+ vehicles:{name:'车辆动态',en:'VEHICLE DYNAMICS',panels:['vehicles','vehicleTrend','vehicleFlow','approvals','vehicleObjects'],layers:['拖车','平板拖车','叉车','门禁']},
+ ships:{name:'船舶动态',en:'VESSEL DYNAMICS',panels:['ships','voyages','berths','shipPeak'],layers:['船舶','摄像头']},
+ energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','solar','shore','resources','carbon','energyTrend'],layers:['场地','船舶']},
+ video:{name:'监控视频',en:'VIDEO MONITORING',panels:['channelList','videoGuide'],layers:['摄像头'],layout:'video'},
+ map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'}
+};
+// The two editions share the map and controls, but keep their own business content.
+const menuEditionKey='hainan-port-menu-edition';
+const menuTopicsKey='hainan-port-menu-last-topics';
+let menuEdition='four';
+const lastMenuTopics={eight:'people',four:'production'};
+try{
+ const saved=localStorage.getItem(menuEditionKey);
+ if(saved==='eight'||saved==='four')menuEdition=saved;
+ const remembered=JSON.parse(localStorage.getItem(menuTopicsKey)||'{}');
+ if(eightMenuTopics[remembered?.eight])lastMenuTopics.eight=remembered.eight;
+ if(fourMenuTopics[remembered?.four])lastMenuTopics.four=remembered.four;
+}catch{}
+let topics=menuEdition==='eight'?eightMenuTopics:fourMenuTopics;
+function syncMenuEdition(){
+ document.documentElement.dataset.menuEdition=menuEdition;
+ $('#business-panels-style').disabled=menuEdition==='eight';
+ document.querySelectorAll('[data-menu-edition-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.menuEditionChoice===menuEdition)));
+}
+syncMenuEdition();
 const topicAliases={people:'safety',vehicles:'safety',ships:'production',energy:'resources',video:'resources'};
-function resolveTopic(key){return topics[key]?key:topicAliases[key]||defaultTopic();}
+function resolveTopic(key){return topics[key]?key:menuEdition==='four'&&topicAliases[key]?topicAliases[key]:defaultTopic();}
 
 const layerKinds={'叉车':'forklift','船舶':'ship','拖车':'truck','平板拖车':'truck','汽车吊':'crane','轮胎吊':'crane','摄像头':'camera','门禁':'gate','场地':'area'};
 const point=(id,kind,x,y,name,status='正常',extra={})=>({id,kind,x,y,name,status,...extra});
@@ -188,7 +217,7 @@ const points=[
 ];
 const cameras=['01 泊位监控','作业区监控','出入口监控'];
 const cameraPositions=['20% 30%','48% 58%','75% 70%'];
-let current='production', selected=null, enabled=new Set(topics.production.layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
+let current=defaultTopic(), selected=null, enabled=new Set(topics[current].layers), zoom=1,panX=0,panY=0,baseWidth=0, drag=null, lastPointFocus=null, currentPanel=null, previousFocus=null;
 // V2.3: finalized eight-menu organization and version 1 menu buttons.
 let trendChoice='吞吐量',objectQuery='';
 const dashboardLayoutKey='hainan-port-dashboard-layout';
@@ -212,14 +241,14 @@ try{
  }
 }catch{}
 function syncPageAppearance(){
- const supported=true;
+ const supported=menuEdition==='four'||current==='people';
  if(supported&&pageStyle==='airy')document.documentElement.dataset.pageStyle='airy';
  else delete document.documentElement.dataset.pageStyle;
  if(supported&&dataDisplay==='dimensional')document.documentElement.dataset.chartMode='dimensional';
  else delete document.documentElement.dataset.chartMode;
  document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.pageStyleChoice===pageStyle)));
  document.querySelectorAll('[data-display-choice]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.displayChoice===dataDisplay)));
- $('#page-style-note').textContent=supported?'两组设置可独立组合，支持四个专题的 16:9 与 32:9。':'设置已记住；切回人员动态时生效。';
+ $('#page-style-note').textContent=menuEdition==='four'?'两组设置可独立组合，支持四个专题的 16:9 与 32:9。':supported?'两组设置可独立组合，支持人员动态的 16:9 与 32:9。':'设置已记住；切回人员动态时生效。';
 }
 const personSeries={'管理人员':[104,112,108,120,116,124,128],'作业人员':[242,281,260,306,294,321,334],'参观访问':[38,40,42,44,40,45,46],'船舶相关':[102,99,98,105,98,106,104]};
 const strip=(items,attr,active)=>`<div class="view-switch" role="group">${items.map(k=>`<button ${attr}="${esc(k)}" aria-pressed="${k===active}">${esc(k)}</button>`).join('')}</div>`;
@@ -287,7 +316,7 @@ Object.assign(panels,{
  });
 const business=createBusinessPanels({esc,fmt,metrics,bars,table,linkedRows,panels,days,productionTasks,productionSeries,tickets,shipVoyageValues,personSeries,todayEntry,vehicleHistory,vehicleTraffic,vehicleApprovalTotals,cameras});
 Object.assign(panels,business.panels);
-function defaultTopic(){return 'production';}
+function defaultTopic(){return menuEdition==='eight'?'people':'production';}
 function activeView(){return topics[current];}
 function mapMatchingObjects(){const q=objectQuery.trim().toLowerCase();return points.filter(p=>enabled.has(p.kind)&&(!q||(p.name+p.kind+p.status).toLowerCase().includes(q)));}
 function objectResults(){
@@ -325,7 +354,19 @@ function updateMapSidebar(){
  if($('#map-selection-empty'))$('#map-selection-empty').hidden=Boolean(selected);
 }
 
+function eightMenuSummary(){
+ const view=activeView();
+ if(current==='people')return [['当前在场',386,'人','','people','people'],['今日峰值',428,'人','','people','people'],['今日入场',todayEntry,'人','','people','peopleEntry'],['海油内',248,'人','','people','peopleAffiliation'],['海油外',138,'人','','people','peopleAffiliation']];
+ if(current==='vehicles')return [['在场车辆',vehicleHistory.at(-1),'辆','','truck','vehicles'],['今日进场',vehicleTraffic[0][1],'车次','','truck','vehicleFlow'],['今日出场',vehicleTraffic[1][1],'车次','','truck','vehicleFlow'],['待审批',vehicleApprovalTotals[0][1],'单','','gate','approvals']];
+ if(current==='safety')return [...panels.safety.rows.slice(0,2).map(([label,value,unit])=>[label,value,unit,'','shield','safety']),...panels.availability.rows.slice(0,3).map(([label,value,unit])=>[label,value,unit,'','shield','availability'])];
+ if(current==='ships')return panels.ships.rows.map(([label,value,unit])=>[label,value,unit,'','ship','ships']);
+ if(view.layout==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['已开启图层',enabled.size,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
+ if(view.layout==='video')return [['模拟通道',3,'路','','camera','channelList'],['真实接入',0,'路','','camera','videoGuide']];
+ const keys={energy:['electricity','solar','carbon'],production:['production','shipWork','cargo']}[current];
+ return keys.flatMap(k=>panels[k].rows.filter(r=>typeof r[1]==='number').slice(0,2).map(([l,v,u])=>[l,v,u,'','chart',k])).slice(0,6);
+}
 function topicSummary(){
+ if(menuEdition==='eight')return eightMenuSummary();
  if(current==='map')return [['可见对象',points.filter(p=>enabled.has(p.kind)).length,'个','示意位置','area','mapObjects'],['已开启图层',enabled.size,'类','','layers','mapGuide'],['摄像通道',3,'路','模拟通道','camera','channelList']];
  return business.summary[current];
 }
@@ -365,18 +406,20 @@ $('#markers').innerHTML=points.map(p=>`<button class="map-marker" data-point="${
 function renderPanels(){
  restorePeoplePanels();
  document.documentElement.dataset.topic=current;
+ // Reset edition-specific geometry before rendering either card arrangement.
+ for(const id of ['left-panels','right-panels'])$('#'+id).style.removeProperty('--layout-panel-rows');
  // Move persistent controls out before replacing the sidebar; their event bindings survive.
  if($('#selection').closest('#right-panels'))$('#map-stage').append($('#selection'));
  if($('#layer-controls').closest('#right-panels'))$('.scene-ui').append($('#layer-controls'));
  renderLayerControls();
  if(current==='map'){for(const id of ['left-panels','right-panels'])$('#'+id).style.removeProperty('--layout-panel-rows');renderMapPanels();return;}
  if(current==='video'){renderVideoPanels();return;}
- const view=activeView();
+ const view=activeView(),half=menuEdition==='eight'?Math.ceil(view.panels.length/2):0;
  ['left-panels','right-panels'].forEach((id,index)=>{
-  const wing=$('#'+id),items=index?view.right:view.left;
+  const wing=$('#'+id),items=menuEdition==='eight'?view.panels.slice(index*half,index*half+half):index?view.right:view.left;
   wing.style.setProperty('--panel-count',items.length);
-  wing.style.setProperty('--layout-panel-rows',index?view.rightRows:view.leftRows);
-  wing.innerHTML=items.map(key=>{const p=panels[key];return `<section class="panel business-panel" data-panel="${key}"><div class="panel-head"><h2>${p.title}</h2><button class="panel-link" data-detail="${key}" aria-label="查看${p.title}详情">详情 ${icon('arrow')}</button></div><div class="panel-body">${p.render()}</div></section>`}).join('');
+  if(menuEdition==='four')wing.style.setProperty('--layout-panel-rows',index?view.rightRows:view.leftRows);
+  wing.innerHTML=items.map(key=>{const p=panels[key];return `<section class="panel${menuEdition==='four'?' business-panel':''}" data-panel="${key}"><div class="panel-head"><h2>${p.title}</h2><button class="panel-link" data-detail="${key}" aria-label="查看${p.title}详情">详情 ${icon('arrow')}</button></div><div class="panel-body">${p.render()}</div></section>`}).join('');
  });
 }
 function updateMarkers(){document.querySelectorAll('[data-point]').forEach(el=>{el.hidden=!enabled.has(el.dataset.kind);el.classList.toggle('selected',el.dataset.point===selected);el.setAttribute('aria-pressed',String(el.dataset.point===selected));});document.querySelectorAll('[data-layer]').forEach(el=>el.setAttribute('aria-pressed',String(enabled.has(el.dataset.layer))));$('#visible-count').textContent=points.filter(p=>enabled.has(p.kind)).length;if($('#object-results'))$('#object-results').innerHTML=objectResults();if(activeView().layout==='map'){renderSummary();updateMapSidebar();}}
@@ -386,9 +429,11 @@ function changeTopic(key,announce=true){
  key=resolveTopic(key);
  if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);
  current=key;closeSelection();enabled=new Set(activeView().layers);renderPage();
+ lastMenuTopics[menuEdition]=key;
+ try{localStorage.setItem(menuTopicsKey,JSON.stringify(lastMenuTopics));}catch{}
  if(announce)$('#live-status').textContent='已切换至'+topics[key].name+'，地图视角已保留';
 }
-const initial=resolveTopic(location.hash.slice(1));if(location.hash!=='#'+initial)history.replaceState(null,'','#'+initial);
+const initial=resolveTopic(location.hash.slice(1)||lastMenuTopics[menuEdition]);if(location.hash!=='#'+initial)history.replaceState(null,'','#'+initial);
 function setHash(key){if(location.hash==='#'+key)changeTopic(key);else location.hash=key;}
 window.addEventListener('hashchange',()=>changeTopic(location.hash.slice(1)));
 // V2.3 finalized: one full-port interactive panorama, contained at its natural ratio.
@@ -481,17 +526,32 @@ function syncDashboardLayout(){
  }
  syncPageAppearance();syncPreviewPopovers();fitMap();
 }
+document.querySelectorAll('[data-menu-edition-choice]').forEach(button=>button.addEventListener('click',()=>{
+ const choice=button.dataset.menuEditionChoice;
+ if(choice===menuEdition)return;
+ document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
+ $('#chart-tooltip').hidden=true;
+ closeSelection();
+ currentPanel=null;
+ menuEdition=choice;
+ topics=menuEdition==='eight'?eightMenuTopics:fourMenuTopics;
+ syncMenuEdition();
+ try{localStorage.setItem(menuEditionKey,menuEdition);}catch{}
+ changeTopic(lastMenuTopics[menuEdition],false);
+ button.focus({preventScroll:true});
+ $('#live-status').textContent='已切换为'+(menuEdition==='eight'?'8个菜单':'4个菜单')+'，当前为'+topics[current].name;
+}));
 document.querySelectorAll('[data-page-style-choice]').forEach(button=>button.addEventListener('click',()=>{
  pageStyle=button.dataset.pageStyleChoice;
  try{localStorage.setItem(pageStyleKey,pageStyle);}catch{}
  syncPageAppearance();fitMap();
- $('#live-status').textContent='已切换为'+button.textContent.trim();
+ $('#live-status').textContent=menuEdition==='eight'&&current!=='people'?'设置已记住，适用于人员动态':'已切换为'+button.textContent.trim();
 }));
 document.querySelectorAll('[data-display-choice]').forEach(button=>button.addEventListener('click',()=>{
  dataDisplay=button.dataset.displayChoice;
  try{localStorage.setItem(dataDisplayKey,dataDisplay);}catch{}
  syncPageAppearance();
- $('#live-status').textContent='已切换为'+button.textContent.trim();
+ $('#live-status').textContent=menuEdition==='eight'&&current!=='people'?'设置已记住，适用于人员动态':'已切换为'+button.textContent.trim();
 }));
 document.querySelectorAll('[data-dashboard-layout-choice]').forEach(button=>button.addEventListener('click',()=>{
  const choice=button.dataset.dashboardLayoutChoice;
@@ -512,7 +572,7 @@ $('#selection-action').addEventListener('click',()=>{const p=points.find(x=>x.id
 const detail=$('#detail-dialog');
 function showDialog(d){previousFocus=document.activeElement;d.showModal();}
 function openDetail(key,pointInfo){currentPanel=key;const p=panels[key];$('#detail-title').textContent=p.title+(pointInfo?' · '+pointInfo.name:'');$('#detail-period').value='all';$('#detail-context').textContent=pointInfo?'所选对象为示意点位，下方展示关联业务演示数据。':'演示数据 · 统计日期 2026-10-22';$('#detail-search').value='';renderDetail();showDialog(detail);}
-function renderDetail(){const p=panels[currentPanel],q=$('#detail-search').value.trim(),filter=$('#detail-period').value;let rows=p.rows.filter(r=>!q||r.some(x=>String(x).includes(q)));if(filter==='numeric')rows=rows.filter(r=>typeof r[1]==='number');const headers=p.headers||['指标','数值','单位'];$('#detail-content').innerHTML=(currentPanel==='prodTrend'?`<div class="detail-grid">${['柴油','灰浆','件杂货','吞吐量'].map((n,i)=>`<div><h3 style="font-size:.9rem">${n}趋势（t）</h3>${lineChart([[84,96,92,108,116,112,126],[220,240,230,280,265,296,320],[1820,1960,1900,2120,2080,2260,2414],[2100,2360,2280,2520,2410,2668,2860]][i],null,days,[n])}</div>`).join('')}</div>`:'')+(currentPanel==='berths'?linkedRows(points.filter(p=>p.kind==='船舶').map(p=>[p.name,p.berth+' · '+p.status,'data-detail-locate',p.id])):currentPanel==='vehicleObjects'?linkedRows(points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name,p.status,'data-detail-locate',p.id])):currentPanel==='channelList'?linkedRows(cameras.map((name,i)=>[name,'静态底图模拟','data-detail-camera',String(i)])):'')+(rows.length?`<table class="detail-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(fmt(x))}</td>`).join('')}</tr>`).join('')}</tbody></table>`:'<div class="empty-state">没有符合条件的记录，请清空关键词或切换筛选条件。</div>');$('#detail-count').textContent=`共 ${rows.length} 项`;
+function renderDetail(){const p=panels[currentPanel],q=$('#detail-search').value.trim(),filter=$('#detail-period').value;let rows=p.rows.filter(r=>!q||r.some(x=>String(x).includes(q)));if(filter==='numeric')rows=rows.filter(r=>typeof r[1]==='number');const headers=p.headers||['指标','数值','单位'];$('#detail-content').innerHTML=(currentPanel==='prodTrend'?`<div class="detail-grid">${['柴油','灰浆','件杂货','吞吐量'].map((n,i)=>`<div><h3 style="font-size:.9rem">${n}趋势（t）</h3>${lineChart([[84,96,92,108,116,112,126],[220,240,230,280,265,296,320],[1820,1960,1900,2120,2080,2260,2414],[2100,2360,2280,2520,2410,2668,2860]][i],null,days,[n])}</div>`).join('')}</div>`:'')+(menuEdition==='eight'?'':currentPanel==='berths'?linkedRows(points.filter(p=>p.kind==='船舶').map(p=>[p.name,p.berth+' · '+p.status,'data-detail-locate',p.id])):currentPanel==='vehicleObjects'?linkedRows(points.filter(p=>['叉车','拖车','平板拖车'].includes(p.kind)).map(p=>[p.name,p.status,'data-detail-locate',p.id])):currentPanel==='channelList'?linkedRows(cameras.map((name,i)=>[name,'静态底图模拟','data-detail-camera',String(i)])):'')+(rows.length?`<table class="detail-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(fmt(x))}</td>`).join('')}</tr>`).join('')}</tbody></table>`:'<div class="empty-state">没有符合条件的记录，请清空关键词或切换筛选条件。</div>');$('#detail-count').textContent=`共 ${rows.length} 项`;
 }
 $('#detail-search').addEventListener('input',renderDetail);$('#detail-period').addEventListener('change',renderDetail);
 let currentCamera=0,playing=true;

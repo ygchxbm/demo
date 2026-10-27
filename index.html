@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="production">
+<html data-menu-edition="four" lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="production">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,7 +73,7 @@
 <link rel="stylesheet" href="themes.css">
 <link rel="stylesheet" href="people-airy.css">
 <link rel="stylesheet" href="people-dimensional.css">
-<link rel="stylesheet" href="business-panels.css">
+<link id="business-panels-style" rel="stylesheet" href="business-panels.css">
 <script src="business-panels.js" defer></script>
 <script src="app.js" defer></script>
 </head>
@@ -111,6 +111,13 @@
       <button id="prototype-settings-button" class="icon-btn" aria-label="原型设置" aria-haspopup="dialog" aria-expanded="false" aria-controls="prototype-settings-panel" title="原型设置"><span data-icon="settings"></span></button>
       <section class="prototype-panel" id="prototype-settings-panel" role="dialog" aria-modal="false" aria-labelledby="prototype-settings-title" hidden>
         <div class="prototype-panel-head"><h2 id="prototype-settings-title">原型设置</h2><button id="prototype-settings-close" class="close-btn" aria-label="关闭原型设置"><span data-icon="close"></span></button></div>
+        <div class="prototype-setting-row">
+          <p class="prototype-layout-note" id="menu-edition-label">菜单版本</p>
+          <div class="prototype-layout-options" role="group" aria-labelledby="menu-edition-label">
+            <button type="button" data-menu-edition-choice="eight" aria-pressed="false"><strong>8个菜单</strong></button>
+            <button type="button" data-menu-edition-choice="four" aria-pressed="true"><strong>4个菜单</strong></button>
+          </div>
+        </div>
         <div class="prototype-setting-row">
           <p class="prototype-layout-note" id="dashboard-layout-note">展示比例</p>
           <div class="prototype-layout-options" role="group" aria-labelledby="dashboard-layout-note">

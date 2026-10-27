@@ -111,3 +111,62 @@
 :root .business-yard-layout .bar-row b { font-size: .7rem; }
 .business-yard-layout .business-section { flex-wrap: wrap; }
 .business-yard-layout .business-ring { max-height: 5.9rem; }
+/* Six safety cards retain the existing wings and center map. */
+:root[data-topic=safety] .business-panel .panel-head { margin-bottom: .25rem; padding-bottom: .25rem; min-height: 1.65rem; }
+:root[data-topic=safety] .business-panel .panel-body { gap: .25rem; }
+:root[data-topic=safety] .business-panel .metric-value { font-size: 1.35rem; }
+:root[data-topic=safety] .business-panel .business-chart { flex-basis: 3rem; min-height: 2.5rem; }
+:root[data-topic=safety] .business-panel .business-section { font-size: .68rem; }
+:root[data-topic=safety] .business-panel .business-note { font-size: .6rem; }
+:root[data-topic=safety] .business-panel .business-tabs { gap: .2rem; }
+:root[data-topic=safety] .business-panel .business-tabs button { min-height: 1.4rem; padding: .1rem .35rem; }
+:root[data-topic=safety] .business-panel .bar-list { gap: .25rem; }
+:root[data-topic=safety] .business-panel .business-alert { padding: .2rem .45rem; gap: .35rem; }
+:root[data-topic=safety] .business-panel .business-alert strong { font-size: 1.35rem; }
+:root[data-topic=safety] [data-panel=alertEvents] .linked-rows { gap: .15rem; }
+:root[data-topic=safety] [data-panel=alertEvents] .linked-row { padding: .25rem .35rem; }
+:root[data-topic=safety] [data-panel=alertEvents] .linked-row strong { font-size: .72rem; }
+:root[data-topic=safety] [data-panel=alertEvents] .linked-row small { font-size: .62rem; margin-top: .1rem; }
+.inspection-legend { gap: .7rem; font-size: .6rem; }
+.inspection-legend span::before { content: ''; display: inline-block; width: .4rem; height: .4rem; margin-right: .25rem; border-radius: 50%; background: var(--person-series-0); }
+.inspection-legend span:nth-child(2)::before { background: var(--person-series-1); }
+.inspection-legend span:nth-child(3)::before { background: var(--person-series-2); }
+
+/* Fit the safety comparison and treatment charts inside their existing cards. */
+:root[data-topic=safety] [data-panel=vehicleManagement] .business-columns { max-height: 9rem; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring-layout { grid-template-columns: minmax(0,.9fr) minmax(0,1.25fr); gap: .7rem; min-height: 0; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring { max-height: 5rem; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring-legend { gap: .3rem; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring-legend>div { grid-template-columns: 1fr auto auto; gap: .35rem; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring-legend b { grid-column: auto; }
+:root[data-topic=safety] [data-panel=hazardManagement] .business-ring-legend strong { font-size: 1rem; }
+
+:root[data-topic=safety] [data-panel=vehicleManagement] .business-columns text { font-size: 13px; }
+/* Resource support: two cards per wing, with an independent video preview. */
+:root[data-topic=resources] [data-panel=equipmentUsage] .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); gap: .5rem 1rem; }
+:root[data-topic=resources] [data-panel=intelligentDevices] .business-columns { flex: 1 1 7rem; min-height: 5rem; max-height: 10rem; }
+:root[data-topic=resources] [data-panel=intelligentDevices] .business-columns text { font-size: 12px; }
+.business-empty { display: grid; gap: .35rem; padding: .6rem .7rem; border: 1px dashed var(--glass-edge); border-radius: .35rem; color: var(--muted); }
+.business-empty strong { font-size: .7rem; font-weight: 500; color: var(--text); }
+.business-empty span { font-size: .65rem; }
+.resource-video-preview { position: relative; display: grid; place-items: center; flex: 1 1 10rem; width: 100%; min-height: 6rem; max-height: 17rem; overflow: hidden; border: 1px solid var(--glass-edge); border-radius: .4rem; color: #fff; background: linear-gradient(#00203722,#00203766),url('背景图.png') var(--camera-position)/220% auto no-repeat; cursor: zoom-in; }
+.resource-video-label,.resource-video-caption { position: absolute; left: .6rem; padding: .25rem .4rem; border-radius: .2rem; background: #052638c9; font-size: .65rem; }
+.resource-video-label { top: .6rem; }
+.resource-video-caption { bottom: .6rem; }
+.resource-video-play { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #052638c9; font-size: 1.6rem; }
+:root[data-topic=resources] [data-panel=videoMonitoring] .business-tabs { gap: .35rem; }
+:root[data-topic=resources] [data-panel=videoMonitoring] .business-tabs button { flex: 1; }
+/* Safety's six cards must fit height as well as width; keep all fields reachable. */
+@media (min-width:1200px) {
+ :root[data-menu-edition=four][data-topic=safety]:not([data-dashboard-layout]) { font-size: clamp(12px,min(.902vw,1.55svh),32px); }
+ :root[data-menu-edition=four][data-topic=safety] .wing {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-edge) transparent;
+  clip-path: none;
+ }
+ :root[data-menu-edition=four][data-topic=safety] #left-panels { grid-template-rows: minmax(14rem,1.05fr) minmax(14rem,1fr) minmax(16.5rem,.95fr)!important; }
+ :root[data-menu-edition=four][data-topic=safety] #right-panels { grid-template-rows: minmax(13rem,1fr) minmax(17rem,1fr) minmax(17.5rem,1fr)!important; }
+}

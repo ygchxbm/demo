@@ -172,8 +172,8 @@ const panels={
 };
 const fourMenuTopics={
  production:{name:'生产作业',en:'PRODUCTION OPERATIONS',left:['throughput','shipService','taskOverview'],right:['highRisk','stockyard','chemicals'],leftRows:'.96fr 1.12fr .92fr',rightRows:'1.2fr .95fr .85fr',layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
- safety:{name:'安全合规',en:'SAFETY & COMPLIANCE',left:['personnel','vehicleManagement'],right:['hazardManagement','equipmentUsage'],leftRows:'1.12fr .88fr',rightRows:'.95fr 1.05fr',layers:['门禁','拖车','平板拖车','叉车','场地','汽车吊','轮胎吊']},
- resources:{name:'资源保障',en:'RESOURCE SUPPORT',left:['energyMonitoring','intelligentDevices'],right:['alertEvents','aiRecognition'],leftRows:'1fr 1fr',rightRows:'1fr 1fr',layers:['场地','船舶','摄像头','门禁']},
+ safety:{name:'安全合规',en:'SAFETY & COMPLIANCE',left:['personnel','vehicleManagement','hazardManagement'],right:['intelligentInspection','aiRecognition','alertEvents'],leftRows:'1.05fr 1fr .95fr',rightRows:'1fr 1fr 1fr',layers:['门禁','拖车','平板拖车','叉车','场地','汽车吊','轮胎吊','摄像头']},
+ resources:{name:'资源保障',en:'RESOURCE SUPPORT',left:['energyMonitoring','intelligentDevices'],right:['equipmentUsage','videoMonitoring'],leftRows:'1.1fr .9fr',rightRows:'1fr 1fr',layers:['场地','船舶','摄像头','门禁']},
  map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'}
 };
 const eightMenuTopics={
@@ -314,7 +314,7 @@ Object.assign(panels,{
   channelList:{title:'监控通道',topic:'video',kind:'摄像头',headers:['通道','名称','接入状态'],rows:cameras.map((n,i)=>['CAM 0'+(i+1),n,'模拟']),render:()=>linkedRows(cameras.map((n,i)=>[n,'CAM 0'+(i+1)+' · 静态底图模拟','data-wall-channel',String(i)]))},
   videoGuide:{title:'画面与位置',topic:'video',kind:'摄像头',rows:[['画面来源','港区底图','模拟'],['真实视频流','尚未接入','状态']],render:()=>`<p class="view-copy">选择画面可放大查看，支持暂停模拟、切换通道和定位摄像头。</p>`+linkedRows(points.filter(p=>p.kind==='摄像头').map(p=>[p.name,'查看摄像头示意位置','data-locate',p.id]))},
  });
-const business=createBusinessPanels({esc,fmt,metrics,bars,table,linkedRows,panels,days,productionTasks,productionSeries,tickets,shipVoyageValues,personSeries,todayEntry,vehicleHistory,vehicleTraffic,vehicleApprovalTotals,cameras});
+const business=createBusinessPanels({esc,fmt,metrics,bars,table,linkedRows,panels,days,productionTasks,productionSeries,tickets,shipVoyageValues,personSeries,todayEntry,vehicleHistory,vehicleTraffic,vehicleApprovalTotals,cameras,cameraPositions,points});
 Object.assign(panels,business.panels);
 function defaultTopic(){return menuEdition==='eight'?'people':'production';}
 function activeView(){return topics[current];}

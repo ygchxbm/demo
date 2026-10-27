@@ -171,14 +171,14 @@ const panels={
  safetyTrend:{title:'作业票趋势',topic:'safety',kind:'场地',rows:days.map((d,i)=>[d,safetyHistory[i],'张']),render:safetyTrendColumns}
 };
 const topics={
- people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
- energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','solar','shore','resources','carbon','energyTrend'],layers:['场地','船舶']},
- ships:{name:'船舶动态',en:'VESSEL DYNAMICS',panels:['ships','voyages','berths','shipPeak'],layers:['船舶','摄像头']},
- vehicles:{name:'车辆动态',en:'VEHICLE DYNAMICS',panels:['vehicles','vehicleTrend','vehicleFlow','approvals','vehicleObjects'],layers:['拖车','平板拖车','叉车','门禁']},
- map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'},
- video:{name:'监控视频',en:'VIDEO MONITORING',panels:['channelList','videoGuide'],layers:['摄像头'],layout:'video'},
  production:{name:'生产状态',en:'PRODUCTION OPERATIONS',panels:['production','shipWork','cargo','fuel','ash','prodTrend'],layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
- safety:{name:'安全控制',en:'SAFETY & EQUIPMENT MONITORING',panels:['safety','permits','safetyTrend','availability','equipment','risks'],layers:['场地','摄像头','门禁','汽车吊','轮胎吊']}
+ safety:{name:'安全控制',en:'SAFETY & EQUIPMENT MONITORING',panels:['safety','permits','safetyTrend','availability','equipment','risks'],layers:['场地','摄像头','门禁','汽车吊','轮胎吊']},
+ people:{name:'人员动态',en:'PERSONNEL DYNAMICS',panels:['people','peopleAffiliation','peopleEntry','peopleTrends','peopleWeekComposition'],layers:['门禁']},
+ vehicles:{name:'车辆动态',en:'VEHICLE DYNAMICS',panels:['vehicles','vehicleTrend','vehicleFlow','approvals','vehicleObjects'],layers:['拖车','平板拖车','叉车','门禁']},
+ ships:{name:'船舶动态',en:'VESSEL DYNAMICS',panels:['ships','voyages','berths','shipPeak'],layers:['船舶','摄像头']},
+ energy:{name:'能耗监测',en:'ENERGY & CARBON MONITORING',panels:['electricity','solar','shore','resources','carbon','energyTrend'],layers:['场地','船舶']},
+ video:{name:'监控视频',en:'VIDEO MONITORING',panels:['channelList','videoGuide'],layers:['摄像头'],layout:'video'},
+ map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'}
 };
 const layerKinds={'叉车':'forklift','船舶':'ship','拖车':'truck','平板拖车':'truck','汽车吊':'crane','轮胎吊':'crane','摄像头':'camera','门禁':'gate','场地':'area'};
 const point=(id,kind,x,y,name,status='正常',extra={})=>({id,kind,x,y,name,status,...extra});

@@ -1,0 +1,88 @@
+/* Card content only: the existing workspace/map geometry remains in charge. */
+:root:is([data-topic=production],[data-topic=safety],[data-topic=resources]) .wing {
+  grid-template-rows: var(--layout-panel-rows);
+  min-height: 0;
+}
+:root .business-panel { min-height: 0; }
+:root .business-panel .panel-head { flex: none; min-height: 1.9rem; margin-bottom: .5rem; padding-bottom: .4rem; }
+:root .business-panel .panel-head h2 { font-size: 1.05rem; letter-spacing: .05em; }
+:root .business-panel .panel-body { gap: .45rem; justify-content: space-between; min-height: 0; }
+.business-panel .metrics { flex: none; gap: .55rem; }
+:root .business-panel .metric-label { font-size: .72rem; line-height: 1.45; color: var(--muted); white-space: normal; }
+:root .business-panel .metric-value { font: 1.65rem/1.25 var(--number); color: var(--text); }
+:root .business-panel .metric-value small { font: .65rem var(--font); margin-left: .2rem; color: var(--muted); }
+.business-panel .metric:first-child .metric-value { color: var(--accent); }
+.business-note { flex: none; margin: 0; color: var(--muted); font-size: .67rem; line-height: 1.5; }
+.business-section { display: flex; flex: none; align-items: baseline; justify-content: space-between; gap: .4rem; font-size: .72rem; line-height: 1.4; color: var(--text); }
+.business-section small { color: var(--muted); font-size: .62rem; }
+.business-tabs { display: flex; flex: none; flex-wrap: wrap; gap: .3rem; }
+.business-tabs button { min-height: 1.65rem; padding: .18rem .45rem; border: 1px solid var(--glass-edge); border-radius: .3rem; background: var(--glass-control); color: var(--muted); font-size: .64rem; }
+.business-tabs button[aria-pressed=true] { background: var(--glass-highlight); border-color: var(--accent); color: var(--text); }
+.business-chart { display: block; flex: 1 1 5.5rem; width: 100%; min-height: 3.5rem; max-height: 9rem; overflow: visible; }
+.business-chart text { fill: var(--muted); font: 10px var(--font); }
+.business-chart .gridline { stroke: var(--person-chart-line); stroke-dasharray: 2 5; }
+.business-chart g:focus-visible { outline: 2px solid var(--accent); }
+:root .business-panel .bar-list { flex: none; display: grid; gap: .4rem; align-content: start; }
+:root .business-panel .bar-row { grid-template-columns: 5.2rem minmax(0,1fr) 4.2rem; font-size: .72rem; gap: .5rem; }
+.business-panel .bar-track { border-radius: 3px; overflow: hidden; }
+:root .business-panel .bar-fill { background: var(--person-series-0); }
+:root .business-panel .bar-row:nth-child(2n) .bar-fill { background: var(--person-series-1); }
+:root .business-panel .bar-row:nth-child(3n) .bar-fill { background: var(--person-series-2); }
+.business-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .45rem .8rem; flex: none; }
+.business-grid>div { display: flex; align-items: baseline; justify-content: space-between; gap: .35rem; padding: .2rem 0; border-bottom: 1px solid var(--person-chart-line); }
+.business-grid span { color: var(--muted); font-size: .68rem; }
+.business-grid strong { font: 1.1rem var(--number); }
+.business-grid small { font: .6rem var(--font); color: var(--muted); }
+.business-links { display: flex; flex: none; flex-wrap: wrap; gap: .3rem .6rem; }
+:root .business-links .text-btn { padding: .2rem 0; min-height: 1.4rem; background: transparent; border: 0; font-size: .66rem; color: var(--accent); }
+.business-inline { display: flex; flex: none; gap: .35rem 1rem; flex-wrap: wrap; color: var(--muted); font-size: .7rem; }
+.business-inline b { color: var(--text); font: 1.05rem var(--number); }
+.business-progress { height: .4rem; flex: none; background: var(--glass-control); border-radius: 3px; overflow: hidden; }
+.business-progress span { display: block; height: 100%; background: var(--person-series-1); }
+.business-alert { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem; padding: .5rem .65rem; background: color-mix(in srgb,var(--person-series-2) 10%,transparent); border-left: 2px solid var(--person-series-2); color: var(--person-series-2); }
+.business-alert span { font-size: .8rem; }
+.business-alert strong { margin-left: auto; font: 1.8rem var(--number); }
+.business-alert small { font: .65rem var(--font); }
+.business-panel .status-table { flex: none; font-size: .67rem; }
+.business-panel .status-table th,.business-panel .status-table td { padding: .45rem .2rem; }
+.business-panel .linked-rows { flex: 1; display: grid; gap: .55rem; }
+.business-panel .linked-row { min-width: 0; padding: .6rem .4rem; border-bottom: 1px solid var(--person-chart-line); background: transparent; border-radius: .3rem; }
+.business-panel .linked-row strong { font-size: .85rem; font-weight: 500; }
+.business-panel .linked-row small { font-size: .68rem; color: var(--muted); margin-top: .2rem; }
+.business-panel button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.business-panel .linked-row:hover { background: var(--glass-highlight); }
+/* Desktop wings allocate their height by content instead of forcing equal rows. */
+@media (min-width:1200px) {
+ :root:is([data-topic=production],[data-topic=safety],[data-topic=resources]) .wing { grid-template-rows: var(--layout-panel-rows)!important; }
+}
+@media (max-width:1199px) {
+ :root:not([data-dashboard-layout]) .wing:has(.business-panel) { grid-template-rows: none; grid-auto-rows: auto; }
+ :root:not([data-dashboard-layout]) .business-panel { min-height: 19rem; }
+ :root:not([data-dashboard-layout]) .business-chart { min-height: 7rem; }
+}
+/* Keep settings for the existing glass/airy surfaces independent from data rendering. */
+:root[data-page-style=airy] .business-panel .metric-value { font-weight: 300; text-shadow: var(--airy-text-shadow); }
+:root .business-panel .panel-body { gap: .35rem; }
+:root .business-panel .bar-list { gap: .3rem; }
+:root .navigation .demo-label { display: flex; position: absolute; top: .45rem; right: .35rem; bottom: auto; font-size: .65rem; pointer-events: none; }
+:root[data-chart-mode=dimensional] .business-panel .bar-track { overflow: visible; }
+:root[data-chart-mode=dimensional] .business-panel .bar-fill { box-shadow: inset 0 2px 1px #ffffff66, 0 3px 0 color-mix(in srgb,var(--person-series-0) 40%,var(--surface)); }
+@media (max-width:1199px) {
+ :root:not([data-dashboard-layout]) .navigation .demo-label { position: static; justify-self: end; }
+}
+:root .navigation { position: relative; }
+:root:is([data-topic=production],[data-topic=safety],[data-topic=resources]) .wing>.business-panel { padding: 0 .1rem; }
+:root:is([data-topic=production],[data-topic=safety],[data-topic=resources]) .wing>.business-panel+.business-panel { padding-top: .55rem; }
+:root .business-panel .metric { padding: 0; }
+:root .business-panel .metric-value { font-size: 1.55rem; }
+:root .business-panel .business-chart { min-height: 3rem; }
+/* Constrain glass painting to the actual wing, including in scaled previews. */
+:root .wing:has(.business-panel) { contain: paint; }
+:root .business-panel .metric { gap: .15rem; }
+:root .business-panel .bar-row { line-height: 1.3; }
+:root .business-panel .bar-row b { font-size: .78rem; line-height: 1.3; }
+.business-grid>div { line-height: 1.2; }
+.business-grid strong { line-height: 1.1; }
+:root .navigation .demo-label { grid-area: 1 / 1; align-self: start; }
+:root .wing:has(.business-panel) { clip-path: inset(0 round .8rem); }
+:root[data-page-style=airy] .wing:has(.business-panel) { clip-path: inset(0); }

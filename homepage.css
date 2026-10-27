@@ -1,6 +1,6 @@
 /* Theme palettes live in themes.css; chart categories keep stable colors. */
 /* Shared glass dashboard shell for personnel and energy topics. */
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) {
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) {
   --person-series-0: #79d6ff;
   --person-series-1: #77efcf;
   --person-series-2: #ffe28b;
@@ -9,9 +9,9 @@
   --muted: var(--theme-muted);
   --person-chart-line: rgba(182,226,247,.3);
 }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { mask-image: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer:after { background: linear-gradient(180deg,rgba(0,57,95,.08),transparent 30%,transparent 85%,rgba(0,58,84,.08)); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing {
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { mask-image: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer:after { background: linear-gradient(180deg,rgba(0,57,95,.08),transparent 30%,transparent 85%,rgba(0,58,84,.08)); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing {
   border: 1px solid color-mix(in srgb,var(--accent) 40%,transparent);
   border-radius: .8rem;
   background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom));
@@ -21,15 +21,15 @@
   padding: 1.1rem 1.2rem;
   gap: 0;
 }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing:before { display: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing:last-child .panel { border: 0; border-radius: 0; background: none; padding: 0 .1rem; box-shadow: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel+.panel { border-top: 1px solid var(--person-chart-line); padding-top: .75rem; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head { min-height: 2.25rem; padding-bottom: .5rem; margin-bottom: .65rem; border-bottom: 1px solid var(--person-chart-line); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head:after { display: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: .08em; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-link { font-size: .75rem; color: var(--text); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-body { gap: .6rem; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing:before { display: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing:last-child .panel { border: 0; border-radius: 0; background: none; padding: 0 .1rem; box-shadow: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel+.panel { border-top: 1px solid var(--person-chart-line); padding-top: .75rem; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head { min-height: 2.25rem; padding-bottom: .5rem; margin-bottom: .65rem; border-bottom: 1px solid var(--person-chart-line); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head:after { display: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-head h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: .08em; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-link { font-size: .75rem; color: var(--text); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel-body { gap: .6rem; }
 :root[data-topic=people] .person-number strong { font-size: 2.6rem; color: var(--accent); line-height: 1.1; }
 :root[data-topic=people] .person-number strong small { color: var(--text); font-size: 1rem; margin-left: .3rem; }
 :root[data-topic=people] .person-number>span,
@@ -64,7 +64,7 @@
 :root[data-topic=people] .person-share-legend { gap: .9rem; }
 :root[data-topic=people] .person-series-label { gap: .55rem; white-space: nowrap; }
 :root[data-topic=people] .person-series-label:before { width: .65rem; height: .65rem; border-radius: 50%; box-shadow: inset 0 1px 2px #ffffff66; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .chart-caption { display: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .chart-caption { display: none; }
 :root[data-topic=people] .person-entry-head { align-items: stretch; gap: 0; }
 :root[data-topic=people] .person-entry-head>.person-number { flex: 1; }
 :root[data-topic=people] .person-change { flex: 1; border-left: 1px solid color-mix(in srgb,var(--accent) 45%,transparent); text-align: left; padding-left: 2rem; align-content: start; }
@@ -84,51 +84,51 @@
 :root[data-topic=people] .person-trend-chart { position: absolute; bottom: .6rem; right: 0; width: calc(100% - 7rem); height: 3.7rem; }
 :root[data-topic=people] .person-trend-line { stroke-width: 2; }
 :root[data-topic=people] .person-trend-dates { display: flex; justify-content: space-between; color: var(--muted); font: .75rem var(--number); padding: .5rem .3rem .7rem; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading h2,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading small,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-legend,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .layer-controls,
-:root:is([data-topic=people],[data-topic=energy]) #markers,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .demo-label,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .footer { display: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation { gap: .65rem; padding: .2rem 0 .4rem; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-width: 6rem; min-height: 1.8rem; padding: .2rem .8rem; border-color: color-mix(in srgb,var(--accent) 50%,transparent); background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 55%,transparent),color-mix(in srgb,var(--surface) 70%,transparent)); box-shadow: inset 0 1px 1px rgba(226,249,255,.2); font-weight: 400; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button:after { display: none; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button[aria-current=page] { border-color: var(--accent); background: linear-gradient(180deg,color-mix(in srgb,var(--accent) 75%,var(--surface)),color-mix(in srgb,var(--accent) 50%,transparent)); box-shadow: inset 0 0 .45rem var(--accent),0 0 .9rem color-mix(in srgb,var(--accent) 60%,transparent); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title { position: relative; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { content: ''; position: absolute; top: 72%; height: 2px; width: 2.75rem; background: linear-gradient(90deg,transparent,var(--accent)); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 20%; }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 20%; transform: rotate(180deg); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading h2,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading small,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-legend,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .layer-controls,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy]) #markers,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .demo-label,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .footer { display: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation { gap: .65rem; padding: .2rem 0 .4rem; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-width: 6rem; min-height: 1.8rem; padding: .2rem .8rem; border-color: color-mix(in srgb,var(--accent) 50%,transparent); background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 55%,transparent),color-mix(in srgb,var(--surface) 70%,transparent)); box-shadow: inset 0 1px 1px rgba(226,249,255,.2); font-weight: 400; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button:after { display: none; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button[aria-current=page] { border-color: var(--accent); background: linear-gradient(180deg,color-mix(in srgb,var(--accent) 75%,var(--surface)),color-mix(in srgb,var(--accent) 50%,transparent)); box-shadow: inset 0 0 .45rem var(--accent),0 0 .9rem color-mix(in srgb,var(--accent) 60%,transparent); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title { position: relative; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before,
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { content: ''; position: absolute; top: 72%; height: 2px; width: 2.75rem; background: linear-gradient(90deg,transparent,var(--accent)); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 20%; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 20%; transform: rotate(180deg); }
 @media (min-width:1200px) {
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) { font-size: clamp(12px,.902vw,32px); overflow: hidden; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .app { padding: 0 1.25rem 1.75rem; grid-template-rows: 4.5rem 2.5rem minmax(0,1fr) 0; height: 100svh; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { grid-template-columns: 1fr minmax(28rem,2fr) 1fr; gap: 1.5rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title h1 { font-size: 1.65rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title p { font-size: .75rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand { display: flex; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-label { display: block; font-size: 1.15rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-mark { width: 2.3rem; height: 2.3rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-small { font-size: .6rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .clock strong { font-size: 1.5rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .clock span { font-size: .8rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .navigation { padding: 0; align-self: start; z-index: 10; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .workspace { grid-template-columns: minmax(0,24.65%) minmax(0,1fr) minmax(0,24.65%); gap: 1rem; margin-top: -1.25rem; height: calc(100% + 1.25rem); }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) { font-size: clamp(12px,.902vw,32px); overflow: hidden; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .app { padding: 0 1.25rem 1.75rem; grid-template-rows: 4.5rem 2.5rem minmax(0,1fr) 0; height: 100svh; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { grid-template-columns: 1fr minmax(28rem,2fr) 1fr; gap: 1.5rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title h1 { font-size: 1.65rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title p { font-size: .75rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand { display: flex; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-label { display: block; font-size: 1.15rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-mark { width: 2.3rem; height: 2.3rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .brand-small { font-size: .6rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .clock strong { font-size: 1.5rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .clock span { font-size: .8rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .navigation { padding: 0; align-self: start; z-index: 10; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .workspace { grid-template-columns: minmax(0,24.65%) minmax(0,1fr) minmax(0,24.65%); gap: 1rem; margin-top: -1.25rem; height: calc(100% + 1.25rem); }
   :root[data-topic=people] #left-panels { grid-template-rows: minmax(0,1.1fr) minmax(0,.95fr) minmax(0,1.05fr); }
   :root[data-topic=people] #right-panels { grid-template-rows: minmax(0,1.75fr) minmax(0,1fr); }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .center,
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-stage { min-height: 0; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .scene-ui { width: 100%; grid-template-rows: 5.2rem minmax(0,1fr) auto; grid-template-areas: 'heading' 'space' 'summary'; padding: 0 0 .6rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .scene-space { min-height: 0; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading { align-self: end; padding: 0; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools { margin-left: auto; margin-right: 22%; gap: .2rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools .icon-btn { width: 2rem; height: 2rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary { width: 76%; justify-self: center; padding: .7rem .5rem; background: color-mix(in srgb,var(--surface) 65%,transparent); border: 1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius: .65rem; backdrop-filter: blur(8px); gap: 0; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item { background: none; border-radius: 0; padding: 0 .5rem!important; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item+.summary-item { border-left: 1px solid color-mix(in srgb,var(--accent) 40%,transparent); }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .label { font-size: .8rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value { font-size: 1.5rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value .unit { font-size: .8rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .center,
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-stage { min-height: 0; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .scene-ui { width: 100%; grid-template-rows: 5.2rem minmax(0,1fr) auto; grid-template-areas: 'heading' 'space' 'summary'; padding: 0 0 .6rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .scene-space { min-height: 0; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-heading { align-self: end; padding: 0; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools { margin-left: auto; margin-right: 22%; gap: .2rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .map-tools .icon-btn { width: 2rem; height: 2rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary { width: 76%; justify-self: center; padding: .7rem .5rem; background: color-mix(in srgb,var(--surface) 65%,transparent); border: 1px solid color-mix(in srgb,var(--accent) 35%,transparent); border-radius: .65rem; backdrop-filter: blur(8px); gap: 0; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item { background: none; border-radius: 0; padding: 0 .5rem!important; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item+.summary-item { border-left: 1px solid color-mix(in srgb,var(--accent) 40%,transparent); }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .label { font-size: .8rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value { font-size: 1.5rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value .unit { font-size: .8rem; }
   :root[data-topic=people] .person-stock { padding: .45rem .3rem .8rem; }
   :root[data-topic=people] [data-panel=people] .panel-body { gap: .7rem; }
   :root[data-topic=people] [data-panel=peopleAffiliation] .panel-head { margin-bottom: 0; }
@@ -136,14 +136,14 @@
   :root[data-topic=people] [data-panel=peopleWeekComposition] .panel-body { padding-bottom: 1rem; }
 }
 @media (max-width:1199px) {
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { padding: 1rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel { padding: .75rem 0; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { padding: 1rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panel { padding: .75rem 0; }
   :root[data-topic=people] .person-share-row { font-size: .75rem; gap: .4rem; }
   :root[data-topic=people] .person-share-row strong { font-size: 1rem; }
   :root[data-topic=people] .person-peak,:root[data-topic=people] .person-change { padding-left: 1rem; }
   :root[data-topic=people] .person-small-multiples { min-height: 25rem; }
   :root[data-topic=people] .person-mini-head small { font-size: .7rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-height: 44px; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) #navigation button { min-height: 44px; }
 }
 @media (max-width:767px) {
   :root[data-topic=people] .person-role-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: .3rem; }
@@ -158,7 +158,7 @@
   :root[data-topic=people] .person-ring-center span { font-size: .65rem; }
 }
 /* Match the reference's bright cyan water and translucent blue glass. */
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom)); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { background: linear-gradient(120deg,var(--theme-wing-top),var(--theme-wing-bottom)); }
 :root[data-topic=people] .person-share { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); }
 :root[data-topic=people] .person-columns text { font-size: 22px; }
 :root[data-topic=people] .person-trend-dates { font: .8rem var(--font); }
@@ -169,27 +169,27 @@
 :root[data-topic=people] .person-share-row strong,
 :root[data-topic=people] .person-mini-head b,
 :root[data-topic=people] .person-change strong,
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value { font-family: 'DIN Alternate','Arial Narrow','Avenir Next Condensed',sans-serif; font-style: normal; font-weight: 500; }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .summary-item .value { font-family: 'DIN Alternate','Arial Narrow','Avenir Next Condensed',sans-serif; font-style: normal; font-weight: 500; }
 @media (min-width:1200px) {
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { padding-top: 1.35rem; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { padding-top: 1.35rem; }
   :root[data-topic=people] #right-panels { grid-template-rows: minmax(0,1.9fr) minmax(0,1fr); }
   :root[data-topic=people] .person-role-grid { padding-bottom: 1.6rem; }
   :root[data-topic=people] .person-peak { padding-left: 2.5rem; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 48%,transparent),transparent); }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 22%; }
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 22%; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .masthead { background: linear-gradient(180deg,color-mix(in srgb,var(--surface) 48%,transparent),transparent); }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:before { left: 22%; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .title:after { right: 22%; }
 }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { filter: brightness(1.08) saturate(1.2); }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer:after {
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer .port-image { filter: brightness(1.08) saturate(1.2); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .panorama-layer:after {
   background: linear-gradient(180deg,rgba(0,110,168,.42),transparent 30%),rgba(0,155,195,.1);
 }
-:root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { backdrop-filter: blur(8px) saturate(1.25); -webkit-backdrop-filter: blur(8px) saturate(1.25); }
+:root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .wing { backdrop-filter: blur(8px) saturate(1.25); -webkit-backdrop-filter: blur(8px) saturate(1.25); }
 :root[data-topic=people] .person-trend-dates { padding-bottom: 1.7rem; }
 :root[data-topic=people] #left-panels .panel-head h2 { padding-left: .25rem; }
 :root[data-topic=people] .person-role-grid { padding-inline: .6rem; }
 :root[data-topic=people] .person-entry-head { padding-left: .25rem; }
 @media (min-width:1200px) {
-  :root:is([data-topic=people],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .app { overflow: clip; }
+  :root:is([data-topic=people],[data-topic=resources],[data-topic=energy],[data-topic=ships],[data-topic=vehicles],[data-topic=map],[data-topic=video],[data-topic=production],[data-topic=safety]) .app { overflow: clip; }
 }
 
 /* Data metrics and charts share the glass shell across energy and ships. */

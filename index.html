@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="people">
+<html lang="zh-CN" data-theme="ocean" data-version="V2.3" data-topic="production">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,6 +73,8 @@
 <link rel="stylesheet" href="themes.css">
 <link rel="stylesheet" href="people-airy.css">
 <link rel="stylesheet" href="people-dimensional.css">
+<link rel="stylesheet" href="business-panels.css">
+<script src="business-panels.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body>
@@ -93,7 +95,7 @@
     <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 3L43 14v20L24 45 5 34V14L24 3Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 29V16h6v13m8 0V16h6v13M10 31c5-4 9 4 14 0s9 4 14 0M10 36c5-4 9 4 14 0s9 4 14 0M24 12v15" stroke="currentColor" stroke-width="2"/></svg>
     <div><span class="brand-label">海南码头</span><span class="brand-small">HAINAN PORT · OPERATIONS</span></div>
   </div>
-  <div class="title"><svg class="title-frame" viewBox="0 0 1000 115" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="title-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".02"/><stop offset="1" stop-color="currentColor" stop-opacity=".13"/></linearGradient></defs><path d="M0 14H115L150 2H850L885 14H1000L925 62H890L846 101H154L110 62H75Z" fill="url(#title-fill)"/><path d="M0 14H115L150 2H850L885 14H1000M75 62H110L154 101H846L890 62H925" stroke="currentColor" stroke-width="1" opacity=".55" fill="none"/><path d="M135 68L166 95H834L865 68" stroke="currentColor" stroke-width="2" opacity=".9" fill="none"/><path d="M85 32l18 13m-6-13l18 13m-6-13l18 13M915 32l-18 13m6-13l-18 13m6-13l-18 13" stroke="currentColor" stroke-width="3" opacity=".5"/></svg><h1>海南码头运行指挥中心</h1><p id="topic-en">PERSONNEL DYNAMICS</p></div>
+  <div class="title"><svg class="title-frame" viewBox="0 0 1000 115" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="title-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".02"/><stop offset="1" stop-color="currentColor" stop-opacity=".13"/></linearGradient></defs><path d="M0 14H115L150 2H850L885 14H1000L925 62H890L846 101H154L110 62H75Z" fill="url(#title-fill)"/><path d="M0 14H115L150 2H850L885 14H1000M75 62H110L154 101H846L890 62H925" stroke="currentColor" stroke-width="1" opacity=".55" fill="none"/><path d="M135 68L166 95H834L865 68" stroke="currentColor" stroke-width="2" opacity=".9" fill="none"/><path d="M85 32l18 13m-6-13l18 13m-6-13l18 13M915 32l-18 13m6-13l-18 13m6-13l-18 13" stroke="currentColor" stroke-width="3" opacity=".5"/></svg><h1>海南码头运行指挥中心</h1><p id="topic-en">PRODUCTION OPERATIONS</p></div>
   <div class="header-tools">
     <div class="clock"><strong id="time">--:--:--</strong><span id="date">本地时间</span></div>
     <div class="theme-wrap">
@@ -130,7 +132,7 @@
             <button type="button" data-display-choice="dimensional" aria-pressed="false"><strong>立体数据</strong></button>
           </div>
         </div>
-        <p id="page-style-note" class="prototype-style-note">两组设置可独立组合，支持人员动态的 16:9 与 32:9。</p>
+        <p id="page-style-note" class="prototype-style-note">两组设置可独立组合，支持生产作业的 16:9 与 32:9。</p>
       </section>
     </div>
     <button id="fullscreen-button" class="icon-btn" aria-label="切换全屏" title="切换全屏"><span data-icon="expand"></span></button>
@@ -138,7 +140,7 @@
 </header>
 <div class="navigation">
   <nav id="navigation" class="nav-tabs" aria-label="业务专题"></nav>
-  <div class="demo-label"><span class="status-dot"></span>运行态势<span style="color:var(--border)"> / </span>演示数据</div>
+  <div class="demo-label"><span class="status-dot"></span>演示数据 · 2026-10-22</div>
 
 </div>
 <main id="main-content" class="workspace">
@@ -149,7 +151,7 @@
       <div class="scene-ui">
         <section id="summary" class="summary" aria-label="港区核心指标"></section>
     <div class="map-heading">
-      <div class="od-field"><h2 id="map-title">港区运行态势</h2><small><span id="topic-label">人员动态</span> · <span id="visible-count">0</span> 个示意点位 · <span id="zoom-level">100%</span></small></div>
+      <div class="od-field"><h2 id="map-title">港区运行态势</h2><small><span id="topic-label">生产作业</span> · <span id="visible-count">0</span> 个示意点位 · <span id="zoom-level">100%</span></small></div>
       <div class="map-tools" role="group" aria-label="地图操作">
         <button id="zoom-out" class="icon-btn" aria-label="缩小地图" title="缩小"><span data-icon="minus"></span></button>
         <button id="zoom-in" class="icon-btn" aria-label="放大地图" title="放大"><span data-icon="plus"></span></button>

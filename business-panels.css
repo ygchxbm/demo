@@ -86,3 +86,28 @@
 :root .navigation .demo-label { grid-area: 1 / 1; align-self: start; }
 :root .wing:has(.business-panel) { clip-path: inset(0 round .8rem); }
 :root[data-page-style=airy] .wing:has(.business-panel) { clip-path: inset(0); }
+/* Quantity comparisons use vertical columns; proportions use two-part rings. */
+.business-columns .business-column-value { font: 12px var(--number); fill: var(--text); }
+.business-column-front { opacity: .88; }
+.business-column-side { filter: brightness(.62); }
+.business-column-top { filter: brightness(1.22); }
+.business-ring-layout { display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.4fr); align-items: center; gap: .65rem; flex: none; }
+.business-ring { display: block; width: 100%; max-height: 7.5rem; overflow: visible; }
+.business-ring-value { fill: var(--text); font: 23px var(--number); }
+.business-ring-label { fill: var(--muted); font: 10px var(--font); }
+.business-ring-floor { opacity: .7; }
+.business-ring-legend { display: grid; gap: .7rem; }
+.business-ring-legend>div { display: grid; grid-template-columns: 1fr auto; gap: .2rem .5rem; align-items: baseline; }
+.business-ring-legend span { color: var(--muted); font-size: .72rem; }
+.business-ring-legend strong { font: 1.1rem var(--number); color: var(--text); white-space: nowrap; }
+.business-ring-legend small { font: .6rem var(--font); color: var(--muted); }
+.business-ring-legend b { grid-column: 2; font: .7rem var(--number); color: var(--muted); text-align: right; }
+.business-ring-legend span::before,.business-ring-keys span::before { content: ''; display: inline-block; width: .45rem; height: .45rem; border-radius: 50%; margin-right: .35rem; background: var(--ring-color); }
+.business-yard-layout { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.4fr); align-items: center; gap: .7rem; flex: 1; min-height: 0; }
+.business-ring-layout.is-compact { grid-template-columns: 1fr; gap: .1rem; }
+.business-ring-keys { display: flex; justify-content: center; gap: .5rem; color: var(--muted); font-size: .6rem; }
+.business-yard-layout>div:last-child { display: grid; gap: .5rem; min-width: 0; }
+:root .business-yard-layout .bar-row { grid-template-columns: 2.1rem minmax(0,1fr) 2.8rem; gap: .3rem; }
+:root .business-yard-layout .bar-row b { font-size: .7rem; }
+.business-yard-layout .business-section { flex-wrap: wrap; }
+.business-yard-layout .business-ring { max-height: 5.9rem; }

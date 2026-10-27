@@ -171,7 +171,7 @@ const panels={
  safetyTrend:{title:'作业票趋势',topic:'safety',kind:'场地',rows:days.map((d,i)=>[d,safetyHistory[i],'张']),render:safetyTrendColumns}
 };
 const topics={
- production:{name:'生产作业',en:'PRODUCTION OPERATIONS',left:['throughput','shipService','taskOverview'],right:['highRisk','stockyard','chemicals'],leftRows:'1.02fr 1.02fr .96fr',rightRows:'1.2fr .95fr .85fr',layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
+ production:{name:'生产作业',en:'PRODUCTION OPERATIONS',left:['throughput','shipService','taskOverview'],right:['highRisk','stockyard','chemicals'],leftRows:'.96fr 1.12fr .92fr',rightRows:'1.2fr .95fr .85fr',layers:['场地','叉车','拖车','平板拖车','汽车吊','轮胎吊','船舶']},
  safety:{name:'安全合规',en:'SAFETY & COMPLIANCE',left:['personnel','vehicleManagement'],right:['hazardManagement','equipmentUsage'],leftRows:'1.12fr .88fr',rightRows:'.95fr 1.05fr',layers:['门禁','拖车','平板拖车','叉车','场地','汽车吊','轮胎吊']},
  resources:{name:'资源保障',en:'RESOURCE SUPPORT',left:['energyMonitoring','intelligentDevices'],right:['alertEvents','aiRecognition'],leftRows:'1fr 1fr',rightRows:'1fr 1fr',layers:['场地','船舶','摄像头','门禁']},
  map:{name:'地图',en:'PORT MAP EXPLORER',panels:['mapObjects','mapGuide'],layers:['叉车','船舶','拖车','平板拖车','汽车吊','轮胎吊','摄像头','门禁','场地'],layout:'map'}

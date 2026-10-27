@@ -97,6 +97,32 @@
   background: var(--cc-card-fill); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   box-shadow: var(--cc-glass-shadow);
 }
+/* 玻璃表面独立于环境底色：保留海蓝材质，其他主题匹配其透底程度与明暗层次。 */
+:root[data-command-center][data-theme=ocean] {
+  --cc-material-fill: linear-gradient(120deg, rgba(12,113,167,.6), rgba(5,106,152,.46));
+  --cc-material-edge: rgba(114,213,255,.4);
+  --cc-material-light: rgba(114,213,255,.08);
+}
+:root[data-command-center][data-theme=jade] {
+  --cc-material-fill: linear-gradient(120deg, rgba(24,145,120,.6), rgba(12,121,103,.46));
+  --cc-material-edge: rgba(133,231,202,.4);
+  --cc-material-light: rgba(133,231,202,.08);
+}
+:root[data-command-center][data-theme=lagoon] {
+  --cc-material-fill: linear-gradient(120deg, rgba(32,108,151,.6), rgba(17,84,127,.46));
+  --cc-material-edge: rgba(135,207,239,.4);
+  --cc-material-light: rgba(135,207,239,.08);
+}
+:root[data-command-center][data-theme=amber] {
+  --cc-material-fill: linear-gradient(120deg, rgba(166,126,66,.6), rgba(139,98,48,.46));
+  --cc-material-edge: rgba(240,207,147,.4);
+  --cc-material-light: rgba(240,207,147,.08);
+}
+:root[data-command-center][data-theme] :is(.wing .cc-card, .cc-summary-item, #layer-controls, .cc-camera) {
+  --cc-card-fill: var(--cc-material-fill);
+  --cc-edge: var(--cc-material-edge);
+  --cc-glass-shadow: inset 0 0 2rem var(--cc-material-light), 0 .3rem 2rem rgba(var(--theme-shadow-rgb),.16);
+}
 .cc-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex: none; padding-bottom: 10px; border-bottom: 1px solid var(--cc-edge); margin-bottom: 10px; }
 .cc-card-head h2 { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 600; line-height: 1.3; margin: 0; white-space: nowrap; }
 .cc-card-head h2 .od-icon { --od-icon-size: 23px; color: var(--accent); }
@@ -278,6 +304,14 @@
 .cc-camera-name .od-icon { --od-icon-size: 15px; }
 .cc-camera-state { top: 38px; left: 8px; color: var(--gold); border-radius: 3px; }
 .cc-camera-foot { left: 0; right: 0; bottom: 0; font-size: 11px; }
+:root[data-command-center][data-theme] :is(#layer-controls, .cc-camera-name, .cc-camera-state, .cc-camera-foot) {
+  background: var(--cc-card-fill);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+:root[data-command-center][data-theme] :is(#layer-controls, .cc-camera) {
+  box-shadow: var(--cc-glass-shadow);
+}
 :root[data-command-center] .footer { display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; padding: 0 4px !important; min-height: 0; margin: 0; font-size: 11px; }
 :root[data-command-center] .footer-left, :root[data-command-center] .footer .notice { font-size: 11px !important; }
 :root[data-command-center] .preview-popover { font-size: 16px; }
